@@ -12,8 +12,17 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+      mono: ['JetBrains Mono', 'monospace'],
+    },
     extend: {
       colors: {
+        waveform: {
+          DEFAULT: "hsl(var(--waveform))",
+          progress: "hsl(var(--waveform-progress))",
+        },
+        playhead: "hsl(var(--playhead))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
