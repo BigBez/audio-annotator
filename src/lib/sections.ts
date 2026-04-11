@@ -36,3 +36,12 @@ export function formatTime(seconds: number): string {
   const secs = Math.floor(seconds % 60);
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
+
+export function parseTime(str: string): number | null {
+  const match = str.trim().match(/^(\d{1,3}):(\d{2})$/);
+  if (!match) return null;
+  const mins = parseInt(match[1], 10);
+  const secs = parseInt(match[2], 10);
+  if (secs >= 60) return null;
+  return mins * 60 + secs;
+}
