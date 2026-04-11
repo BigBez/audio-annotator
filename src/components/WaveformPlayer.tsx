@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Square } from 'lucide-react';
 import { formatTime, type Section } from '@/lib/sections';
 
 interface WaveformPlayerProps {
@@ -9,6 +9,7 @@ interface WaveformPlayerProps {
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
+  onStop: () => void;
   wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
 }
 
@@ -18,6 +19,7 @@ export default function WaveformPlayer({
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
+  onStop,
   wavesurferRef,
 }: WaveformPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,6 @@ export default function WaveformPlayer({
 
       {/* Section regions overlay + waveform */}
       <div className="relative">
-        {/* Section color bar */}
         {duration > 0 && sections.length > 0 && (
           <div className="absolute top-0 left-0 right-0 h-1.5 z-10 rounded-t overflow-hidden flex">
             {sections.map(s => (
@@ -106,7 +107,14 @@ export default function WaveformPlayer({
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={onStop}
+          className="flex items-center justify-center h-9 w-9 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-opacity"
+          title="Stop"
+        >
+          <Square className="h-4 w-4" />
+        </button>
         <button
           onClick={togglePlay}
           className="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
