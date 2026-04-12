@@ -483,18 +483,34 @@ export default function Index() {
         if (e.code === 'Comma') {
           const newEnd = section.end - 0.1;
           if (newEnd <= section.start) return;
-          handleBoundaryEdit(selId, 'end', newEnd);
+          pushUndo();
+          setSections(prev => {
+            const updated = [...prev];
+            updated[idx] = { ...updated[idx], end: newEnd };
+            if (idx < prev.length - 1) {
+              updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+            }
+            boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
+            return updated;
+          });
         } else {
           if (idx === secs.length - 1) return;
           const newEnd = section.end + 0.1;
           if (newEnd >= secs[idx + 1].end) return;
-          handleBoundaryEdit(selId, 'end', newEnd);
+          pushUndo();
+          setSections(prev => {
+            const updated = [...prev];
+            updated[idx] = { ...updated[idx], end: newEnd };
+            updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+            boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
+            return updated;
+          });
         }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, handleSectionSelect, handleBoundaryEdit, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
