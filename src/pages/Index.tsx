@@ -342,37 +342,33 @@ export default function Index() {
         e.preventDefault();
         handleUndo();
       }
-      // Arrow key navigation
-      if (e.code === 'ArrowLeft' && !e.shiftKey) {
+      // Arrow key navigation — helper to find section index at time t
+      if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && !e.shiftKey) {
         e.preventDefault();
         const ws = wavesurferRef.current;
         if (!ws || sectionsRef.current.length === 0) return;
         const t = ws.getCurrentTime();
         const secs = sectionsRef.current;
-        // Find current section
-        let curIdx = secs.findIndex(s => t >= s.start && t < s.end);
-        if (curIdx === -1 && t >= secs[secs.length - 1].end) curIdx = secs.length - 1;
-        if (curIdx === -1) return;
-        // If not at start of current section, go to its start; else go to previous
-        const threshold = 0.05;
-        if (t - secs[curIdx].start > threshold) {
-          ws.seekTo(secs[curIdx].start / ws.getDuration());
-        } else if (curIdx > 0) {
-          ws.seekTo(secs[curIdx - 1].start / ws.getDuration());
+        const dur = ws.getDuration();
+        // Find current section: last section whose start <= t
+        let curIdx = -1;
+        for (let i = secs.length - 1; i >= 0; i--) {
+          if (t >= secs[i].start - 0.01) { curIdx = i; break; }
         }
-        return;
-      }
-      if (e.code === 'ArrowRight' && !e.shiftKey) {
-        e.preventDefault();
-        const ws = wavesurferRef.current;
-        if (!ws || sectionsRef.current.length === 0) return;
-        const t = ws.getCurrentTime();
-        const secs = sectionsRef.current;
-        let curIdx = secs.findIndex(s => t >= s.start && t < s.end);
-        if (curIdx === -1 && t >= secs[secs.length - 1].end) curIdx = secs.length - 1;
         if (curIdx === -1) return;
-        if (curIdx < secs.length - 1) {
-          ws.seekTo(secs[curIdx + 1].start / ws.getDuration());
+
+        if (e.code === 'ArrowLeft') {
+          // Within 2s of section start → go to previous; otherwise go to this section's start
+          if (t - secs[curIdx].start <= 2) {
+            if (curIdx > 0) ws.seekTo(secs[curIdx - 1].start / dur);
+          } else {
+            ws.seekTo(secs[curIdx].start / dur);
+          }
+        } else {
+          // ArrowRight: go to next section start
+          if (curIdx < secs.length - 1) {
+            ws.seekTo(secs[curIdx + 1].start / dur);
+          }
         }
         return;
       }
