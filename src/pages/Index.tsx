@@ -289,23 +289,48 @@ export default function Index() {
   const handleSplitModular = useCallback(() => {
     const selId = selectedSectionIdRef.current;
     const cmdIds = cmdSelectedIdsRef.current;
+    const isMulti = cmdIds.size > 0;
+
     const allIds = new Set<string>();
     if (selId) allIds.add(selId);
     cmdIds.forEach(id => allIds.add(id));
     if (allIds.size === 0) return;
 
-    const groupsToRemove = new Set<string>();
-    for (const id of allIds) {
-      const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(id));
-      if (group) groupsToRemove.add(group.id);
+    // Multi-select: dissolve entire groups
+    if (isMulti) {
+      const groupsToRemove = new Set<string>();
+      for (const id of allIds) {
+        const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(id));
+        if (group) groupsToRemove.add(group.id);
+      }
+      if (groupsToRemove.size === 0) return;
+      pushUndo();
+      setModularGraph(prev => ({
+        ...prev,
+        joinedGroups: prev.joinedGroups.filter(g => !groupsToRemove.has(g.id)),
+      }));
+      return;
     }
-    if (groupsToRemove.size === 0) return;
+
+    // Single select: smart boundary split
+    if (!selId) return;
+    const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(selId));
+    if (!group) return;
 
     pushUndo();
-    setModularGraph(prev => ({
-      ...prev,
-      joinedGroups: prev.joinedGroups.filter(g => !groupsToRemove.has(g.id)),
-    }));
+    const idx = group.sectionIds.indexOf(selId);
+    const before = group.sectionIds.slice(0, idx);
+    const after = group.sectionIds.slice(idx + 1);
+
+    const newGroups = modularGraphRef.current.joinedGroups.filter(g => g.id !== group.id);
+    if (before.length >= 2) {
+      newGroups.push({ id: `mg-group-${Date.now()}-a`, label: group.label, sectionIds: before });
+    }
+    if (after.length >= 2) {
+      newGroups.push({ id: `mg-group-${Date.now()}-b`, label: group.label, sectionIds: after });
+    }
+
+    setModularGraph(prev => ({ ...prev, joinedGroups: newGroups }));
   }, [pushUndo]);
 
   // Undo
