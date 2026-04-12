@@ -835,7 +835,6 @@ export default function Index() {
                 onSelectedIdChange={handleSectionSelect}
                 onCmdSelect={handleCmdSelect}
                 onSeek={handleSeek}
-                onColorChange={handleColorChange}
                 onLabelChange={handleLabelChange}
                 onModularStateChange={setModularGraph}
                 pushUndo={pushUndo}
