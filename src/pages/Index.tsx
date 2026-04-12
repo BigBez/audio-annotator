@@ -284,6 +284,7 @@ export default function Index() {
             label: s.label,
             color: s.color,
             notes: s.content?.notes ?? s.notes ?? '',
+            bars: s.bars ?? null,
           }));
           setSections(imported);
           if (imported.length > 0) {
@@ -462,6 +463,11 @@ export default function Index() {
     pushUndo();
     setVcuSpans(prev => prev.filter(v => v.id !== id));
     setSelectedVcuId(null);
+  }, []);
+
+  const handleBarsChange = useCallback((id: string, bars: string | null) => {
+    pushUndo();
+    setSections(prev => prev.map(s => s.id === id ? { ...s, bars } : s));
   }, []);
 
   const handleSeek = useCallback((time: number) => {
