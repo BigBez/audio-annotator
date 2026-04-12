@@ -45,6 +45,8 @@ export default function Index() {
     // Prevent duplicate or near-duplicate boundaries
     if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
 
+    pushUndo();
+
     boundaries.push(time);
 
     // Rebuild sections: always cover 0 to duration
@@ -113,6 +115,7 @@ export default function Index() {
   }, [handleBoundary]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
+    pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
   }, []);
 
@@ -121,6 +124,7 @@ export default function Index() {
   }, []);
 
   const handleDeleteSection = useCallback((id: string) => {
+    pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === id);
       if (idx === -1) return prev;
@@ -149,6 +153,7 @@ export default function Index() {
   }, []);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
+    pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === sectionId);
       if (idx === -1) return prev;
