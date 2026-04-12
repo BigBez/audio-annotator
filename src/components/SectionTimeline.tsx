@@ -118,7 +118,7 @@ export default function SectionTimeline({
                     e.stopPropagation();
                     if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
                     if (e.key === 'Escape') setEditingLabel(null);
-                  }
+                  }}
                   onBlur={() => { onLabelChange(section.id, labelValue); setEditingLabel(null); }}
                   onClick={e => e.stopPropagation()}
                   className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24"
@@ -131,7 +131,7 @@ export default function SectionTimeline({
                   setSelectedId(section.id);
                   setEditingLabel(section.id);
                   setLabelValue(section.label);
-                }
+                }}
                 className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
               >
                 {section.label}
