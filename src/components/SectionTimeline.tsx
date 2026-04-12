@@ -95,6 +95,7 @@ export default function SectionTimeline({
               <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                 <input
                   autoFocus
+                  onFocus={(e) => e.target.select()}
                   value={labelValue}
                   onChange={e => setLabelValue(e.target.value)}
                   onKeyDown={e => {
