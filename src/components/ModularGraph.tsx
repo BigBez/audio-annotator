@@ -41,6 +41,7 @@ interface ModularGraphProps {
   cmdSelectedIds: Set<string>;
   modularState: ModularGraphState;
   onSelectedIdChange: (id: string | null) => void;
+  onShiftSelect: (id: string) => void;
   onCmdSelect: (id: string) => void;
   onSeek: (time: number) => void;
   onLabelChange: (id: string, label: string) => void;
@@ -55,6 +56,7 @@ export default function ModularGraph({
   cmdSelectedIds,
   modularState,
   onSelectedIdChange,
+  onShiftSelect,
   onCmdSelect,
   onSeek,
   onLabelChange,
@@ -159,7 +161,9 @@ export default function ModularGraph({
           }}
           onClick={(e) => {
             e.stopPropagation();
-            if (e.metaKey || e.ctrlKey) {
+            if (e.shiftKey) {
+              onShiftSelect(section.id);
+            } else if (e.metaKey || e.ctrlKey) {
               onCmdSelect(section.id);
             } else {
               onSelectedIdChange(section.id);

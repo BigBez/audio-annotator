@@ -833,6 +833,7 @@ export default function Index() {
                 cmdSelectedIds={cmdSelectedIds}
                 modularState={modularGraph}
                 onSelectedIdChange={handleSectionSelect}
+                onShiftSelect={handleShiftSelect}
                 onCmdSelect={handleCmdSelect}
                 onSeek={handleSeek}
                 onLabelChange={handleLabelChange}
