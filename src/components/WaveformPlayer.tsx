@@ -96,21 +96,19 @@ export default function WaveformPlayer({
       </div>
 
       {/* Waveform with collapse toggle */}
-      <div className="relative">
-        {!waveformCollapsed && (
-          <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2" />
-        )}
-        {waveformCollapsed && (
-          <div ref={containerRef} className="hidden" />
-        )}
+      <div>
         <button
           onClick={() => setWaveformCollapsed(prev => !prev)}
-          className="absolute -bottom-1 right-1 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors z-10"
+          className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors mb-1"
           title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
-          style={waveformCollapsed ? { position: 'relative', bottom: 'auto', right: 'auto', float: 'right' } : {}}
         >
           {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
         </button>
+        <div
+          ref={containerRef}
+          className="rounded-lg bg-secondary/50 p-2"
+          style={{ display: waveformCollapsed ? 'none' : undefined }}
+        />
       </div>
     </div>
   );
