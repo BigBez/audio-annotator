@@ -25,7 +25,7 @@ interface SectionTimelineProps {
   onColorChange: (ids: string[], color: string) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
-  barCountLayer?: React.ReactNode;
+  
 }
 
 export default function SectionTimeline({
@@ -50,7 +50,7 @@ export default function SectionTimeline({
   onColorChange,
   onVcuLabelChange,
   onDeleteVcu,
-  barCountLayer,
+  
 }: SectionTimelineProps) {
   const setSelectedId = onSelectedIdChange;
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
@@ -92,54 +92,13 @@ export default function SectionTimeline({
 
   return (
     <div className="space-y-2" onClick={e => e.stopPropagation()}>
-      {/* VCU lane */}
-      {vcuSpans.length > 0 && (
-        <div className="relative w-full h-8 mb-1">
-          {vcuSpans.map(vcu => {
-            const range = getVcuTimeRange(vcu);
-            if (range.end <= range.start) return null;
-            const leftPercent = (range.start / duration) * 100;
-            const widthPercent = ((range.end - range.start) / duration) * 100;
-            const isSelected = selectedVcuId === vcu.id;
-
-            return (
-              <div
-                key={vcu.id}
-                className="absolute cursor-pointer"
-                style={{
-                  left: `${leftPercent}%`,
-                  width: `${widthPercent}%`,
-                  top: 0,
-                  bottom: 0,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectedVcuIdChange(isSelected ? null : vcu.id);
-                }}
-              >
-                <div className="absolute inset-x-0 top-0 flex justify-center">
-                  <span className={`text-[10px] font-mono select-none ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
-                    {vcu.label}
-                  </span>
-                </div>
-                <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                  <line x1="0" y1="14" x2="0" y2="100%" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
-                  <line x1="100%" y1="14" x2="100%" y2="100%" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
-                  <line x1="0" y1="14" x2="100%" y2="14" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
-                </svg>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
       {/* Multi-select hint */}
       {isMultiSelect && (
         <p className="text-[11px] font-mono text-muted-foreground text-center">Press G to group selected sections</p>
       )}
 
       {/* Horizontal timeline blocks */}
-      <div className="flex w-full h-10 rounded-lg overflow-hidden border border-border">
+      <div className="flex w-full h-7 rounded-lg overflow-hidden border border-border">
         {sections.map(section => {
           const widthPercent = ((section.end - section.start) / duration) * 100;
           const isActive = activeSection?.id === section.id;
@@ -183,7 +142,46 @@ export default function SectionTimeline({
         })}
       </div>
 
-      {barCountLayer}
+      {/* VCU lane — below section blocks, brackets open downward */}
+      {vcuSpans.length > 0 && (
+        <div className="relative w-full h-4 -mt-2">
+          {vcuSpans.map(vcu => {
+            const range = getVcuTimeRange(vcu);
+            if (range.end <= range.start) return null;
+            const leftPercent = (range.start / duration) * 100;
+            const widthPercent = ((range.end - range.start) / duration) * 100;
+            const isSelected = selectedVcuId === vcu.id;
+
+            return (
+              <div
+                key={vcu.id}
+                className="absolute cursor-pointer"
+                style={{
+                  left: `${leftPercent}%`,
+                  width: `${widthPercent}%`,
+                  top: 0,
+                  bottom: 0,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectedVcuIdChange(isSelected ? null : vcu.id);
+                }}
+              >
+                <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                  <line x1="0" y1="0" x2="0" y2="10" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
+                  <line x1="100%" y1="0" x2="100%" y2="10" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
+                  <line x1="0" y1="10" x2="100%" y2="10" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
+                </svg>
+                <div className="absolute inset-x-0 bottom-[-12px] flex justify-center">
+                  <span className={`text-[10px] font-mono select-none ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {vcu.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Detail strip — State B: multi-select */}
       {isMultiSelect && (
