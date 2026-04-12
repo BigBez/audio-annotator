@@ -14,15 +14,13 @@ export interface VcuSpan {
   sectionIds: string[];
 }
 
-const SECTION_COLORS = [
-  'hsl(168, 50%, 45%)',
-  'hsl(200, 50%, 50%)',
-  'hsl(280, 40%, 55%)',
-  'hsl(340, 50%, 50%)',
-  'hsl(30, 60%, 50%)',
-  'hsl(140, 40%, 45%)',
-  'hsl(220, 50%, 55%)',
-  'hsl(0, 50%, 50%)',
+export const SECTION_COLORS = [
+  '#C94040', '#E8826A',
+  '#D4A017', '#E8C96A',
+  '#3A6EA8', '#6A9EC4',
+  '#3A8A4A', '#7AB87A',
+  '#C45C8A', '#E8A0BC',
+  '#6A3A9A', '#9A6AC4',
 ];
 
 export function getColorForIndex(index: number): string {
