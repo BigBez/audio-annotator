@@ -6,6 +6,11 @@ import SectionTimeline from '@/components/SectionTimeline';
 import { type Section, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music } from 'lucide-react';
 
+interface UndoSnapshot {
+  sections: Section[];
+  boundaries: number[];
+}
+
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
@@ -16,6 +21,18 @@ export default function Index() {
   const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
+  const undoStackRef = useRef<UndoSnapshot[]>([]);
+
+  const pushUndo = useCallback(() => {
+    undoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
+  }, []);
+
+  // Keep a ref to current sections so pushUndo always reads latest
+  const sectionsRef = useRef<Section[]>([]);
+  sectionsRef.current = sections;
 
   const handleBoundary = useCallback(() => {
     const ws = wavesurferRef.current;
@@ -27,6 +44,8 @@ export default function Index() {
 
     // Prevent duplicate or near-duplicate boundaries
     if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
+
+    pushUndo();
 
     boundaries.push(time);
 
@@ -76,6 +95,14 @@ export default function Index() {
     setSelectedSectionId(id);
   }, []);
 
+  // Undo
+  const handleUndo = useCallback(() => {
+    const snapshot = undoStackRef.current.pop();
+    if (!snapshot) return;
+    setSections(snapshot.sections);
+    boundariesRef.current = snapshot.boundaries;
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -90,12 +117,17 @@ export default function Index() {
         e.preventDefault();
         handleBoundary();
       }
+      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary]);
+  }, [handleBoundary, handleUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
+    pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
   }, []);
 
@@ -104,6 +136,7 @@ export default function Index() {
   }, []);
 
   const handleDeleteSection = useCallback((id: string) => {
+    pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === id);
       if (idx === -1) return prev;
@@ -132,6 +165,7 @@ export default function Index() {
   }, []);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
+    pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === sectionId);
       if (idx === -1) return prev;
@@ -192,6 +226,7 @@ export default function Index() {
     setCurrentTime(0);
     setDuration(0);
     boundariesRef.current = [];
+    undoStackRef.current = [];
   }, []);
 
   return (
