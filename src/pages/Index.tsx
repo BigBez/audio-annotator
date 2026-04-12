@@ -221,6 +221,7 @@ export default function Index() {
                 onDelete={handleDeleteSection}
                 onBoundaryEdit={handleBoundaryEdit}
                 onNotesChange={handleNotesChange}
+              />
             )}
           </>
         )}
