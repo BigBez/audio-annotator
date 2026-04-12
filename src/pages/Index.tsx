@@ -64,38 +64,44 @@ export default function Index() {
     const time = ws.getCurrentTime();
     const dur = ws.getDuration();
     if (dur <= 0) return;
-    const boundaries = boundariesRef.current;
-
-    if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
 
     pushUndo();
 
-    boundaries.push(time);
+    setSections(prev => {
+      // If no sections exist yet, create the first two from the split at time
+      if (prev.length === 0) {
+        if (time < 0.01 || dur - time < 0.01) return prev;
+        return [
+          { id: crypto.randomUUID(), start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null },
+          { id: crypto.randomUUID(), start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null },
+        ];
+      }
 
-    const allPoints = [0, ...boundaries, dur];
-    const unique = [...new Set(allPoints)].sort((a, b) => a - b);
+      // Find the section containing the playhead
+      const idx = prev.findIndex(s => time >= s.start && time < s.end);
+      if (idx === -1) return prev;
 
-    const newSections: Section[] = [];
-    for (let i = 0; i < unique.length - 1; i++) {
-      if (unique[i + 1] - unique[i] < 0.01) continue;
-      newSections.push({
-        id: `section-${i}`,
-        start: unique[i],
-        end: unique[i + 1],
-        label: getDefaultLabel(i),
-        color: getColorForIndex(i),
+      const target = prev[idx];
+      // Don't split if too close to existing boundaries
+      if (time - target.start < 0.05 || target.end - time < 0.05) return prev;
+
+      const totalSections = prev.length + 1;
+      const newIndex = totalSections - 1;
+
+      const firstHalf: Section = { ...target, end: time };
+      const secondHalf: Section = {
+        id: crypto.randomUUID(),
+        start: time,
+        end: target.end,
+        label: getDefaultLabel(newIndex),
+        color: getColorForIndex(newIndex),
         notes: '',
         bars: null,
-      });
-    }
-    setSections(prev => {
-      return newSections.map((ns, i) => {
-        const existing = prev.find(p => p.id === ns.id);
-        if (existing) {
-          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars, color: existing.color };
-        }
-        return ns;
-      });
+      };
+
+      const result = [...prev];
+      result.splice(idx, 1, firstHalf, secondHalf);
+      return result;
     });
   }, []);
 
