@@ -234,7 +234,8 @@ export default function ModularGraph({
                 <div className="flex justify-center mb-1">
                   {editingGroupLabel === group.id ? (
                     <input
-                      autoFocus
+                     onMouseDown={e => e.stopPropagation()}
+                     autoFocus
                       onFocus={e => e.target.select()}
                       value={groupLabelValue}
                       onChange={e => setGroupLabelValue(e.target.value)}
@@ -264,8 +265,10 @@ export default function ModularGraph({
                     />
                   ) : (
                     <button
+                      onMouseDown={e => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         setEditingGroupLabel(group.id);
                         setGroupLabelValue(group.label);
                       }}
