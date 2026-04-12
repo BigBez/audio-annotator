@@ -12,6 +12,7 @@ interface UndoSnapshot {
   sections: Section[];
   boundaries: number[];
   vcuSpans: VcuSpan[];
+  cmdSelectedIds: string[];
 }
 
 export default function Index() {
@@ -24,25 +25,30 @@ export default function Index() {
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [selectedVcuId, setSelectedVcuId] = useState<string | null>(null);
   const [shiftSelectedIds, setShiftSelectedIds] = useState<Set<string>>(new Set());
+  const [cmdSelectedIds, setCmdSelectedIds] = useState<Set<string>>(new Set());
   const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
   const undoStackRef = useRef<UndoSnapshot[]>([]);
   const redoStackRef = useRef<UndoSnapshot[]>([]);
 
-  // Keep refs to current state for undo snapshots
   const sectionsRef = useRef<Section[]>([]);
   sectionsRef.current = sections;
   const vcuSpansRef = useRef<VcuSpan[]>([]);
   vcuSpansRef.current = vcuSpans;
   const selectedSectionIdRef = useRef<string | null>(null);
   selectedSectionIdRef.current = selectedSectionId;
+  const cmdSelectedIdsRef = useRef<Set<string>>(new Set());
+  cmdSelectedIdsRef.current = cmdSelectedIds;
+  const shiftSelectedIdsRef = useRef<Set<string>>(new Set());
+  shiftSelectedIdsRef.current = shiftSelectedIds;
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
+      cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
     });
     redoStackRef.current = [];
   }, []);
@@ -81,7 +87,7 @@ export default function Index() {
       return newSections.map((ns, i) => {
         const existing = prev.find(p => p.id === ns.id);
         if (existing) {
-          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars };
+          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars, color: existing.color };
         }
         return ns;
       });
@@ -107,6 +113,7 @@ export default function Index() {
     setSelectedSectionId(id);
     setSelectedVcuId(null);
     setShiftSelectedIds(new Set());
+    setCmdSelectedIds(new Set());
     shiftAnchorRef.current = null;
   }, []);
 
@@ -114,17 +121,18 @@ export default function Index() {
     setSelectedVcuId(id);
     setSelectedSectionId(null);
     setShiftSelectedIds(new Set());
+    setCmdSelectedIds(new Set());
     shiftAnchorRef.current = null;
   }, []);
 
   const shiftAnchorRef = useRef<string | null>(null);
 
   const handleShiftSelect = useCallback((id: string) => {
+    setCmdSelectedIds(new Set());
     const currentSections = sectionsRef.current;
     const clickedIdx = currentSections.findIndex(s => s.id === id);
     if (clickedIdx === -1) return;
 
-    // Determine anchor: use explicit shift anchor, or fall back to regular selection
     let anchorId = shiftAnchorRef.current;
     if (!anchorId) {
       anchorId = selectedSectionIdRef.current;
@@ -132,7 +140,6 @@ export default function Index() {
     if (anchorId) {
       shiftAnchorRef.current = anchorId;
     } else {
-      // No anchor at all — this click becomes the anchor
       shiftAnchorRef.current = id;
       setShiftSelectedIds(new Set([id]));
       setSelectedSectionId(null);
@@ -160,28 +167,44 @@ export default function Index() {
     setSelectedVcuId(null);
   }, []);
 
-  // Create VCU group from shift-selected sections
+  const handleCmdSelect = useCallback((id: string) => {
+    setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
+    setCmdSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+    setSelectedSectionId(null);
+    setSelectedVcuId(null);
+  }, []);
+
+  // Create VCU group from shift or cmd selected sections
   const handleCreateGroup = useCallback(() => {
-    const ids = shiftSelectedIds;
-    if (ids.size === 0) return;
+    const shift = shiftSelectedIdsRef.current;
+    const cmd = cmdSelectedIdsRef.current;
+    const allSelected = new Set([...shift, ...cmd]);
+    if (allSelected.size === 0) return;
 
     const currentSections = sectionsRef.current;
-    // Get indices of selected sections
-    const indices = Array.from(ids).map(id => currentSections.findIndex(s => s.id === id)).filter(i => i !== -1).sort((a, b) => a - b);
+    const indices = Array.from(allSelected).map(id => currentSections.findIndex(s => s.id === id)).filter(i => i !== -1).sort((a, b) => a - b);
 
     if (indices.length === 0) return;
 
-    // Check contiguity
-    for (let i = 1; i < indices.length; i++) {
-      if (indices[i] !== indices[i - 1] + 1) {
-        toast({ title: 'Cannot group', description: 'Selected sections must be contiguous.' });
-        return;
-      }
-    }
-
     pushUndo();
 
-    const sectionIds = indices.map(i => currentSections[i].id);
+    // Fill the contiguous range between outermost selected sections
+    const minIdx = indices[0];
+    const maxIdx = indices[indices.length - 1];
+    const sectionIds: string[] = [];
+    for (let i = minIdx; i <= maxIdx; i++) {
+      sectionIds.push(currentSections[i].id);
+    }
+
     const vcuNumber = vcuSpansRef.current.length + 1;
     const newVcu: VcuSpan = {
       id: `vcu-${Date.now()}`,
@@ -191,10 +214,11 @@ export default function Index() {
 
     setVcuSpans(prev => [...prev, newVcu]);
     setShiftSelectedIds(new Set());
+    setCmdSelectedIds(new Set());
     shiftAnchorRef.current = null;
     setSelectedVcuId(null);
     setSelectedSectionId(sectionIds[0]);
-  }, [shiftSelectedIds, pushUndo]);
+  }, [pushUndo]);
 
   // Undo
   const handleUndo = useCallback(() => {
@@ -204,10 +228,12 @@ export default function Index() {
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
+      cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
     setVcuSpans(snapshot.vcuSpans);
+    setCmdSelectedIds(new Set(snapshot.cmdSelectedIds));
   }, []);
 
   // Redo
@@ -218,10 +244,12 @@ export default function Index() {
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
+      cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
     setVcuSpans(snapshot.vcuSpans);
+    setCmdSelectedIds(new Set(snapshot.cmdSelectedIds));
   }, []);
 
   // Save analysis as JSON
@@ -293,7 +321,6 @@ export default function Index() {
           } else {
             boundariesRef.current = [];
           }
-          // Import VCU spans
           if (data.vcuSpans && Array.isArray(data.vcuSpans)) {
             setVcuSpans(data.vcuSpans.map((v: any) => ({
               id: v.id,
@@ -345,6 +372,13 @@ export default function Index() {
     }, 0);
   }, [pushUndo]);
 
+  const handleColorChange = useCallback((ids: string[], color: string) => {
+    pushUndo();
+    setSections(prev => prev.map(s => ids.includes(s.id) ? { ...s, color } : s));
+    setShiftSelectedIds(new Set());
+    setCmdSelectedIds(new Set());
+  }, [pushUndo]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -375,7 +409,6 @@ export default function Index() {
         e.preventDefault();
         handleUndo();
       }
-      // Arrow key navigation — helper to find section index at time t
       if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && !e.shiftKey) {
         e.preventDefault();
         const ws = wavesurferRef.current;
@@ -383,7 +416,6 @@ export default function Index() {
         const t = ws.getCurrentTime();
         const secs = sectionsRef.current;
         const dur = ws.getDuration();
-        // Find current section: last section whose start <= t
         let curIdx = -1;
         for (let i = secs.length - 1; i >= 0; i--) {
           if (t >= secs[i].start - 0.01) { curIdx = i; break; }
@@ -526,10 +558,11 @@ export default function Index() {
     undoStackRef.current = [];
     redoStackRef.current = [];
     setShiftSelectedIds(new Set());
+    setCmdSelectedIds(new Set());
   }, []);
 
   return (
-    <div className="min-h-screen bg-background" onClick={() => { setSelectedSectionId(null); setSelectedVcuId(null); setShiftSelectedIds(new Set()); }}>
+    <div className="min-h-screen bg-background" onClick={() => { setSelectedSectionId(null); setSelectedVcuId(null); setShiftSelectedIds(new Set()); setCmdSelectedIds(new Set()); }}>
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -582,15 +615,18 @@ export default function Index() {
                   selectedId={selectedSectionId}
                   selectedVcuId={selectedVcuId}
                   shiftSelectedIds={shiftSelectedIds}
+                  cmdSelectedIds={cmdSelectedIds}
                   isPlaying={isPlaying}
                   onSelectedIdChange={handleSectionSelect}
                   onSelectedVcuIdChange={handleVcuSelect}
                   onShiftSelect={handleShiftSelect}
+                  onCmdSelect={handleCmdSelect}
                   onSeek={handleSeek}
                   onLabelChange={handleLabelChange}
                   onDelete={handleDeleteSection}
                   onBoundaryEdit={handleBoundaryEdit}
                   onNotesChange={handleNotesChange}
+                  onColorChange={handleColorChange}
                   onVcuLabelChange={handleVcuLabelChange}
                   onDeleteVcu={handleDeleteVcu}
                   barCountLayer={sections.length > 0 ? (
