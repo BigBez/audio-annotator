@@ -295,11 +295,13 @@ export default function Index() {
   // Split modular graph joined group (S key)
   const handleSplitModular = useCallback(() => {
     const selId = selectedSectionIdRef.current;
+    const shiftIds = shiftSelectedIdsRef.current;
     const cmdIds = cmdSelectedIdsRef.current;
-    const isMulti = cmdIds.size > 0;
+    const isMulti = cmdIds.size > 0 || shiftIds.size > 0;
 
     const allIds = new Set<string>();
     if (selId) allIds.add(selId);
+    shiftIds.forEach(id => allIds.add(id));
     cmdIds.forEach(id => allIds.add(id));
     if (allIds.size === 0) return;
 
