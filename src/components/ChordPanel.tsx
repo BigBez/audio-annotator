@@ -7,40 +7,44 @@ interface ChordPanelProps {
   onChange: (chordLines: ChordLine[]) => void;
 }
 
-const barlineStyle: React.CSSProperties = { width: '1px', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', height: '14px' };
-const dotStyle: React.CSSProperties = { width: '3px', height: '3px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.3)' };
+const barlineColor = 'rgba(255,255,255,0.3)';
+const dotStyle: React.CSSProperties = { width: '3px', height: '3px', borderRadius: '50%', backgroundColor: barlineColor };
 
 function RepeatDots() {
   return (
-    <span className="inline-flex flex-col items-center justify-center gap-[3px]" style={{ height: '14px' }}>
+    <span className="inline-flex flex-col items-center justify-center gap-[3px] self-stretch">
       <span style={dotStyle} />
       <span style={dotStyle} />
     </span>
   );
 }
 
-const barlinePatterns: [string, (isPrefix: boolean) => React.ReactNode][] = [
-  ['|:', (isPrefix) => (
-    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[2px]`}>
-      <span style={barlineStyle} />
+function BarLine() {
+  return <span className="self-stretch" style={{ width: '1px', backgroundColor: barlineColor }} />;
+}
+
+const barlinePatterns: [string, () => React.ReactNode][] = [
+  ['|:', () => (
+    <span className="shrink-0 inline-flex items-stretch gap-[2px]">
+      <BarLine />
       <RepeatDots />
     </span>
   )],
-  [':|', (isPrefix) => (
-    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[2px]`}>
+  [':|', () => (
+    <span className="shrink-0 inline-flex items-stretch gap-[2px]">
       <RepeatDots />
-      <span style={barlineStyle} />
+      <BarLine />
     </span>
   )],
-  ['||', (isPrefix) => (
-    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[1px]`}>
-      <span style={barlineStyle} />
-      <span style={barlineStyle} />
+  ['||', () => (
+    <span className="shrink-0 inline-flex items-stretch gap-[1px]">
+      <BarLine />
+      <BarLine />
     </span>
   )],
-  ['|', (isPrefix) => (
-    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center`}>
-      <span style={barlineStyle} />
+  ['|', () => (
+    <span className="shrink-0 inline-flex items-stretch">
+      <BarLine />
     </span>
   )],
 ];
@@ -51,9 +55,9 @@ function renderBarline(text: string, isPrefix: boolean): React.ReactNode | null 
     if (t.startsWith(symbol)) {
       const rest = t.slice(symbol.length).trim();
       return (
-        <span className={`shrink-0 inline-flex items-center ${isPrefix ? 'mr-1' : 'ml-1'}`}>
-          {render(false)}
-          {rest && <span className="text-xs font-mono text-muted-foreground ml-0.5">{rest}</span>}
+        <span className={`shrink-0 inline-flex items-stretch ${isPrefix ? 'mr-1' : 'ml-1'}`}>
+          {render()}
+          {rest && <span className="text-xs font-mono text-muted-foreground flex items-center ml-1.5">{rest}</span>}
         </span>
       );
     }
