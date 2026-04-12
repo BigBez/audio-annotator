@@ -831,6 +831,7 @@ export default function Index() {
                 currentTime={currentTime}
                 selectedId={selectedSectionId}
                 cmdSelectedIds={cmdSelectedIds}
+                shiftSelectedIds={shiftSelectedIds}
                 modularState={modularGraph}
                 onSelectedIdChange={handleSectionSelect}
                 onShiftSelect={handleShiftSelect}

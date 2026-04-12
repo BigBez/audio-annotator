@@ -39,6 +39,7 @@ interface ModularGraphProps {
   currentTime: number;
   selectedId: string | null;
   cmdSelectedIds: Set<string>;
+  shiftSelectedIds: Set<string>;
   modularState: ModularGraphState;
   onSelectedIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
