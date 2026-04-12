@@ -338,10 +338,20 @@ export default function Index() {
         e.preventDefault();
         handleUndo();
       }
+      if (e.code === 'Backspace' || e.code === 'Delete') {
+        e.preventDefault();
+        if (selectedSectionId) {
+          handleDeleteSection(selectedSectionId);
+          setSelectedSectionId(null);
+        } else if (selectedVcuId) {
+          handleDeleteVcu(selectedVcuId);
+          setSelectedVcuId(null);
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, selectedSectionId, selectedVcuId, handleDeleteSection, handleDeleteVcu]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
