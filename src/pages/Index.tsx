@@ -95,6 +95,14 @@ export default function Index() {
     setSelectedSectionId(id);
   }, []);
 
+  // Undo
+  const handleUndo = useCallback(() => {
+    const snapshot = undoStackRef.current.pop();
+    if (!snapshot) return;
+    setSections(snapshot.sections);
+    boundariesRef.current = snapshot.boundaries;
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -109,10 +117,14 @@ export default function Index() {
         e.preventDefault();
         handleBoundary();
       }
+      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary]);
+  }, [handleBoundary, handleUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
