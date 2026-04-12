@@ -70,12 +70,6 @@ export default function SectionTimeline({
                 setSelectedId(isSelected ? null : section.id);
                 onSeek(section.start);
               }}
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                setSelectedId(section.id);
-                setEditingLabel(section.id);
-                setLabelValue(section.label);
-              }}
             >
               {editingLabel === section.id ? (
                 <input
