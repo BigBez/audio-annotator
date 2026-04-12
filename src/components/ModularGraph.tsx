@@ -54,7 +54,7 @@ export default function ModularGraph({
   onModularStateChange,
   pushUndo,
 }: ModularGraphProps) {
-  const { boxWidths, joinedGroups, barCounts } = modularState;
+  const { boxWidths, joinedGroups, barCounts, boxColors } = modularState;
 
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
   const [labelValue, setLabelValue] = useState('');
@@ -67,6 +67,7 @@ export default function ModularGraph({
 
   const getWidth = (id: string) => boxWidths[id] ?? 120;
   const getBarCount = (id: string) => barCounts[id] ?? '';
+  const getBoxColor = (id: string) => boxColors[id] ?? DEFAULT_BOX_COLOR;
 
   const getGroupForSection = (sectionId: string) =>
     joinedGroups.find(g => g.sectionIds.includes(sectionId));
@@ -140,7 +141,7 @@ export default function ModularGraph({
           style={{
             width: w,
             height: 64,
-            backgroundColor: section.color,
+            backgroundColor: getBoxColor(section.id),
             boxShadow: isCmdSelected
               ? 'inset 0 0 0 2px rgba(255,255,255,0.9)'
               : isSelected
@@ -159,7 +160,7 @@ export default function ModularGraph({
             }
           }}
         >
-          <span className="text-xs font-display font-medium text-white truncate px-1 drop-shadow-sm select-none">
+          <span className="text-xs font-display font-medium text-foreground truncate px-1 drop-shadow-sm select-none">
             {section.label}
           </span>
         </div>
@@ -297,7 +298,12 @@ export default function ModularGraph({
       {/* Modular detail strip */}
       {isMultiSelect && (
         <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
-          <ColorPickerButton mode="multi" onColorSelect={(color) => onColorChange(Array.from(multiSelectedIds), color)} />
+          <ColorPickerButton mode="multi" onColorSelect={(color) => {
+            pushUndo();
+            const next = { ...boxColors };
+            multiSelectedIds.forEach(id => { next[id] = color; });
+            updateState({ boxColors: next });
+          }} />
           <span className="text-xs text-muted-foreground">{multiSelectedIds.size} boxes selected</span>
           <div className="flex-1" />
           <label className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -410,7 +416,10 @@ export default function ModularGraph({
             selectedGroup ? 'rounded-b-md border-t-0 pl-5' : 'rounded-md'
           }`}>
             {selectedGroup && <span className="text-muted-foreground text-xs">↳</span>}
-            <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+            <ColorPickerButton mode="single" activeColor={getBoxColor(selectedSection.id)} onColorSelect={(color) => {
+              pushUndo();
+              updateState({ boxColors: { ...boxColors, [selectedSection.id]: color } });
+            }} />
             {editingLabel === selectedSection.id ? (
               <input
                 autoFocus
