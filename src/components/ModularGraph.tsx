@@ -298,204 +298,215 @@ export default function ModularGraph({
         </div>
       </div>
 
-      {/* Modular detail strip */}
-      {isMultiSelect && (
-        <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
-          <ColorPickerButton mode="multi" onColorSelect={(color) => {
-            pushUndo();
-            const next = { ...boxColors };
-            multiSelectedIds.forEach(id => { next[id] = color; });
-            updateState({ boxColors: next });
-          }} />
-          <span className="text-xs text-muted-foreground">{multiSelectedIds.size} boxes selected</span>
-          <div className="flex-1" />
-          <label className="text-[10px] text-muted-foreground flex items-center gap-1">
-            W
-            <input
-              type="text"
-              value={editingWidth ? widthInputValue : String(currentWidthValue)}
-              onFocus={e => {
-                setEditingWidth(true);
-                setWidthInputValue(String(currentWidthValue));
-                e.target.select();
-              }}
-              onChange={e => setWidthInputValue(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  const v = parseInt(widthInputValue, 10);
-                  if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
-                  setEditingWidth(false);
-                  (e.target as HTMLInputElement).blur();
-                }
-                if (e.key === 'Escape') {
-                  setEditingWidth(false);
-                  (e.target as HTMLInputElement).blur();
-                }
-                e.stopPropagation();
-              }}
-              onBlur={() => {
-                if (editingWidth) {
-                  const v = parseInt(widthInputValue, 10);
-                  if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
-                  setEditingWidth(false);
-                }
-              }}
-              className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
-              onClick={e => e.stopPropagation()}
-            />
-          </label>
-        </div>
-      )}
-
-      {!isMultiSelect && selectedSection && (
-        <div className="mt-2 space-y-0">
-          {/* Group label row if in a joined group */}
-          {selectedGroup && (
-            <div className="flex items-center gap-3 px-2 py-1 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
-              {editingGroupLabel === selectedGroup.id ? (
-                <input
-                  autoFocus
-                  onFocus={e => e.target.select()}
-                  value={groupLabelValue}
-                  onChange={e => setGroupLabelValue(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      pushUndo();
-                      updateState({
-                        joinedGroups: joinedGroups.map(g =>
-                          g.id === selectedGroup.id ? { ...g, label: groupLabelValue } : g
-                        ),
-                      });
-                      setEditingGroupLabel(null);
-                    }
-                    if (e.key === 'Escape') setEditingGroupLabel(null);
-                  }}
-                  onBlur={() => {
+      {/* Collapsible modular detail strip */}
+      {(isMultiSelect || selectedSection) && (
+        <div className="mt-2 rounded-md bg-card border border-border overflow-hidden">
+          <button
+            onClick={() => setDetailsOpen(prev => !prev)}
+            className={`w-full flex items-center gap-1.5 px-3 ${detailsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+          >
+            <ChevronRight className={`h-3 w-3 transition-transform ${detailsOpen ? 'rotate-90' : ''}`} />
+            <span className={detailsOpen ? 'text-[10px] text-muted-foreground' : ''}>Details</span>
+          </button>
+          {detailsOpen && (
+            <div className="px-2 pb-1.5">
+              {isMultiSelect && (
+                <div className="flex items-center gap-3 py-1 text-sm font-mono">
+                  <ColorPickerButton mode="multi" onColorSelect={(color) => {
                     pushUndo();
-                    updateState({
-                      joinedGroups: joinedGroups.map(g =>
-                        g.id === selectedGroup.id ? { ...g, label: groupLabelValue } : g
-                      ),
-                    });
-                    setEditingGroupLabel(null);
-                  }}
-                  className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20"
-                  onClick={e => e.stopPropagation()}
-                />
-              ) : (
-                <button
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setEditingGroupLabel(selectedGroup.id);
-                    setGroupLabelValue(selectedGroup.label);
-                  }}
-                  className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
-                >
-                  {selectedGroup.label}
-                  <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
-                </button>
+                    const next = { ...boxColors };
+                    multiSelectedIds.forEach(id => { next[id] = color; });
+                    updateState({ boxColors: next });
+                  }} />
+                  <span className="text-xs text-muted-foreground">{multiSelectedIds.size} boxes selected</span>
+                  <div className="flex-1" />
+                  <label className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    W
+                    <input
+                      type="text"
+                      value={editingWidth ? widthInputValue : String(currentWidthValue)}
+                      onFocus={e => {
+                        setEditingWidth(true);
+                        setWidthInputValue(String(currentWidthValue));
+                        e.target.select();
+                      }}
+                      onChange={e => setWidthInputValue(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const v = parseInt(widthInputValue, 10);
+                          if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
+                          setEditingWidth(false);
+                          (e.target as HTMLInputElement).blur();
+                        }
+                        if (e.key === 'Escape') {
+                          setEditingWidth(false);
+                          (e.target as HTMLInputElement).blur();
+                        }
+                        e.stopPropagation();
+                      }}
+                      onBlur={() => {
+                        if (editingWidth) {
+                          const v = parseInt(widthInputValue, 10);
+                          if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
+                          setEditingWidth(false);
+                        }
+                      }}
+                      className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
+                      onClick={e => e.stopPropagation()}
+                    />
+                  </label>
+                </div>
               )}
-              <span className="text-muted-foreground text-xs">|</span>
-              <span className="text-[10px] text-muted-foreground">{selectedGroup.sectionIds.length} sections</span>
-              <div className="flex-1" />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  pushUndo();
-                  updateState({
-                    joinedGroups: joinedGroups.filter(g => g.id !== selectedGroup.id),
-                  });
-                }}
-                className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
-                title="Split group"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
+
+              {!isMultiSelect && selectedSection && (
+                <div className="space-y-0">
+                  {selectedGroup && (
+                    <div className="flex items-center gap-3 py-1 text-sm font-mono">
+                      {editingGroupLabel === selectedGroup.id ? (
+                        <input
+                          autoFocus
+                          onFocus={e => e.target.select()}
+                          value={groupLabelValue}
+                          onChange={e => setGroupLabelValue(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              pushUndo();
+                              updateState({
+                                joinedGroups: joinedGroups.map(g =>
+                                  g.id === selectedGroup.id ? { ...g, label: groupLabelValue } : g
+                                ),
+                              });
+                              setEditingGroupLabel(null);
+                            }
+                            if (e.key === 'Escape') setEditingGroupLabel(null);
+                          }}
+                          onBlur={() => {
+                            pushUndo();
+                            updateState({
+                              joinedGroups: joinedGroups.map(g =>
+                                g.id === selectedGroup.id ? { ...g, label: groupLabelValue } : g
+                              ),
+                            });
+                            setEditingGroupLabel(null);
+                          }}
+                          className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20"
+                          onClick={e => e.stopPropagation()}
+                        />
+                      ) : (
+                        <button
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setEditingGroupLabel(selectedGroup.id);
+                            setGroupLabelValue(selectedGroup.label);
+                          }}
+                          className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
+                        >
+                          {selectedGroup.label}
+                          <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                        </button>
+                      )}
+                      <span className="text-muted-foreground text-xs">|</span>
+                      <span className="text-[10px] text-muted-foreground">{selectedGroup.sectionIds.length} sections</span>
+                      <div className="flex-1" />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          pushUndo();
+                          updateState({
+                            joinedGroups: joinedGroups.filter(g => g.id !== selectedGroup.id),
+                          });
+                        }}
+                        className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
+                        title="Split group"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                  <div className={`flex items-center gap-3 py-1 text-sm font-mono ${selectedGroup ? 'pl-3' : ''}`}>
+                    {selectedGroup && <span className="text-muted-foreground text-xs">↳</span>}
+                    <ColorPickerButton mode="single" activeColor={getBoxColor(selectedSection.id)} onColorSelect={(color) => {
+                      pushUndo();
+                      updateState({ boxColors: { ...boxColors, [selectedSection.id]: color } });
+                    }} />
+                    {editingLabel === selectedSection.id ? (
+                      <textarea
+                        autoFocus
+                        onFocus={e => e.target.select()}
+                        value={labelValue}
+                        onChange={e => setLabelValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && e.shiftKey) {
+                            e.preventDefault();
+                            const target = e.target as HTMLTextAreaElement;
+                            const start = target.selectionStart ?? labelValue.length;
+                            const end = target.selectionEnd ?? labelValue.length;
+                            const newVal = labelValue.slice(0, start) + '\n' + labelValue.slice(end);
+                            setLabelValue(newVal);
+                            requestAnimationFrame(() => { target.setSelectionRange(start + 1, start + 1); });
+                          } else if (e.key === 'Enter') { e.preventDefault(); onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
+                          if (e.key === 'Escape') setEditingLabel(null);
+                        }}
+                        onBlur={() => { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }}
+                        className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24 resize-none"
+                        rows={2}
+                        onClick={e => e.stopPropagation()}
+                      />
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingLabel(selectedSection.id);
+                          setLabelValue(selectedSection.label);
+                        }}
+                        className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
+                      >
+                        {selectedSection.label}
+                        <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      </button>
+                    )}
+                    <div className="flex-1" />
+                    <label className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      W
+                      <input
+                        type="text"
+                        value={editingWidth ? widthInputValue : String(getWidth(selectedSection.id))}
+                        onFocus={e => {
+                          setEditingWidth(true);
+                          setWidthInputValue(String(getWidth(selectedSection.id)));
+                          e.target.select();
+                        }}
+                        onChange={e => setWidthInputValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            const v = parseInt(widthInputValue, 10);
+                            if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
+                            setEditingWidth(false);
+                            (e.target as HTMLInputElement).blur();
+                          }
+                          if (e.key === 'Escape') {
+                            setEditingWidth(false);
+                            (e.target as HTMLInputElement).blur();
+                          }
+                          e.stopPropagation();
+                        }}
+                        onBlur={() => {
+                          if (editingWidth) {
+                            const v = parseInt(widthInputValue, 10);
+                            if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
+                            setEditingWidth(false);
+                          }
+                        }}
+                        className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
+                        onClick={e => e.stopPropagation()}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-          {/* Section detail row */}
-          <div className={`flex items-center gap-3 px-2 py-1.5 bg-card border border-border text-sm font-mono ${
-            selectedGroup ? 'rounded-b-md border-t-0 pl-5' : 'rounded-md'
-          }`}>
-            {selectedGroup && <span className="text-muted-foreground text-xs">↳</span>}
-            <ColorPickerButton mode="single" activeColor={getBoxColor(selectedSection.id)} onColorSelect={(color) => {
-              pushUndo();
-              updateState({ boxColors: { ...boxColors, [selectedSection.id]: color } });
-            }} />
-            {editingLabel === selectedSection.id ? (
-              <textarea
-                autoFocus
-                onFocus={e => e.target.select()}
-                value={labelValue}
-                onChange={e => setLabelValue(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && e.shiftKey) {
-                    e.preventDefault();
-                    const target = e.target as HTMLTextAreaElement;
-                    const start = target.selectionStart ?? labelValue.length;
-                    const end = target.selectionEnd ?? labelValue.length;
-                    const newVal = labelValue.slice(0, start) + '\n' + labelValue.slice(end);
-                    setLabelValue(newVal);
-                    requestAnimationFrame(() => { target.setSelectionRange(start + 1, start + 1); });
-                  } else if (e.key === 'Enter') { e.preventDefault(); onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
-                  if (e.key === 'Escape') setEditingLabel(null);
-                }}
-                onBlur={() => { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }}
-                className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24 resize-none"
-                rows={2}
-                onClick={e => e.stopPropagation()}
-              />
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingLabel(selectedSection.id);
-                  setLabelValue(selectedSection.label);
-                }}
-                className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
-              >
-                {selectedSection.label}
-                <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
-              </button>
-            )}
-            <div className="flex-1" />
-            <label className="text-[10px] text-muted-foreground flex items-center gap-1">
-              W
-              <input
-                type="text"
-                value={editingWidth ? widthInputValue : String(getWidth(selectedSection.id))}
-                onFocus={e => {
-                  setEditingWidth(true);
-                  setWidthInputValue(String(getWidth(selectedSection.id)));
-                  e.target.select();
-                }}
-                onChange={e => setWidthInputValue(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    const v = parseInt(widthInputValue, 10);
-                    if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
-                    setEditingWidth(false);
-                    (e.target as HTMLInputElement).blur();
-                  }
-                  if (e.key === 'Escape') {
-                    setEditingWidth(false);
-                    (e.target as HTMLInputElement).blur();
-                  }
-                  e.stopPropagation();
-                }}
-                onBlur={() => {
-                  if (editingWidth) {
-                    const v = parseInt(widthInputValue, 10);
-                    if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
-                    setEditingWidth(false);
-                  }
-                }}
-                className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
-                onClick={e => e.stopPropagation()}
-              />
-            </label>
-          </div>
         </div>
       )}
     </div>
