@@ -58,6 +58,24 @@ export default function Index() {
     });
   }, []);
 
+  // Playhead-driven selection
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (manualSelectRef.current) {
+      manualSelectRef.current = false;
+      return;
+    }
+    const active = sections.find(s => currentTime >= s.start && currentTime < s.end);
+    if (active && active.id !== selectedSectionId) {
+      setSelectedSectionId(active.id);
+    }
+  }, [currentTime, isPlaying, sections, selectedSectionId]);
+
+  const handleSectionSelect = useCallback((id: string | null) => {
+    manualSelectRef.current = true;
+    setSelectedSectionId(id);
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -218,6 +236,8 @@ export default function Index() {
                 sections={sections}
                 currentTime={currentTime}
                 duration={duration}
+                selectedId={selectedSectionId}
+                onSelectedIdChange={handleSectionSelect}
                 onSeek={handleSeek}
                 onLabelChange={handleLabelChange}
                 onDelete={handleDeleteSection}
