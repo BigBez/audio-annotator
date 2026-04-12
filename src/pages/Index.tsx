@@ -101,6 +101,22 @@ export default function Index() {
   const handleUndo = useCallback(() => {
     const snapshot = undoStackRef.current.pop();
     if (!snapshot) return;
+    redoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
+    setSections(snapshot.sections);
+    boundariesRef.current = snapshot.boundaries;
+  }, []);
+
+  // Redo
+  const handleRedo = useCallback(() => {
+    const snapshot = redoStackRef.current.pop();
+    if (!snapshot) return;
+    undoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
   }, []);
@@ -119,7 +135,10 @@ export default function Index() {
         e.preventDefault();
         handleBoundary();
       }
-      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+        e.preventDefault();
+        handleRedo();
+      } else if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
       }
