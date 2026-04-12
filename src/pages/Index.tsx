@@ -472,6 +472,41 @@ export default function Index() {
           setSelectedVcuId(null);
         }
       }
+      if (e.code === 'Comma' || e.code === 'Period') {
+        e.preventDefault();
+        const selId = selectedSectionIdRef.current;
+        if (!selId) return;
+        const secs = sectionsRef.current;
+        const idx = secs.findIndex(s => s.id === selId);
+        if (idx === -1) return;
+        const section = secs[idx];
+        if (e.code === 'Comma') {
+          const newEnd = section.end - 0.1;
+          if (newEnd <= section.start) return;
+          pushUndo();
+          setSections(prev => {
+            const updated = [...prev];
+            updated[idx] = { ...updated[idx], end: newEnd };
+            if (idx < prev.length - 1) {
+              updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+            }
+            boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
+            return updated;
+          });
+        } else {
+          if (idx === secs.length - 1) return;
+          const newEnd = section.end + 0.1;
+          if (newEnd >= secs[idx + 1].end) return;
+          pushUndo();
+          setSections(prev => {
+            const updated = [...prev];
+            updated[idx] = { ...updated[idx], end: newEnd };
+            updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+            boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
+            return updated;
+          });
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
