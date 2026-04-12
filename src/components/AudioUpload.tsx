@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react';
 
 interface AudioUploadProps {
   onFileLoaded: (file: File) => void;
+  onJsonImport?: (file: File) => void;
 }
 
 const ACCEPTED = ['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/x-flac', 'audio/mp4', 'audio/x-m4a'];

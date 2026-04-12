@@ -70,11 +70,33 @@ export default function SectionTimeline({
                 setSelectedId(isSelected ? null : section.id);
                 onSeek(section.start);
               }}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                setSelectedId(section.id);
+                setEditingLabel(section.id);
+                setLabelValue(section.label);
+              }}
             >
-              <span className="text-xs font-display font-medium text-white truncate px-1 drop-shadow-sm select-none">
-                {section.label}
-              </span>
-
+              {editingLabel === section.id ? (
+                <input
+                  autoFocus
+                  value={labelValue}
+                  onChange={e => setLabelValue(e.target.value)}
+                  onFocus={e => e.target.select()}
+                  onKeyDown={e => {
+                    e.stopPropagation();
+                    if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
+                    if (e.key === 'Escape') setEditingLabel(null);
+                  }}
+                  onBlur={() => { onLabelChange(section.id, labelValue); setEditingLabel(null); }}
+                  onClick={e => e.stopPropagation()}
+                  className="bg-secondary/80 border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20 text-center"
+                />
+              ) : (
+                <span className="text-xs font-display font-medium text-white truncate px-1 drop-shadow-sm select-none">
+                  {section.label}
+                </span>
+              )}
             </div>
           );
         })}
@@ -97,6 +119,7 @@ export default function SectionTimeline({
                   autoFocus
                   value={labelValue}
                   onChange={e => setLabelValue(e.target.value)}
+                  onFocus={e => e.target.select()}
                   onKeyDown={e => {
                     if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
                     if (e.key === 'Escape') setEditingLabel(null);
