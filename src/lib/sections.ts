@@ -5,6 +5,7 @@ export interface Section {
   label: string;
   color: string;
   notes: string;
+  bars: string | null;
 }
 
 export interface VcuSpan {

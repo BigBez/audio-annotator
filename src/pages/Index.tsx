@@ -3,6 +3,7 @@ import WaveSurfer from 'wavesurfer.js';
 import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
+import BarCountLayer from '@/components/BarCountLayer';
 import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -73,13 +74,14 @@ export default function Index() {
         label: getDefaultLabel(i),
         color: getColorForIndex(i),
         notes: '',
+        bars: null,
       });
     }
     setSections(prev => {
       return newSections.map((ns, i) => {
         const existing = prev.find(p => p.id === ns.id);
         if (existing) {
-          return { ...ns, label: existing.label, notes: existing.notes };
+          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars };
         }
         return ns;
       });
@@ -237,6 +239,7 @@ export default function Index() {
         content: {
           notes: s.notes,
         },
+        bars: s.bars,
       })),
       vcuSpans: vcuSpans.map(v => ({
         id: v.id,
@@ -282,6 +285,7 @@ export default function Index() {
             label: s.label,
             color: s.color,
             notes: s.content?.notes ?? s.notes ?? '',
+            bars: s.bars ?? null,
           }));
           setSections(imported);
           if (imported.length > 0) {
@@ -462,6 +466,11 @@ export default function Index() {
     setSelectedVcuId(null);
   }, []);
 
+  const handleBarsChange = useCallback((id: string, bars: string | null) => {
+    pushUndo();
+    setSections(prev => prev.map(s => s.id === id ? { ...s, bars } : s));
+  }, []);
+
   const handleSeek = useCallback((time: number) => {
     if (duration > 0) {
       wavesurferRef.current?.seekTo(time / duration);
@@ -535,26 +544,35 @@ export default function Index() {
             />
 
             {duration > 0 && (
-              <SectionTimeline
-                sections={sections}
-                vcuSpans={vcuSpans}
-                currentTime={currentTime}
-                duration={duration}
-                selectedId={selectedSectionId}
-                selectedVcuId={selectedVcuId}
-                shiftSelectedIds={shiftSelectedIds}
-                isPlaying={isPlaying}
-                onSelectedIdChange={handleSectionSelect}
-                onSelectedVcuIdChange={handleVcuSelect}
-                onShiftSelect={handleShiftSelect}
-                onSeek={handleSeek}
-                onLabelChange={handleLabelChange}
-                onDelete={handleDeleteSection}
-                onBoundaryEdit={handleBoundaryEdit}
-                onNotesChange={handleNotesChange}
-                onVcuLabelChange={handleVcuLabelChange}
-                onDeleteVcu={handleDeleteVcu}
-              />
+              <>
+                <SectionTimeline
+                  sections={sections}
+                  vcuSpans={vcuSpans}
+                  currentTime={currentTime}
+                  duration={duration}
+                  selectedId={selectedSectionId}
+                  selectedVcuId={selectedVcuId}
+                  shiftSelectedIds={shiftSelectedIds}
+                  isPlaying={isPlaying}
+                  onSelectedIdChange={handleSectionSelect}
+                  onSelectedVcuIdChange={handleVcuSelect}
+                  onShiftSelect={handleShiftSelect}
+                  onSeek={handleSeek}
+                  onLabelChange={handleLabelChange}
+                  onDelete={handleDeleteSection}
+                  onBoundaryEdit={handleBoundaryEdit}
+                  onNotesChange={handleNotesChange}
+                  onVcuLabelChange={handleVcuLabelChange}
+                  onDeleteVcu={handleDeleteVcu}
+                />
+                {sections.length > 0 && (
+                  <BarCountLayer
+                    sections={sections}
+                    duration={duration}
+                    onBarsChange={handleBarsChange}
+                  />
+                )}
+              </>
             )}
           </>
         )}
