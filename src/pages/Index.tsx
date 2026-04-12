@@ -12,6 +12,8 @@ export default function Index() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
 
