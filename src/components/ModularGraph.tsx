@@ -25,14 +25,6 @@ export const DEFAULT_MODULAR_STATE: ModularGraphState = {
 
 const DEFAULT_BOX_COLOR = '#7B8A8A';
 
-function getContrastText(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  const L = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
-  return L > 0.4 ? '#1a1a1a' : '#ffffff';
-}
 
 interface ModularGraphProps {
   sections: Section[];
@@ -76,7 +68,7 @@ export default function ModularGraph({
   const [widthInputValue, setWidthInputValue] = useState('');
   const [editingWidth, setEditingWidth] = useState(false);
 
-  const getWidth = (id: string) => boxWidths[id] ?? 120;
+  const getWidth = (id: string) => boxWidths[id] ?? 80;
   const getBarCount = (id: string) => barCounts[id] ?? '';
   const getBoxColor = (id: string) => boxColors[id] ?? DEFAULT_BOX_COLOR;
 
@@ -174,7 +166,7 @@ export default function ModularGraph({
             }
           }}
         >
-          <span className="text-xs font-display font-medium truncate px-1 drop-shadow-sm select-none" style={{ color: getContrastText(getBoxColor(section.id)) }}>
+          <span className="text-xs font-display font-medium truncate px-1 drop-shadow-sm select-none" style={{ color: '#ffffff' }}>
             {section.label}
           </span>
         </div>
@@ -235,7 +227,7 @@ export default function ModularGraph({
 
       {/* Boxes row with group labels */}
       <div className="overflow-x-auto">
-        <div className="flex items-end" style={{ gap: 0, justifyContent: 'center' }}>
+        <div className="flex items-end" style={{ gap: 0, justifyContent: 'flex-start' }}>
           {renderItems.map((item) => {
             if (item.type === 'single') {
               return (
