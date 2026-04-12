@@ -391,16 +391,19 @@ export default function Index() {
         if (curIdx === -1) return;
 
         if (e.code === 'ArrowLeft') {
-          // Within 2s of section start → go to previous; otherwise go to this section's start
           if (t - secs[curIdx].start <= 2) {
-            if (curIdx > 0) ws.seekTo(secs[curIdx - 1].start / dur);
+            if (curIdx > 0) {
+              ws.seekTo(secs[curIdx - 1].start / dur);
+              handleSectionSelect(secs[curIdx - 1].id);
+            }
           } else {
             ws.seekTo(secs[curIdx].start / dur);
+            handleSectionSelect(secs[curIdx].id);
           }
         } else {
-          // ArrowRight: go to next section start
           if (curIdx < secs.length - 1) {
             ws.seekTo(secs[curIdx + 1].start / dur);
+            handleSectionSelect(secs[curIdx + 1].id);
           }
         }
         return;
@@ -436,7 +439,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
