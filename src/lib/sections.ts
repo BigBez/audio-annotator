@@ -1,3 +1,15 @@
+export interface ChordBar {
+  id: string;
+  content: string;
+}
+
+export interface ChordLine {
+  id: string;
+  prefix: string;
+  bars: ChordBar[];
+  suffix: string;
+}
+
 export interface Section {
   id: string;
   start: number;
@@ -6,6 +18,7 @@ export interface Section {
   color: string;
   notes: string;
   bars: string | null;
+  chordLines: ChordLine[];
 }
 
 export interface VcuSpan {
