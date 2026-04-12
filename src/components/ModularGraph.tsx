@@ -58,6 +58,8 @@ export default function ModularGraph({
   const [groupLabelValue, setGroupLabelValue] = useState('');
   const [editingBarCount, setEditingBarCount] = useState<string | null>(null);
   const [barCountValue, setBarCountValue] = useState('');
+  const [widthInputValue, setWidthInputValue] = useState('');
+  const [editingWidth, setEditingWidth] = useState(false);
 
   const getWidth = (id: string) => boxWidths[id] ?? 120;
   const getBarCount = (id: string) => barCounts[id] ?? '';
@@ -295,13 +297,33 @@ export default function ModularGraph({
           <label className="text-[10px] text-muted-foreground flex items-center gap-1">
             W
             <input
-              type="number"
-              min={60}
-              max={400}
-              value={currentWidthValue}
-              onChange={e => {
-                const v = parseInt(e.target.value, 10);
-                if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
+              type="text"
+              value={editingWidth ? widthInputValue : String(currentWidthValue)}
+              onFocus={e => {
+                setEditingWidth(true);
+                setWidthInputValue(String(currentWidthValue));
+                e.target.select();
+              }}
+              onChange={e => setWidthInputValue(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  const v = parseInt(widthInputValue, 10);
+                  if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
+                  setEditingWidth(false);
+                  (e.target as HTMLInputElement).blur();
+                }
+                if (e.key === 'Escape') {
+                  setEditingWidth(false);
+                  (e.target as HTMLInputElement).blur();
+                }
+                e.stopPropagation();
+              }}
+              onBlur={() => {
+                if (editingWidth) {
+                  const v = parseInt(widthInputValue, 10);
+                  if (!isNaN(v)) handleWidthChange(Array.from(multiSelectedIds), v);
+                  setEditingWidth(false);
+                }
               }}
               className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
               onClick={e => e.stopPropagation()}
@@ -413,13 +435,33 @@ export default function ModularGraph({
             <label className="text-[10px] text-muted-foreground flex items-center gap-1">
               W
               <input
-                type="number"
-                min={60}
-                max={400}
-                value={getWidth(selectedSection.id)}
-                onChange={e => {
-                  const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
+                type="text"
+                value={editingWidth ? widthInputValue : String(getWidth(selectedSection.id))}
+                onFocus={e => {
+                  setEditingWidth(true);
+                  setWidthInputValue(String(getWidth(selectedSection.id)));
+                  e.target.select();
+                }}
+                onChange={e => setWidthInputValue(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    const v = parseInt(widthInputValue, 10);
+                    if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
+                    setEditingWidth(false);
+                    (e.target as HTMLInputElement).blur();
+                  }
+                  if (e.key === 'Escape') {
+                    setEditingWidth(false);
+                    (e.target as HTMLInputElement).blur();
+                  }
+                  e.stopPropagation();
+                }}
+                onBlur={() => {
+                  if (editingWidth) {
+                    const v = parseInt(widthInputValue, 10);
+                    if (!isNaN(v)) handleWidthChange([selectedSection.id], v);
+                    setEditingWidth(false);
+                  }
                 }}
                 className="w-14 bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
                 onClick={e => e.stopPropagation()}
