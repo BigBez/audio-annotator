@@ -5,6 +5,7 @@ import { formatTime, type Section } from '@/lib/sections';
 
 interface WaveformPlayerProps {
   file: File;
+  sections: Section[];
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
@@ -14,6 +15,7 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
+  sections,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
@@ -101,7 +103,30 @@ export default function WaveformPlayer({
       </div>
 
       {/* Waveform */}
-      <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2" />
+      <div ref={containerRef} className="rounded-t-lg bg-secondary/50 p-2" />
+
+      {/* Section color strip */}
+      {sections.length > 0 && duration > 0 && (
+        <div className="flex w-full rounded-b-lg overflow-hidden" style={{ height: 20 }}>
+          {sections.map(section => {
+            const widthPct = ((section.end - section.start) / duration) * 100;
+            return (
+              <div
+                key={section.id}
+                className="flex items-center justify-center overflow-hidden"
+                style={{ width: `${widthPct}%`, backgroundColor: section.color }}
+              >
+                <span
+                  className="text-white font-medium leading-none truncate px-0.5"
+                  style={{ fontSize: 10 }}
+                >
+                  {section.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
