@@ -167,7 +167,7 @@ export default function ModularGraph({
             }
           }}
         >
-          <span className="text-xs font-display font-medium text-foreground truncate px-1 drop-shadow-sm select-none">
+          <span className="text-xs font-display font-medium truncate px-1 drop-shadow-sm select-none" style={{ color: getContrastText(getBoxColor(section.id)) }}>
             {section.label}
           </span>
         </div>
