@@ -139,6 +139,7 @@ export default function ModularGraph({
     const isActive = activeSection?.id === section.id;
     const isSelected = selectedId === section.id;
     const isCmdSelected = cmdSelectedIds.has(section.id);
+    const isShiftSelected = shiftSelectedIds.has(section.id);
 
     return (
       <div
@@ -153,7 +154,7 @@ export default function ModularGraph({
             width: w,
             height: 64,
             backgroundColor: getBoxColor(section.id),
-            boxShadow: isCmdSelected
+            boxShadow: isCmdSelected || isShiftSelected
               ? 'inset 0 0 0 2px rgba(255,255,255,0.9)'
               : isSelected
               ? 'inset 0 0 0 2px rgba(255,255,255,0.8)'
