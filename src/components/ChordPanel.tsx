@@ -111,7 +111,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   <input
                     value={line.prefix}
                     onChange={e => updatePrefix(lineIdx, e.target.value)}
-                    placeholder="…"
+                    placeholder="e.g. |:"
                     className="w-12 shrink-0 bg-secondary border border-border rounded px-1 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center mr-1"
                   />
                 ) : (
@@ -125,7 +125,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   {line.bars.map((bar, barIdx) => (
                     <div key={bar.id} className="flex items-stretch">
                       {barIdx > 0 && (
-                        <div className="w-px bg-border self-stretch" />
+                        <div className="self-stretch" style={{ width: '1px', backgroundColor: 'rgba(255,255,255,0.3)' }} />
                       )}
                       {editMode ? (
                         <input
@@ -140,8 +140,13 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                           className="min-w-[80px] bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
                         />
                       ) : (
-                        <div className="min-w-[80px] flex items-center justify-center px-1.5 py-0.5">
-                          <span className="text-xs font-mono text-foreground text-center">{bar.content || '\u00A0'}</span>
+                        <div className="min-w-[80px] flex items-center justify-around px-1.5 py-0.5">
+                          {bar.content.trim() && bar.content.trim().includes(' ')
+                            ? bar.content.trim().split(/\s+/).map((token, ti) => (
+                                <span key={ti} className="text-xs font-mono text-foreground text-center">{token}</span>
+                              ))
+                            : <span className="text-xs font-mono text-foreground text-center">{bar.content || '\u00A0'}</span>
+                          }
                         </div>
                       )}
                     </div>
@@ -153,7 +158,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   <input
                     value={line.suffix}
                     onChange={e => updateSuffix(lineIdx, e.target.value)}
-                    placeholder="…"
+                    placeholder="e.g. :| x2"
                     className="w-12 shrink-0 bg-secondary border border-border rounded px-1 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center ml-1"
                   />
                 ) : (
