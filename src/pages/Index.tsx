@@ -603,7 +603,6 @@ export default function Index() {
 
             <WaveformPlayer
               file={file}
-              sections={sections}
               onTimeUpdate={setCurrentTime}
               onDurationReady={setDuration}
               onPlayStateChange={setIsPlaying}
