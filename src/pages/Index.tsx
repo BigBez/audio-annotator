@@ -472,6 +472,25 @@ export default function Index() {
           setSelectedVcuId(null);
         }
       }
+      if (e.code === 'Comma' || e.code === 'Period') {
+        e.preventDefault();
+        const selId = selectedSectionIdRef.current;
+        if (!selId) return;
+        const secs = sectionsRef.current;
+        const idx = secs.findIndex(s => s.id === selId);
+        if (idx === -1) return;
+        const section = secs[idx];
+        if (e.code === 'Comma') {
+          const newEnd = section.end - 0.1;
+          if (newEnd <= section.start) return;
+          handleBoundaryEdit(selId, 'end', newEnd);
+        } else {
+          if (idx === secs.length - 1) return;
+          const newEnd = section.end + 0.1;
+          if (newEnd >= secs[idx + 1].end) return;
+          handleBoundaryEdit(selId, 'end', newEnd);
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
