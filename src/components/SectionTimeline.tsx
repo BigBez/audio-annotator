@@ -63,6 +63,9 @@ export default function SectionTimeline({
   const [timeValue, setTimeValue] = useState('');
   const [editingVcuLabel, setEditingVcuLabel] = useState<string | null>(null);
   const [vcuLabelValue, setVcuLabelValue] = useState('');
+  const [chordsOpen, setChordsOpen] = useState(false);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
 
   if (sections.length === 0) {
     return (
