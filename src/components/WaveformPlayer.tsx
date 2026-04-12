@@ -5,7 +5,6 @@ import { formatTime, type Section } from '@/lib/sections';
 
 interface WaveformPlayerProps {
   file: File;
-  sections: Section[];
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
@@ -15,7 +14,6 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
-  sections,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,

@@ -7,6 +7,7 @@ interface SectionTimelineProps {
   currentTime: number;
   duration: number;
   selectedId: string | null;
+  isPlaying: boolean;
   onSelectedIdChange: (id: string | null) => void;
   onSeek: (time: number) => void;
   onLabelChange: (id: string, label: string) => void;
@@ -20,6 +21,7 @@ export default function SectionTimeline({
   currentTime,
   duration,
   selectedId,
+  isPlaying,
   onSelectedIdChange,
   onSeek,
   onLabelChange,
