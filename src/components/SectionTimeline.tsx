@@ -25,7 +25,7 @@ interface SectionTimelineProps {
   onColorChange: (ids: string[], color: string) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
-  barCountLayer?: React.ReactNode;
+  
 }
 
 export default function SectionTimeline({
@@ -50,7 +50,7 @@ export default function SectionTimeline({
   onColorChange,
   onVcuLabelChange,
   onDeleteVcu,
-  barCountLayer,
+  
 }: SectionTimelineProps) {
   const setSelectedId = onSelectedIdChange;
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
