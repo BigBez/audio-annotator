@@ -22,6 +22,7 @@ export default function Index() {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
   const undoStackRef = useRef<UndoSnapshot[]>([]);
+  const redoStackRef = useRef<UndoSnapshot[]>([]);
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
