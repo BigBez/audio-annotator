@@ -102,7 +102,7 @@ export default function SectionTimeline({
         if (!section) return null;
 
         return (
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono flex-1">
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono flex-1" onClick={e => e.stopPropagation()}>
             {/* Color dot */}
             <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: section.color }} />
 
