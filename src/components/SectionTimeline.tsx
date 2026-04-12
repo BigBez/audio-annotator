@@ -301,19 +301,66 @@ export default function SectionTimeline({
         </div>
       )}
 
-      {/* Notes panel */}
-      <div className="rounded-lg border border-border bg-card p-3 h-32 overflow-y-auto">
-        {selectedId && selectedSection ? (
-          <textarea
-            value={selectedSection.notes}
-            onChange={e => onNotesChange(selectedId, e.target.value)}
-            placeholder="Add notes for this section…"
-            className="w-full h-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none"
-          />
-        ) : (
-          <p className="text-muted-foreground text-sm font-mono">Select a section to add notes.</p>
-        )}
-      </div>
+      {/* Collapsible panels */}
+      {selectedId && selectedSection && (
+        <div className="space-y-0">
+          {/* Chords panel */}
+          <div className="rounded-t-lg border border-border bg-card overflow-hidden">
+            <button
+              onClick={() => setChordsOpen(prev => !prev)}
+              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
+              Chords
+            </button>
+            {chordsOpen && (
+              <div className="px-3 pb-2">
+                <ChordPanel
+                  chordLines={selectedSection.chordLines}
+                  onChange={lines => onChordLinesChange(selectedId, lines)}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Lyrics panel */}
+          <div className="border-x border-b border-border bg-card overflow-hidden">
+            <button
+              onClick={() => setLyricsOpen(prev => !prev)}
+              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
+              Lyrics
+            </button>
+            {lyricsOpen && (
+              <div className="px-3 pb-2">
+                <p className="text-xs text-muted-foreground/60 font-mono italic">Coming soon</p>
+              </div>
+            )}
+          </div>
+
+          {/* Notes panel */}
+          <div className="rounded-b-lg border-x border-b border-border bg-card overflow-hidden">
+            <button
+              onClick={() => setNotesOpen(prev => !prev)}
+              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronRight className={`h-3 w-3 transition-transform ${notesOpen ? 'rotate-90' : ''}`} />
+              Notes
+            </button>
+            {notesOpen && (
+              <div className="px-3 pb-2">
+                <textarea
+                  value={selectedSection.notes}
+                  onChange={e => onNotesChange(selectedId, e.target.value)}
+                  placeholder="Add notes for this section…"
+                  className="w-full h-28 bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 

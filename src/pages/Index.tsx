@@ -678,6 +678,11 @@ export default function Index() {
     setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
   }, []);
 
+  const handleChordLinesChange = useCallback((id: string, chordLines: import('@/lib/sections').ChordLine[]) => {
+    pushUndo();
+    setSections(prev => prev.map(s => s.id === id ? { ...s, chordLines } : s));
+  }, [pushUndo]);
+
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
     pushUndo();
