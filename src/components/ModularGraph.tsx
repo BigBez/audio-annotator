@@ -166,7 +166,7 @@ export default function ModularGraph({
             }
           }}
         >
-          <span className="text-xs font-display font-medium truncate px-1 drop-shadow-sm select-none" style={{ color: '#ffffff' }}>
+          <span className="text-xs font-display font-medium px-1 drop-shadow-sm select-none" style={{ color: '#ffffff', whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'center', overflow: 'hidden' }}>
             {section.label}
           </span>
         </div>
@@ -435,7 +435,15 @@ export default function ModularGraph({
                 value={labelValue}
                 onChange={e => setLabelValue(e.target.value)}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
+                  if (e.key === 'Enter' && e.shiftKey) {
+                    e.preventDefault();
+                    const target = e.target as HTMLInputElement;
+                    const start = target.selectionStart ?? labelValue.length;
+                    const end = target.selectionEnd ?? labelValue.length;
+                    const newVal = labelValue.slice(0, start) + '\n' + labelValue.slice(end);
+                    setLabelValue(newVal);
+                    requestAnimationFrame(() => { target.setSelectionRange(start + 1, start + 1); });
+                  } else if (e.key === 'Enter') { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
                   if (e.key === 'Escape') setEditingLabel(null);
                 }}
                 onBlur={() => { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }}
