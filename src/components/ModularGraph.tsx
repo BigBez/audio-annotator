@@ -300,6 +300,7 @@ export default function ModularGraph({
             );
           })}
         </div>
+        </div>
       </div>
 
       {/* Modular detail strip */}
