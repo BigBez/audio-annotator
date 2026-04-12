@@ -439,7 +439,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
