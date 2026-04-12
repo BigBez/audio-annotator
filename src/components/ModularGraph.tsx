@@ -100,7 +100,7 @@ export default function ModularGraph({
 
   const handleWidthChange = (ids: string[], width: number) => {
     pushUndo();
-    const clamped = Math.max(60, Math.min(400, width));
+    const clamped = Math.max(10, Math.min(400, width));
     const next = { ...boxWidths };
     ids.forEach(id => { next[id] = clamped; });
     updateState({ boxWidths: next });
