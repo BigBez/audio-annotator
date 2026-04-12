@@ -238,6 +238,7 @@ export default function Index() {
         content: {
           notes: s.notes,
         },
+        bars: s.bars,
       })),
       vcuSpans: vcuSpans.map(v => ({
         id: v.id,
