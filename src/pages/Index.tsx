@@ -18,32 +18,35 @@ export default function Index() {
   const handleBoundary = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
-    // Always read the true current time directly from WaveSurfer
     const time = ws.getCurrentTime();
     const dur = ws.getDuration();
     if (dur <= 0) return;
     const boundaries = boundariesRef.current;
 
-    // Prevent duplicate or zero-distance boundaries
+    // Prevent duplicate or near-duplicate boundaries
     if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
 
     boundaries.push(time);
 
-    // Rebuild sections from boundaries
+    // Rebuild sections: always cover 0 to duration
+    const allPoints = [0, ...boundaries, dur];
+    // Deduplicate and sort
+    const unique = [...new Set(allPoints)].sort((a, b) => a - b);
+
     const newSections: Section[] = [];
-    for (let i = 0; i < boundaries.length - 1; i++) {
+    for (let i = 0; i < unique.length - 1; i++) {
+      if (unique[i + 1] - unique[i] < 0.01) continue;
       newSections.push({
         id: `section-${i}`,
-        start: boundaries[i],
-        end: boundaries[i + 1],
+        start: unique[i],
+        end: unique[i + 1],
         label: getDefaultLabel(i),
         color: getColorForIndex(i),
         notes: '',
       });
     }
     setSections(prev => {
-      // Preserve existing labels/notes
-      return newSections.map(ns => {
+      return newSections.map((ns, i) => {
         const existing = prev.find(p => p.id === ns.id);
         if (existing) {
           return { ...ns, label: existing.label, notes: existing.notes };
@@ -74,6 +77,10 @@ export default function Index() {
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
+  }, []);
+
+  const handleNotesChange = useCallback((id: string, notes: string) => {
+    setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
   }, []);
 
   const handleDeleteSection = useCallback((id: string) => {
@@ -213,6 +220,7 @@ export default function Index() {
                 onLabelChange={handleLabelChange}
                 onDelete={handleDeleteSection}
                 onBoundaryEdit={handleBoundaryEdit}
+                onNotesChange={handleNotesChange}
               />
             )}
           </>

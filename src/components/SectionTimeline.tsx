@@ -10,6 +10,7 @@ interface SectionTimelineProps {
   onLabelChange: (id: string, label: string) => void;
   onDelete: (id: string) => void;
   onBoundaryEdit: (id: string, field: 'start' | 'end', value: number) => void;
+  onNotesChange: (id: string, notes: string) => void;
 }
 
 export default function SectionTimeline({
@@ -20,6 +21,7 @@ export default function SectionTimeline({
   onLabelChange,
   onDelete,
   onBoundaryEdit,
+  onNotesChange,
 }: SectionTimelineProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
@@ -186,6 +188,20 @@ export default function SectionTimeline({
           </div>
         );
       })()}
+
+      {/* Notes panel */}
+      <div className="rounded-lg border border-border bg-card p-3 h-32 overflow-y-auto">
+        {selectedId && sections.find(s => s.id === selectedId) ? (
+          <textarea
+            value={sections.find(s => s.id === selectedId)!.notes}
+            onChange={e => onNotesChange(selectedId, e.target.value)}
+            placeholder="Add notes for this section…"
+            className="w-full h-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none"
+          />
+        ) : (
+          <p className="text-muted-foreground text-sm font-mono">Select a section to add notes.</p>
+        )}
+      </div>
     </div>
   );
 }
