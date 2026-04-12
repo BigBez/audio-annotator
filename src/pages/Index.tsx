@@ -22,12 +22,14 @@ export default function Index() {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
   const undoStackRef = useRef<UndoSnapshot[]>([]);
+  const redoStackRef = useRef<UndoSnapshot[]>([]);
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
     });
+    redoStackRef.current = [];
   }, []);
 
   // Keep a ref to current sections so pushUndo always reads latest
@@ -99,6 +101,22 @@ export default function Index() {
   const handleUndo = useCallback(() => {
     const snapshot = undoStackRef.current.pop();
     if (!snapshot) return;
+    redoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
+    setSections(snapshot.sections);
+    boundariesRef.current = snapshot.boundaries;
+  }, []);
+
+  // Redo
+  const handleRedo = useCallback(() => {
+    const snapshot = redoStackRef.current.pop();
+    if (!snapshot) return;
+    undoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
   }, []);
@@ -117,7 +135,10 @@ export default function Index() {
         e.preventDefault();
         handleBoundary();
       }
-      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+      if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+        e.preventDefault();
+        handleRedo();
+      } else if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
       }
@@ -227,6 +248,7 @@ export default function Index() {
     setDuration(0);
     boundariesRef.current = [];
     undoStackRef.current = [];
+    redoStackRef.current = [];
   }, []);
 
   return (
