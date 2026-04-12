@@ -14,7 +14,7 @@ export default function BarCountLayer({ sections, duration, onBarsChange }: BarC
   if (sections.length === 0) return null;
 
   return (
-    <div className="flex w-full h-6">
+    <div className="flex w-full h-6 bg-muted/30">
       {sections.map((section, i) => {
         const widthPercent = ((section.end - section.start) / duration) * 100;
         const isEditing = editingId === section.id;

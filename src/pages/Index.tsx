@@ -544,7 +544,7 @@ export default function Index() {
             />
 
             {duration > 0 && (
-              <>
+              <div>
                 <SectionTimeline
                   sections={sections}
                   vcuSpans={vcuSpans}
@@ -572,7 +572,7 @@ export default function Index() {
                     onBarsChange={handleBarsChange}
                   />
                 )}
-              </>
+              </div>
             )}
           </>
         )}
