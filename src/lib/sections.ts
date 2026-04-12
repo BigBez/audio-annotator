@@ -7,6 +7,12 @@ export interface Section {
   notes: string;
 }
 
+export interface VcuSpan {
+  id: string;
+  label: string;
+  sectionIds: string[];
+}
+
 const SECTION_COLORS = [
   'hsl(168, 50%, 45%)',
   'hsl(200, 50%, 50%)',

@@ -3,39 +3,46 @@ import WaveSurfer from 'wavesurfer.js';
 import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
-import { type Section, getColorForIndex, getDefaultLabel } from '@/lib/sections';
+import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface UndoSnapshot {
   sections: Section[];
   boundaries: number[];
+  vcuSpans: VcuSpan[];
 }
 
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
+  const [vcuSpans, setVcuSpans] = useState<VcuSpan[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [selectedVcuId, setSelectedVcuId] = useState<string | null>(null);
+  const [shiftSelectedIds, setShiftSelectedIds] = useState<Set<string>>(new Set());
   const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
   const undoStackRef = useRef<UndoSnapshot[]>([]);
   const redoStackRef = useRef<UndoSnapshot[]>([]);
 
+  // Keep refs to current state for undo snapshots
+  const sectionsRef = useRef<Section[]>([]);
+  sectionsRef.current = sections;
+  const vcuSpansRef = useRef<VcuSpan[]>([]);
+  vcuSpansRef.current = vcuSpans;
+
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
+      vcuSpans: structuredClone(vcuSpansRef.current),
     });
     redoStackRef.current = [];
   }, []);
-
-  // Keep a ref to current sections so pushUndo always reads latest
-  const sectionsRef = useRef<Section[]>([]);
-  sectionsRef.current = sections;
 
   const handleBoundary = useCallback(() => {
     const ws = wavesurferRef.current;
@@ -45,16 +52,13 @@ export default function Index() {
     if (dur <= 0) return;
     const boundaries = boundariesRef.current;
 
-    // Prevent duplicate or near-duplicate boundaries
     if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
 
     pushUndo();
 
     boundaries.push(time);
 
-    // Rebuild sections: always cover 0 to duration
     const allPoints = [0, ...boundaries, dur];
-    // Deduplicate and sort
     const unique = [...new Set(allPoints)].sort((a, b) => a - b);
 
     const newSections: Section[] = [];
@@ -90,13 +94,66 @@ export default function Index() {
     const active = sections.find(s => currentTime >= s.start && currentTime < s.end);
     if (active && active.id !== selectedSectionId) {
       setSelectedSectionId(active.id);
+      setSelectedVcuId(null);
     }
   }, [currentTime, isPlaying, sections, selectedSectionId]);
 
   const handleSectionSelect = useCallback((id: string | null) => {
     manualSelectRef.current = true;
     setSelectedSectionId(id);
+    setSelectedVcuId(null);
+    setShiftSelectedIds(new Set());
   }, []);
+
+  const handleVcuSelect = useCallback((id: string | null) => {
+    setSelectedVcuId(id);
+    setSelectedSectionId(null);
+    setShiftSelectedIds(new Set());
+  }, []);
+
+  const handleShiftSelect = useCallback((id: string) => {
+    setShiftSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setSelectedSectionId(null);
+    setSelectedVcuId(null);
+  }, []);
+
+  // Create VCU group from shift-selected sections
+  const handleCreateGroup = useCallback(() => {
+    const ids = shiftSelectedIds;
+    if (ids.size === 0) return;
+
+    const currentSections = sectionsRef.current;
+    // Get indices of selected sections
+    const indices = Array.from(ids).map(id => currentSections.findIndex(s => s.id === id)).filter(i => i !== -1).sort((a, b) => a - b);
+
+    if (indices.length === 0) return;
+
+    // Check contiguity
+    for (let i = 1; i < indices.length; i++) {
+      if (indices[i] !== indices[i - 1] + 1) {
+        toast({ title: 'Cannot group', description: 'Selected sections must be contiguous.' });
+        return;
+      }
+    }
+
+    pushUndo();
+
+    const sectionIds = indices.map(i => currentSections[i].id);
+    const vcuNumber = vcuSpansRef.current.length + 1;
+    const newVcu: VcuSpan = {
+      id: `vcu-${Date.now()}`,
+      label: `VCU${vcuNumber}`,
+      sectionIds,
+    };
+
+    setVcuSpans(prev => [...prev, newVcu]);
+    setShiftSelectedIds(new Set());
+  }, [shiftSelectedIds, pushUndo]);
 
   // Undo
   const handleUndo = useCallback(() => {
@@ -105,9 +162,11 @@ export default function Index() {
     redoStackRef.current.push({
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
+      vcuSpans: structuredClone(vcuSpansRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
+    setVcuSpans(snapshot.vcuSpans);
   }, []);
 
   // Redo
@@ -117,9 +176,11 @@ export default function Index() {
     undoStackRef.current.push({
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
+      vcuSpans: structuredClone(vcuSpansRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
+    setVcuSpans(snapshot.vcuSpans);
   }, []);
 
   // Save analysis as JSON
@@ -138,6 +199,11 @@ export default function Index() {
           notes: s.notes,
         },
       })),
+      vcuSpans: vcuSpans.map(v => ({
+        id: v.id,
+        label: v.label,
+        sectionIds: v.sectionIds,
+      })),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -146,7 +212,7 @@ export default function Index() {
     a.download = file.name.replace(/\.[^/.]+$/, '') + '.json';
     a.click();
     URL.revokeObjectURL(url);
-  }, [file, sections]);
+  }, [file, sections, vcuSpans]);
 
   // Load analysis from JSON
   const handleImport = useCallback(() => {
@@ -179,11 +245,20 @@ export default function Index() {
             notes: s.content?.notes ?? s.notes ?? '',
           }));
           setSections(imported);
-          // Rebuild boundaries from imported sections
           if (imported.length > 0) {
             boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
           } else {
             boundariesRef.current = [];
+          }
+          // Import VCU spans
+          if (data.vcuSpans && Array.isArray(data.vcuSpans)) {
+            setVcuSpans(data.vcuSpans.map((v: any) => ({
+              id: v.id,
+              label: v.label,
+              sectionIds: v.sectionIds,
+            })));
+          } else {
+            setVcuSpans([]);
           }
         } catch {
           toast({ title: 'Import failed', description: 'Could not parse JSON file.' });
@@ -213,6 +288,10 @@ export default function Index() {
         e.preventDefault();
         handleBoundary();
       }
+      if (e.code === 'KeyG' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        handleCreateGroup();
+      }
       if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
         handleRedo();
@@ -223,7 +302,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleSave]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
@@ -248,19 +327,22 @@ export default function Index() {
         return [];
       }
 
-      // Absorb into previous section, or next if no previous
       if (idx > 0) {
         next[idx - 1] = { ...next[idx - 1], end: deleted.end };
       } else if (next.length > 0) {
         next[0] = { ...next[0], start: deleted.start };
       }
 
-      // Rebuild boundaries from sections
       const newBoundaries = [next[0].start, ...next.map(s => s.end)];
       boundariesRef.current = newBoundaries;
 
       return next;
     });
+    // Also remove deleted section from any VCU spans
+    setVcuSpans(prev => prev.map(v => ({
+      ...v,
+      sectionIds: v.sectionIds.filter(sid => sid !== id),
+    })).filter(v => v.sectionIds.length > 0));
   }, []);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
@@ -268,33 +350,26 @@ export default function Index() {
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === sectionId);
       if (idx === -1) return prev;
-      
+
       const section = prev[idx];
       const updated = [...prev];
-      
+
       if (field === 'start') {
-        // Can't go below 0 or above section end
         if (newValue < 0 || newValue >= section.end) return prev;
-        // Can't overlap previous section
         if (idx > 0 && newValue < updated[idx - 1].start) return prev;
         updated[idx] = { ...section, start: newValue };
-        // Adjust previous section's end
         if (idx > 0) {
           updated[idx - 1] = { ...updated[idx - 1], end: newValue };
         }
       } else {
-        // Can't go below section start or above duration
         if (newValue <= section.start) return prev;
-        // Can't overlap next section's end
         if (idx < prev.length - 1 && newValue > updated[idx + 1].end) return prev;
         updated[idx] = { ...section, end: newValue };
-        // Adjust next section's start
         if (idx < prev.length - 1) {
           updated[idx + 1] = { ...updated[idx + 1], start: newValue };
         }
       }
 
-      // Rebuild boundaries
       if (updated.length > 0) {
         const newBoundaries = [updated[0].start, ...updated.map(s => s.end)];
         boundariesRef.current = newBoundaries;
@@ -302,6 +377,17 @@ export default function Index() {
 
       return updated;
     });
+  }, []);
+
+  const handleVcuLabelChange = useCallback((id: string, label: string) => {
+    pushUndo();
+    setVcuSpans(prev => prev.map(v => v.id === id ? { ...v, label } : v));
+  }, []);
+
+  const handleDeleteVcu = useCallback((id: string) => {
+    pushUndo();
+    setVcuSpans(prev => prev.filter(v => v.id !== id));
+    setSelectedVcuId(null);
   }, []);
 
   const handleSeek = useCallback((time: number) => {
@@ -322,15 +408,17 @@ export default function Index() {
     wavesurferRef.current = null;
     setFile(null);
     setSections([]);
+    setVcuSpans([]);
     setCurrentTime(0);
     setDuration(0);
     boundariesRef.current = [];
     undoStackRef.current = [];
     redoStackRef.current = [];
+    setShiftSelectedIds(new Set());
   }, []);
 
   return (
-    <div className="min-h-screen bg-background" onClick={() => setSelectedSectionId(null)}>
+    <div className="min-h-screen bg-background" onClick={() => { setSelectedSectionId(null); setSelectedVcuId(null); setShiftSelectedIds(new Set()); }}>
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -374,20 +462,26 @@ export default function Index() {
               wavesurferRef={wavesurferRef}
             />
 
-            {/* Horizontal section timeline */}
             {duration > 0 && (
               <SectionTimeline
                 sections={sections}
+                vcuSpans={vcuSpans}
                 currentTime={currentTime}
                 duration={duration}
                 selectedId={selectedSectionId}
+                selectedVcuId={selectedVcuId}
+                shiftSelectedIds={shiftSelectedIds}
                 isPlaying={isPlaying}
                 onSelectedIdChange={handleSectionSelect}
+                onSelectedVcuIdChange={handleVcuSelect}
+                onShiftSelect={handleShiftSelect}
                 onSeek={handleSeek}
                 onLabelChange={handleLabelChange}
                 onDelete={handleDeleteSection}
                 onBoundaryEdit={handleBoundaryEdit}
                 onNotesChange={handleNotesChange}
+                onVcuLabelChange={handleVcuLabelChange}
+                onDeleteVcu={handleDeleteVcu}
               />
             )}
           </>
