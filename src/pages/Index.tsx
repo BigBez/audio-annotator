@@ -342,6 +342,57 @@ export default function Index() {
         e.preventDefault();
         handleUndo();
       }
+      // Arrow key navigation
+      if (e.code === 'ArrowLeft' && !e.shiftKey) {
+        e.preventDefault();
+        const ws = wavesurferRef.current;
+        if (!ws || sectionsRef.current.length === 0) return;
+        const t = ws.getCurrentTime();
+        const secs = sectionsRef.current;
+        // Find current section
+        let curIdx = secs.findIndex(s => t >= s.start && t < s.end);
+        if (curIdx === -1 && t >= secs[secs.length - 1].end) curIdx = secs.length - 1;
+        if (curIdx === -1) return;
+        // If not at start of current section, go to its start; else go to previous
+        const threshold = 0.05;
+        if (t - secs[curIdx].start > threshold) {
+          ws.seekTo(secs[curIdx].start / ws.getDuration());
+        } else if (curIdx > 0) {
+          ws.seekTo(secs[curIdx - 1].start / ws.getDuration());
+        }
+        return;
+      }
+      if (e.code === 'ArrowRight' && !e.shiftKey) {
+        e.preventDefault();
+        const ws = wavesurferRef.current;
+        if (!ws || sectionsRef.current.length === 0) return;
+        const t = ws.getCurrentTime();
+        const secs = sectionsRef.current;
+        let curIdx = secs.findIndex(s => t >= s.start && t < s.end);
+        if (curIdx === -1 && t >= secs[secs.length - 1].end) curIdx = secs.length - 1;
+        if (curIdx === -1) return;
+        if (curIdx < secs.length - 1) {
+          ws.seekTo(secs[curIdx + 1].start / ws.getDuration());
+        }
+        return;
+      }
+      if (e.code === 'ArrowLeft' && e.shiftKey) {
+        e.preventDefault();
+        const ws = wavesurferRef.current;
+        if (!ws) return;
+        const newTime = Math.max(0, ws.getCurrentTime() - 5);
+        ws.seekTo(newTime / ws.getDuration());
+        return;
+      }
+      if (e.code === 'ArrowRight' && e.shiftKey) {
+        e.preventDefault();
+        const ws = wavesurferRef.current;
+        if (!ws) return;
+        const dur = ws.getDuration();
+        const newTime = Math.min(dur, ws.getCurrentTime() + 5);
+        ws.seekTo(newTime / dur);
+        return;
+      }
       if (e.code === 'Backspace' || e.code === 'Delete') {
         e.preventDefault();
         const selSection = selectedSectionIdRef.current;
