@@ -39,7 +39,7 @@ export default function WaveformPlayer({
       barWidth: 2,
       barGap: 1,
       barRadius: 2,
-      height: 120,
+      height: 60,
       normalize: true,
     });
 
@@ -78,34 +78,6 @@ export default function WaveformPlayer({
 
   return (
     <div className="space-y-3">
-      {/* Time display */}
-      <div className="flex items-center justify-between font-mono text-sm">
-        <span className="text-accent-foreground">{formatTime(currentTime)}</span>
-        <span className="text-muted-foreground">{formatTime(duration)}</span>
-      </div>
-
-      {/* Section regions overlay + waveform */}
-      <div className="relative">
-        {duration > 0 && sections.length > 0 && (
-          <div className="absolute top-0 left-0 right-0 h-1.5 z-10 rounded-t overflow-hidden flex">
-            {sections.map(s => (
-              <div
-                key={s.id}
-                style={{
-                  left: `${(s.start / duration) * 100}%`,
-                  width: `${((s.end - s.start) / duration) * 100}%`,
-                  backgroundColor: s.color,
-                  position: 'absolute',
-                  top: 0,
-                  height: '100%',
-                }}
-              />
-            ))}
-          </div>
-        )}
-        <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2 pt-3" />
-      </div>
-
       {/* Controls */}
       <div className="flex items-center justify-center gap-2">
         <button
@@ -123,6 +95,15 @@ export default function WaveformPlayer({
         </button>
         <span className="ml-3 text-xs text-muted-foreground font-mono">Space to play/pause · Enter to mark section</span>
       </div>
+
+      {/* Time display */}
+      <div className="flex items-center justify-between font-mono text-sm">
+        <span className="text-accent-foreground">{formatTime(currentTime)}</span>
+        <span className="text-muted-foreground">{formatTime(duration)}</span>
+      </div>
+
+      {/* Waveform */}
+      <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2" />
     </div>
   );
 }
