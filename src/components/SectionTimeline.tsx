@@ -325,7 +325,7 @@ export default function SectionTimeline({
           <div className="rounded-t-lg border border-border bg-card overflow-hidden">
             <button
               onClick={() => setChordsOpen(prev => !prev)}
-              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+              className={`w-full flex items-center gap-1.5 px-3 ${chordsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
             >
               <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
               <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
@@ -344,7 +344,7 @@ export default function SectionTimeline({
           <div className="border-x border-b border-border bg-card overflow-hidden">
             <button
               onClick={() => setLyricsOpen(prev => !prev)}
-              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+              className={`w-full flex items-center gap-1.5 px-3 ${lyricsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
             >
               <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
               <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
@@ -363,7 +363,7 @@ export default function SectionTimeline({
           <div className="rounded-b-lg border-x border-b border-border bg-card overflow-hidden">
             <button
               onClick={() => setNotesOpen(prev => !prev)}
-              className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+              className={`w-full flex items-center gap-1.5 px-3 ${notesOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
             >
               <ChevronRight className={`h-3 w-3 transition-transform ${notesOpen ? 'rotate-90' : ''}`} />
               Notes
