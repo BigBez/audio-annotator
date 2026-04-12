@@ -265,10 +265,9 @@ export default function ModularGraph({
                     />
                   ) : (
                     <button
-                      onMouseDown={e => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onMouseDown={(e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         setEditingGroupLabel(group.id);
                         setGroupLabelValue(group.label);
                       }}
@@ -372,7 +371,8 @@ export default function ModularGraph({
                 />
               ) : (
                 <button
-                  onClick={(e) => {
+                  onMouseDown={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     setEditingGroupLabel(selectedGroup.id);
                     setGroupLabelValue(selectedGroup.label);
