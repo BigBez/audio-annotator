@@ -371,7 +371,8 @@ export default function ModularGraph({
                 />
               ) : (
                 <button
-                  onClick={(e) => {
+                  onMouseDown={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     setEditingGroupLabel(selectedGroup.id);
                     setGroupLabelValue(selectedGroup.label);
