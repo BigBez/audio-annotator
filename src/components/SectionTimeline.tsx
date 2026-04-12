@@ -321,42 +321,51 @@ export default function SectionTimeline({
       {/* Collapsible panels */}
       {selectedId && selectedSection && (
         <div className="space-y-0">
-          {/* Chords panel */}
-          <div className="rounded-t-lg border border-border bg-card overflow-hidden">
-            <button
-              onClick={() => setChordsOpen(prev => !prev)}
-              className={`w-full flex items-center gap-1.5 px-3 ${chordsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+          {/* Chords + Lyrics side by side */}
+          <div className="flex gap-0">
+            {/* Chords panel */}
+            <div
+              className="border border-border bg-card overflow-hidden rounded-tl-lg transition-all min-w-0"
+              style={{ flex: chordsOpen && !lyricsOpen ? '1 1 100%' : !chordsOpen && lyricsOpen ? '0 0 auto' : '1 1 50%' }}
             >
-              <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
-              <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
-            </button>
-            {chordsOpen && (
-              <div className="px-3 pb-2">
-                <ChordPanel
-                  chordLines={selectedSection.chordLines}
-                  onChange={lines => onChordLinesChange(selectedId, lines)}
-                />
-              </div>
-            )}
-          </div>
+              <button
+                onClick={() => setChordsOpen(prev => !prev)}
+                className={`w-full flex items-center gap-1.5 px-3 ${chordsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+              >
+                <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
+                <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
+              </button>
+              {chordsOpen && (
+                <div className="px-3 pb-2">
+                  <ChordPanel
+                    chordLines={selectedSection.chordLines}
+                    onChange={lines => onChordLinesChange(selectedId, lines)}
+                  />
+                </div>
+              )}
+            </div>
 
-          {/* Lyrics panel */}
-          <div className="border-x border-b border-border bg-card overflow-hidden">
-            <button
-              onClick={() => setLyricsOpen(prev => !prev)}
-              className={`w-full flex items-center gap-1.5 px-3 ${lyricsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+            {/* Lyrics panel */}
+            <div
+              className="border border-l-0 border-border bg-card overflow-hidden rounded-tr-lg transition-all min-w-0"
+              style={{ flex: lyricsOpen && !chordsOpen ? '1 1 100%' : !lyricsOpen && chordsOpen ? '0 0 auto' : '1 1 50%' }}
             >
-              <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
-              <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
-            </button>
-            {lyricsOpen && (
-              <div className="px-3 pb-2">
-                <LyricsPanel
-                  lyricLines={selectedSection.lyricLines}
-                  onChange={lines => onLyricLinesChange(selectedId!, lines)}
-                />
-              </div>
-            )}
+              <button
+                onClick={() => setLyricsOpen(prev => !prev)}
+                className={`w-full flex items-center gap-1.5 px-3 ${lyricsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+              >
+                <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
+                <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
+              </button>
+              {lyricsOpen && (
+                <div className="px-3 pb-2">
+                  <LyricsPanel
+                    lyricLines={selectedSection.lyricLines}
+                    onChange={lines => onLyricLinesChange(selectedId!, lines)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Notes panel */}
