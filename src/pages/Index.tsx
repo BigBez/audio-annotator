@@ -4,7 +4,8 @@ import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
 import { type Section, getColorForIndex, getDefaultLabel } from '@/lib/sections';
-import { Music } from 'lucide-react';
+import { Music, Upload } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface UndoSnapshot {
   sections: Section[];
