@@ -29,6 +29,7 @@ export default function Index() {
       sections: structuredClone(sectionsRef.current),
       boundaries: [...boundariesRef.current],
     });
+    redoStackRef.current = [];
   }, []);
 
   // Keep a ref to current sections so pushUndo always reads latest
