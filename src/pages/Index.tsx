@@ -353,7 +353,17 @@ export default function Index() {
           <AudioUpload onFileLoaded={setFile} />
         ) : (
           <>
-            <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleImport(); }}
+                className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                title="Import analysis JSON"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Import
+              </button>
+            </div>
 
             <WaveformPlayer
               file={file}
