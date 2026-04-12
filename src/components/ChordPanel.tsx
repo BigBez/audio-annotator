@@ -7,34 +7,57 @@ interface ChordPanelProps {
   onChange: (chordLines: ChordLine[]) => void;
 }
 
-const barlineStyle = { width: '1px', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', height: '1em', verticalAlign: 'middle' };
-const dotStyle = { width: '3px', height: '3px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', verticalAlign: 'middle' };
+const barlineStyle: React.CSSProperties = { width: '1px', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', height: '14px' };
+const dotStyle: React.CSSProperties = { width: '3px', height: '3px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.3)' };
 
-function renderBarlineSymbol(text: string) {
+function RepeatDots() {
+  return (
+    <span className="inline-flex flex-col items-center justify-center gap-[3px]" style={{ height: '14px' }}>
+      <span style={dotStyle} />
+      <span style={dotStyle} />
+    </span>
+  );
+}
+
+const barlinePatterns: [string, (isPrefix: boolean) => React.ReactNode][] = [
+  ['|:', (isPrefix) => (
+    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[2px]`}>
+      <span style={barlineStyle} />
+      <RepeatDots />
+    </span>
+  )],
+  [':|', (isPrefix) => (
+    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[2px]`}>
+      <RepeatDots />
+      <span style={barlineStyle} />
+    </span>
+  )],
+  ['||', (isPrefix) => (
+    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center gap-[1px]`}>
+      <span style={barlineStyle} />
+      <span style={barlineStyle} />
+    </span>
+  )],
+  ['|', (isPrefix) => (
+    <span className={`shrink-0 ${isPrefix ? 'mr-1' : 'ml-1'} inline-flex items-center`}>
+      <span style={barlineStyle} />
+    </span>
+  )],
+];
+
+function renderBarline(text: string, isPrefix: boolean): React.ReactNode | null {
   const t = text.trim();
-  if (t === '|:') return (
-    <span className="shrink-0 mr-1 inline-flex items-center gap-[2px]">
-      <span style={barlineStyle} />
-      <span style={dotStyle} />
-    </span>
-  );
-  if (t === ':|') return (
-    <span className="shrink-0 ml-1 inline-flex items-center gap-[2px]">
-      <span style={dotStyle} />
-      <span style={barlineStyle} />
-    </span>
-  );
-  if (t === '||') return (
-    <span className="shrink-0 inline-flex items-center gap-[1px]">
-      <span style={barlineStyle} />
-      <span style={barlineStyle} />
-    </span>
-  );
-  if (t === '|') return (
-    <span className="shrink-0 inline-flex items-center">
-      <span style={barlineStyle} />
-    </span>
-  );
+  for (const [symbol, render] of barlinePatterns) {
+    if (t.startsWith(symbol)) {
+      const rest = t.slice(symbol.length).trim();
+      return (
+        <span className={`shrink-0 inline-flex items-center ${isPrefix ? 'mr-1' : 'ml-1'}`}>
+          {render(false)}
+          {rest && <span className="text-xs font-mono text-muted-foreground ml-0.5">{rest}</span>}
+        </span>
+      );
+    }
+  }
   return null;
 }
 
