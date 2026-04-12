@@ -544,33 +544,35 @@ export default function Index() {
             />
 
             {duration > 0 && (
-              <SectionTimeline
-                sections={sections}
-                vcuSpans={vcuSpans}
-                currentTime={currentTime}
-                duration={duration}
-                selectedId={selectedSectionId}
-                selectedVcuId={selectedVcuId}
-                shiftSelectedIds={shiftSelectedIds}
-                isPlaying={isPlaying}
-                onSelectedIdChange={handleSectionSelect}
-                onSelectedVcuIdChange={handleVcuSelect}
-                onShiftSelect={handleShiftSelect}
-                onSeek={handleSeek}
-                onLabelChange={handleLabelChange}
-                onDelete={handleDeleteSection}
-                onBoundaryEdit={handleBoundaryEdit}
-                onNotesChange={handleNotesChange}
-                onVcuLabelChange={handleVcuLabelChange}
-                onDeleteVcu={handleDeleteVcu}
-              />
-              {sections.length > 0 && (
-                <BarCountLayer
+              <>
+                <SectionTimeline
                   sections={sections}
+                  vcuSpans={vcuSpans}
+                  currentTime={currentTime}
                   duration={duration}
-                  onBarsChange={handleBarsChange}
+                  selectedId={selectedSectionId}
+                  selectedVcuId={selectedVcuId}
+                  shiftSelectedIds={shiftSelectedIds}
+                  isPlaying={isPlaying}
+                  onSelectedIdChange={handleSectionSelect}
+                  onSelectedVcuIdChange={handleVcuSelect}
+                  onShiftSelect={handleShiftSelect}
+                  onSeek={handleSeek}
+                  onLabelChange={handleLabelChange}
+                  onDelete={handleDeleteSection}
+                  onBoundaryEdit={handleBoundaryEdit}
+                  onNotesChange={handleNotesChange}
+                  onVcuLabelChange={handleVcuLabelChange}
+                  onDeleteVcu={handleDeleteVcu}
                 />
-              )}
+                {sections.length > 0 && (
+                  <BarCountLayer
+                    sections={sections}
+                    duration={duration}
+                    onBarsChange={handleBarsChange}
+                  />
+                )}
+              </>
             )}
           </>
         )}
