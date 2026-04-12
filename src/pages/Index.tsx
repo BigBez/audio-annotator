@@ -105,55 +105,55 @@ export default function Index() {
     setSelectedSectionId(id);
     setSelectedVcuId(null);
     setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
   }, []);
 
   const handleVcuSelect = useCallback((id: string | null) => {
     setSelectedVcuId(id);
     setSelectedSectionId(null);
     setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
   }, []);
 
+  const shiftAnchorRef = useRef<string | null>(null);
+
   const handleShiftSelect = useCallback((id: string) => {
-    setShiftSelectedIds(prev => {
-      const currentSections = sectionsRef.current;
-      const clickedIdx = currentSections.findIndex(s => s.id === id);
-      if (clickedIdx === -1) return prev;
+    const currentSections = sectionsRef.current;
+    const clickedIdx = currentSections.findIndex(s => s.id === id);
+    if (clickedIdx === -1) return;
 
-      if (prev.size === 0) {
-        // First shift-click: use the currently selected section as anchor if available
-        const anchorId = selectedSectionIdRef.current;
-        if (anchorId) {
-          const anchorIdx = currentSections.findIndex(s => s.id === anchorId);
-          if (anchorIdx !== -1) {
-            const minIdx = Math.min(anchorIdx, clickedIdx);
-            const maxIdx = Math.max(anchorIdx, clickedIdx);
-            const next = new Set<string>();
-            for (let i = minIdx; i <= maxIdx; i++) {
-              next.add(currentSections[i].id);
-            }
-            return next;
-          }
-        }
-        // No anchor — just select this one section
-        return new Set([id]);
-      }
+    // Determine anchor: use explicit shift anchor, or fall back to regular selection
+    let anchorId = shiftAnchorRef.current;
+    if (!anchorId) {
+      anchorId = selectedSectionIdRef.current;
+    }
+    if (anchorId) {
+      shiftAnchorRef.current = anchorId;
+    } else {
+      // No anchor at all — this click becomes the anchor
+      shiftAnchorRef.current = id;
+      setShiftSelectedIds(new Set([id]));
+      setSelectedSectionId(null);
+      setSelectedVcuId(null);
+      return;
+    }
 
-      // Find indices of all currently selected sections
-      const selectedIndices = Array.from(prev)
-        .map(sid => currentSections.findIndex(s => s.id === sid))
-        .filter(i => i !== -1);
-      selectedIndices.push(clickedIdx);
+    const anchorIdx = currentSections.findIndex(s => s.id === anchorId);
+    if (anchorIdx === -1) {
+      shiftAnchorRef.current = id;
+      setShiftSelectedIds(new Set([id]));
+      setSelectedSectionId(null);
+      setSelectedVcuId(null);
+      return;
+    }
 
-      const minIdx = Math.min(...selectedIndices);
-      const maxIdx = Math.max(...selectedIndices);
-
-      // Select the full contiguous range
-      const next = new Set<string>();
-      for (let i = minIdx; i <= maxIdx; i++) {
-        next.add(currentSections[i].id);
-      }
-      return next;
-    });
+    const minIdx = Math.min(anchorIdx, clickedIdx);
+    const maxIdx = Math.max(anchorIdx, clickedIdx);
+    const next = new Set<string>();
+    for (let i = minIdx; i <= maxIdx; i++) {
+      next.add(currentSections[i].id);
+    }
+    setShiftSelectedIds(next);
     setSelectedSectionId(null);
     setSelectedVcuId(null);
   }, []);
@@ -189,6 +189,9 @@ export default function Index() {
 
     setVcuSpans(prev => [...prev, newVcu]);
     setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
+    setSelectedVcuId(newVcu.id);
+    setSelectedSectionId(null);
   }, [shiftSelectedIds, pushUndo]);
 
   // Undo
