@@ -58,6 +58,8 @@ export default function ModularGraph({
   const [groupLabelValue, setGroupLabelValue] = useState('');
   const [editingBarCount, setEditingBarCount] = useState<string | null>(null);
   const [barCountValue, setBarCountValue] = useState('');
+  const [widthInputValue, setWidthInputValue] = useState('');
+  const [editingWidth, setEditingWidth] = useState(false);
 
   const getWidth = (id: string) => boxWidths[id] ?? 120;
   const getBarCount = (id: string) => barCounts[id] ?? '';
