@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, X } from 'lucide-react';
+import { Pencil, X, ChevronRight } from 'lucide-react';
 import type { Section } from '@/lib/sections';
 import ColorPickerButton from '@/components/ColorPickerButton';
 
@@ -67,6 +67,7 @@ export default function ModularGraph({
   const [barCountValue, setBarCountValue] = useState('');
   const [widthInputValue, setWidthInputValue] = useState('');
   const [editingWidth, setEditingWidth] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const getWidth = (id: string) => boxWidths[id] ?? 80;
   const getBarCount = (id: string) => barCounts[id] ?? '';
