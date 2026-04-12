@@ -338,10 +338,43 @@ export default function Index() {
         e.preventDefault();
         handleUndo();
       }
+      if (e.code === 'Backspace' || e.code === 'Delete') {
+        e.preventDefault();
+        const selSection = selectedSectionIdRef.current;
+        if (selSection) {
+          pushUndo();
+          setSections(prev => {
+            const idx = prev.findIndex(s => s.id === selSection);
+            if (idx === -1) return prev;
+            const deleted = prev[idx];
+            const next = [...prev];
+            next.splice(idx, 1);
+            boundariesRef.current = boundariesRef.current.filter(
+              b => b !== deleted.start && b !== deleted.end
+            );
+            if (idx > 0) {
+              next[idx - 1] = { ...next[idx - 1], end: deleted.end };
+            } else if (next.length > 0) {
+              next[0] = { ...next[0], start: deleted.start };
+            }
+            boundariesRef.current = [0, ...next.map(s => s.end)];
+            return next;
+          });
+          setVcuSpans(prev => prev.map(v => ({
+            ...v,
+            sectionIds: v.sectionIds.filter(sid => sid !== selSection),
+          })).filter(v => v.sectionIds.length > 0));
+          setSelectedSectionId(null);
+        } else if (selectedVcuId) {
+          pushUndo();
+          setVcuSpans(prev => prev.filter(v => v.id !== selectedVcuId));
+          setSelectedVcuId(null);
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();

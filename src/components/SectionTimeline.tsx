@@ -224,7 +224,28 @@ export default function SectionTimeline({
           <div className="space-y-0">
             {/* VCU row */}
             <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
-              <span className="text-xs font-display font-medium text-foreground">{selectedSectionVcu.label}</span>
+              {editingVcuLabel === selectedSectionVcu.id ? (
+                <input
+                  autoFocus
+                  onFocus={e => e.target.select()}
+                  value={vcuLabelValue}
+                  onChange={e => setVcuLabelValue(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }
+                    if (e.key === 'Escape') setEditingVcuLabel(null);
+                  }}
+                  onBlur={() => { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }}
+                  className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20"
+                />
+              ) : (
+                <button
+                  onClick={() => { setEditingVcuLabel(selectedSectionVcu.id); setVcuLabelValue(selectedSectionVcu.label); }}
+                  className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
+                >
+                  {selectedSectionVcu.label}
+                  <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                </button>
+              )}
               <span className="text-muted-foreground text-xs">|</span>
               <span className="text-xs text-muted-foreground">{formatTime(range.start)}</span>
               <span className="text-muted-foreground text-xs">–</span>
