@@ -429,7 +429,7 @@ export default function ModularGraph({
               updateState({ boxColors: { ...boxColors, [selectedSection.id]: color } });
             }} />
             {editingLabel === selectedSection.id ? (
-              <input
+              <textarea
                 autoFocus
                 onFocus={e => e.target.select()}
                 value={labelValue}
@@ -437,17 +437,18 @@ export default function ModularGraph({
                 onKeyDown={e => {
                   if (e.key === 'Enter' && e.shiftKey) {
                     e.preventDefault();
-                    const target = e.target as HTMLInputElement;
+                    const target = e.target as HTMLTextAreaElement;
                     const start = target.selectionStart ?? labelValue.length;
                     const end = target.selectionEnd ?? labelValue.length;
                     const newVal = labelValue.slice(0, start) + '\n' + labelValue.slice(end);
                     setLabelValue(newVal);
                     requestAnimationFrame(() => { target.setSelectionRange(start + 1, start + 1); });
-                  } else if (e.key === 'Enter') { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
+                  } else if (e.key === 'Enter') { e.preventDefault(); onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }
                   if (e.key === 'Escape') setEditingLabel(null);
                 }}
                 onBlur={() => { onLabelChange(selectedSection.id, labelValue); setEditingLabel(null); }}
-                className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24"
+                className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24 resize-none"
+                rows={2}
                 onClick={e => e.stopPropagation()}
               />
             ) : (
