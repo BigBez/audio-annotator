@@ -636,47 +636,42 @@ export default function Index() {
               </button>
             </div>
 
-            <WaveformPlayer
-              file={file}
-              onTimeUpdate={setCurrentTime}
-              onDurationReady={setDuration}
-              onPlayStateChange={setIsPlaying}
-              onStop={handleStop}
-              wavesurferRef={wavesurferRef}
-            />
+            <div>
+              <WaveformPlayer
+                file={file}
+                onTimeUpdate={setCurrentTime}
+                onDurationReady={setDuration}
+                onPlayStateChange={setIsPlaying}
+                onStop={handleStop}
+                wavesurferRef={wavesurferRef}
+              />
 
-            {duration > 0 && (
-                <SectionTimeline
-                  sections={sections}
-                  vcuSpans={vcuSpans}
-                  currentTime={currentTime}
-                  duration={duration}
-                  selectedId={selectedSectionId}
-                  selectedVcuId={selectedVcuId}
-                  shiftSelectedIds={shiftSelectedIds}
-                  cmdSelectedIds={cmdSelectedIds}
-                  isPlaying={isPlaying}
-                  onSelectedIdChange={handleSectionSelect}
-                  onSelectedVcuIdChange={handleVcuSelect}
-                  onShiftSelect={handleShiftSelect}
-                  onCmdSelect={handleCmdSelect}
-                  onSeek={handleSeek}
-                  onLabelChange={handleLabelChange}
-                  onDelete={handleDeleteSection}
-                  onBoundaryEdit={handleBoundaryEdit}
-                  onNotesChange={handleNotesChange}
-                  onColorChange={handleColorChange}
-                  onVcuLabelChange={handleVcuLabelChange}
-                  onDeleteVcu={handleDeleteVcu}
-                  barCountLayer={sections.length > 0 ? (
-                    <BarCountLayer
-                      sections={sections}
-                      duration={duration}
-                      onBarsChange={handleBarsChange}
-                    />
-                  ) : undefined}
-                />
-            )}
+              {duration > 0 && (
+                  <SectionTimeline
+                    sections={sections}
+                    vcuSpans={vcuSpans}
+                    currentTime={currentTime}
+                    duration={duration}
+                    selectedId={selectedSectionId}
+                    selectedVcuId={selectedVcuId}
+                    shiftSelectedIds={shiftSelectedIds}
+                    cmdSelectedIds={cmdSelectedIds}
+                    isPlaying={isPlaying}
+                    onSelectedIdChange={handleSectionSelect}
+                    onSelectedVcuIdChange={handleVcuSelect}
+                    onShiftSelect={handleShiftSelect}
+                    onCmdSelect={handleCmdSelect}
+                    onSeek={handleSeek}
+                    onLabelChange={handleLabelChange}
+                    onDelete={handleDeleteSection}
+                    onBoundaryEdit={handleBoundaryEdit}
+                    onNotesChange={handleNotesChange}
+                    onColorChange={handleColorChange}
+                    onVcuLabelChange={handleVcuLabelChange}
+                    onDeleteVcu={handleDeleteVcu}
+                  />
+              )}
+            </div>
           </>
         )}
       </main>
