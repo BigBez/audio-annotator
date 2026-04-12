@@ -115,6 +115,7 @@ export default function SectionTimeline({
                   onChange={e => setLabelValue(e.target.value)}
                   onFocus={e => e.target.select()}
                   onKeyDown={e => {
+                    e.stopPropagation();
                     if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
                     if (e.key === 'Escape') setEditingLabel(null);
                   }}
@@ -127,6 +128,7 @@ export default function SectionTimeline({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  setSelectedId(section.id);
                   setEditingLabel(section.id);
                   setLabelValue(section.label);
                 }}
