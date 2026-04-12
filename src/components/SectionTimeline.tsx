@@ -45,7 +45,7 @@ export default function SectionTimeline({
   const activeSection = sections.find(s => currentTime >= s.start && currentTime < s.end);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" onClick={e => e.stopPropagation()}>
       {/* Horizontal timeline blocks */}
       <div className="flex w-full h-10 rounded-lg overflow-hidden border border-border">
         {sections.map(section => {
