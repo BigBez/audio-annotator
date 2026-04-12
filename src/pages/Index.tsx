@@ -401,6 +401,7 @@ export default function Index() {
         boxWidths: modularGraph.boxWidths,
         joinedGroups: modularGraph.joinedGroups,
         barCounts: modularGraph.barCounts,
+        boxColors: modularGraph.boxColors,
       },
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -463,6 +464,7 @@ export default function Index() {
               boxWidths: data.modularGraph.boxWidths ?? {},
               joinedGroups: data.modularGraph.joinedGroups ?? [],
               barCounts: data.modularGraph.barCounts ?? {},
+              boxColors: data.modularGraph.boxColors ?? {},
             });
           } else {
             setModularGraph(DEFAULT_MODULAR_STATE);
