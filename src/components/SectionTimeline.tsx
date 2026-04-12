@@ -6,6 +6,8 @@ interface SectionTimelineProps {
   sections: Section[];
   currentTime: number;
   duration: number;
+  selectedId: string | null;
+  onSelectedIdChange: (id: string | null) => void;
   onSeek: (time: number) => void;
   onLabelChange: (id: string, label: string) => void;
   onDelete: (id: string) => void;
@@ -17,13 +19,15 @@ export default function SectionTimeline({
   sections,
   currentTime,
   duration,
+  selectedId,
+  onSelectedIdChange,
   onSeek,
   onLabelChange,
   onDelete,
   onBoundaryEdit,
   onNotesChange,
 }: SectionTimelineProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const setSelectedId = onSelectedIdChange;
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
   const [labelValue, setLabelValue] = useState('');
   const [editingTime, setEditingTime] = useState<{ id: string; field: 'start' | 'end' } | null>(null);
