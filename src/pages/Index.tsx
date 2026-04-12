@@ -105,12 +105,14 @@ export default function Index() {
     setSelectedSectionId(id);
     setSelectedVcuId(null);
     setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
   }, []);
 
   const handleVcuSelect = useCallback((id: string | null) => {
     setSelectedVcuId(id);
     setSelectedSectionId(null);
     setShiftSelectedIds(new Set());
+    shiftAnchorRef.current = null;
   }, []);
 
   const shiftAnchorRef = useRef<string | null>(null);
