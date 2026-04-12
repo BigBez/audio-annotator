@@ -144,7 +144,7 @@ export default function SectionTimeline({
 
       {/* VCU lane — below section blocks, brackets open downward */}
       {vcuSpans.length > 0 && (
-        <div className="relative w-full h-4 -mt-2">
+        <div className="relative w-full h-8 -mt-1">
           {vcuSpans.map(vcu => {
             const range = getVcuTimeRange(vcu);
             if (range.end <= range.start) return null;
@@ -172,7 +172,7 @@ export default function SectionTimeline({
                   <line x1="100%" y1="0" x2="100%" y2="10" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
                   <line x1="0" y1="10" x2="100%" y2="10" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
                 </svg>
-                <div className="absolute inset-x-0 bottom-[-12px] flex justify-center">
+                <div className="absolute inset-x-0 bottom-0 flex justify-center">
                   <span className={`text-[10px] font-mono select-none ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {vcu.label}
                   </span>
