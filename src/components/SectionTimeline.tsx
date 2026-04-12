@@ -69,6 +69,7 @@ export default function SectionTimeline({
   const [chordsOpen, setChordsOpen] = useState(false);
   const [lyricsOpen, setLyricsOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   if (sections.length === 0) {
     return (
@@ -246,61 +247,74 @@ export default function SectionTimeline({
         );
       })()}
 
-      {/* Detail strip — State 2: Section selected that belongs to a VCU */}
-      {!isMultiSelect && selectedSection && selectedSectionVcu && (() => {
-        const range = getVcuTimeRange(selectedSectionVcu);
-        return (
-          <div className="mt-2 space-y-0">
-            <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
-              {editingVcuLabel === selectedSectionVcu.id ? (
-                <input
-                  autoFocus
-                  onFocus={e => e.target.select()}
-                  value={vcuLabelValue}
-                  onChange={e => setVcuLabelValue(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }
-                    if (e.key === 'Escape') setEditingVcuLabel(null);
-                  }}
-                  onBlur={() => { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }}
-                  className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20"
-                />
-              ) : (
-                <button
-                  onClick={() => { setEditingVcuLabel(selectedSectionVcu.id); setVcuLabelValue(selectedSectionVcu.label); }}
-                  className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
-                >
-                  {selectedSectionVcu.label}
-                  <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
-                </button>
+      {/* Detail strip — collapsible, for section selected with or without VCU */}
+      {!isMultiSelect && selectedSection && (
+        <div className="mt-2 rounded-md bg-card border border-border overflow-hidden">
+          <button
+            onClick={() => setDetailsOpen(prev => !prev)}
+            className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronRight className={`h-3 w-3 transition-transform ${detailsOpen ? 'rotate-90' : ''}`} />
+            <span className={detailsOpen ? 'text-[10px] text-muted-foreground' : ''}>Details</span>
+          </button>
+          {detailsOpen && (
+            <div className="px-2 pb-1.5">
+              {selectedSectionVcu && (() => {
+                const range = getVcuTimeRange(selectedSectionVcu);
+                return (
+                  <div className="space-y-0">
+                    <div className="flex items-center gap-3 px-0 py-1 text-sm font-mono">
+                      {editingVcuLabel === selectedSectionVcu.id ? (
+                        <input
+                          autoFocus
+                          onFocus={e => e.target.select()}
+                          value={vcuLabelValue}
+                          onChange={e => setVcuLabelValue(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }
+                            if (e.key === 'Escape') setEditingVcuLabel(null);
+                          }}
+                          onBlur={() => { onVcuLabelChange(selectedSectionVcu.id, vcuLabelValue); setEditingVcuLabel(null); }}
+                          className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20"
+                        />
+                      ) : (
+                        <button
+                          onClick={() => { setEditingVcuLabel(selectedSectionVcu.id); setVcuLabelValue(selectedSectionVcu.label); }}
+                          className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
+                        >
+                          {selectedSectionVcu.label}
+                          <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                        </button>
+                      )}
+                      <span className="text-muted-foreground text-xs">|</span>
+                      <span className="text-xs text-muted-foreground">{formatTime(range.start)}</span>
+                      <span className="text-muted-foreground text-xs">–</span>
+                      <span className="text-xs text-muted-foreground">{formatTime(range.end)}</span>
+                      <div className="flex-1" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDeleteVcu(selectedSectionVcu.id); }}
+                        className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
+                        title="Remove grouping"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-3 pl-3 py-1 text-sm font-mono">
+                      <span className="text-muted-foreground text-xs">↳</span>
+                      <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+                      {renderSectionControls(selectedSection)}
+                    </div>
+                  </div>
+                );
+              })()}
+              {!selectedSectionVcu && (
+                <div className="flex items-center gap-3 px-0 py-1 text-sm font-mono">
+                  <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+                  {renderSectionControls(selectedSection)}
+                </div>
               )}
-              <span className="text-muted-foreground text-xs">|</span>
-              <span className="text-xs text-muted-foreground">{formatTime(range.start)}</span>
-              <span className="text-muted-foreground text-xs">–</span>
-              <span className="text-xs text-muted-foreground">{formatTime(range.end)}</span>
-              <div className="flex-1" />
-              <button
-                onClick={(e) => { e.stopPropagation(); onDeleteVcu(selectedSectionVcu.id); }}
-                className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
-                title="Remove grouping"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
             </div>
-            <div className="flex items-center gap-3 pl-5 pr-2 py-1.5 rounded-b-md bg-card border border-border border-t-0 text-sm font-mono">
-              <span className="text-muted-foreground text-xs">↳</span>
-              <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
-              {renderSectionControls(selectedSection)}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Detail strip — State 1: Section selected, no VCU */}
-      {!isMultiSelect && selectedSection && !selectedSectionVcu && (
-        <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
-          <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
-          {renderSectionControls(selectedSection)}
+          )}
         </div>
       )}
 
@@ -358,9 +372,20 @@ export default function SectionTimeline({
               <div className="px-3 pb-2">
                 <textarea
                   value={selectedSection.notes}
-                  onChange={e => onNotesChange(selectedId, e.target.value)}
+                  onChange={e => {
+                    onNotesChange(selectedId, e.target.value);
+                    const el = e.target;
+                    el.style.height = 'auto';
+                    el.style.height = el.scrollHeight + 'px';
+                  }}
+                  ref={el => {
+                    if (el) {
+                      el.style.height = 'auto';
+                      el.style.height = el.scrollHeight + 'px';
+                    }
+                  }}
                   placeholder="Add notes for this section…"
-                  className="w-full h-28 bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none"
+                  className="w-full min-h-[32px] bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
                 />
               </div>
             )}

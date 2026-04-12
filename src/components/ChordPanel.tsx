@@ -120,8 +120,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
 
   if (chordLines.length === 0 && !editMode) {
     return (
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground/60 font-mono italic">No chords yet</p>
+      <div className="flex justify-end">
         <button
           onClick={() => { addLine(); setEditMode(true); }}
           className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"

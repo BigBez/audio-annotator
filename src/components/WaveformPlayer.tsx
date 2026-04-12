@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import { Play, Pause, Square } from 'lucide-react';
+import { Play, Pause, Square, ChevronUp, ChevronDown } from 'lucide-react';
 import { formatTime, type Section } from '@/lib/sections';
 
 interface WaveformPlayerProps {
@@ -24,6 +24,7 @@ export default function WaveformPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [waveformCollapsed, setWaveformCollapsed] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -75,7 +76,7 @@ export default function WaveformPlayer({
   }, []);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Controls */}
       <div className="flex items-center justify-center gap-2">
         <button
@@ -94,14 +95,23 @@ export default function WaveformPlayer({
         <span className="ml-3 text-xs text-muted-foreground font-mono">Space to play/pause · Enter to mark section</span>
       </div>
 
-      {/* Time display */}
-      <div className="flex items-center justify-between font-mono text-sm">
-        <span className="text-accent-foreground">{formatTime(currentTime)}</span>
-        <span className="text-muted-foreground">{formatTime(duration)}</span>
+      {/* Waveform with collapse toggle */}
+      <div className="relative">
+        {!waveformCollapsed && (
+          <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2" />
+        )}
+        {waveformCollapsed && (
+          <div ref={containerRef} className="hidden" />
+        )}
+        <button
+          onClick={() => setWaveformCollapsed(prev => !prev)}
+          className="absolute -bottom-1 right-1 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors z-10"
+          title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
+          style={waveformCollapsed ? { position: 'relative', bottom: 'auto', right: 'auto', float: 'right' } : {}}
+        >
+          {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+        </button>
       </div>
-
-      {/* Waveform */}
-      <div ref={containerRef} className="rounded-lg bg-secondary/50 p-2" />
     </div>
   );
 }

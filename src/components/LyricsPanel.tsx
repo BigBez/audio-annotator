@@ -58,8 +58,7 @@ export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) 
 
   if (lyricLines.length === 0 && !editMode) {
     return (
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground/60 font-mono italic">No lyrics yet</p>
+      <div className="flex justify-end">
         <button
           onClick={() => { addLine(); setEditMode(true); }}
           className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
