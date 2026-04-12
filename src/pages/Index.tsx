@@ -480,8 +480,9 @@ export default function Index() {
         const idx = secs.findIndex(s => s.id === selId);
         if (idx === -1) return;
         const section = secs[idx];
+        const delta = e.shiftKey ? 0.5 : 0.1;
         if (e.code === 'Comma') {
-          const newEnd = section.end - 0.1;
+          const newEnd = section.end - delta;
           if (newEnd <= section.start) return;
           pushUndo();
           setSections(prev => {
@@ -495,7 +496,7 @@ export default function Index() {
           });
         } else {
           if (idx === secs.length - 1) return;
-          const newEnd = section.end + 0.1;
+          const newEnd = section.end + delta;
           if (newEnd >= secs[idx + 1].end) return;
           pushUndo();
           setSections(prev => {

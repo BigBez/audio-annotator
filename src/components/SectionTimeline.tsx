@@ -144,7 +144,7 @@ export default function SectionTimeline({
 
       {/* VCU lane — below section blocks, brackets open downward */}
       {vcuSpans.length > 0 && (
-        <div className="relative w-full h-4 -mt-2">
+        <div className="relative w-full h-4 -mt-2 mb-4">
           {vcuSpans.map(vcu => {
             const range = getVcuTimeRange(vcu);
             if (range.end <= range.start) return null;
