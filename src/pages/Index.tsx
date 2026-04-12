@@ -353,7 +353,7 @@ export default function Index() {
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         {!file ? (
-          <AudioUpload onFileLoaded={setFile} />
+          <AudioUpload onFileLoaded={setFile} onJsonImport={processJsonImport} />
         ) : (
           <>
             <div className="flex items-center gap-3">
