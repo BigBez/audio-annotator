@@ -13,13 +13,17 @@ export interface ModularGraphState {
   boxWidths: Record<string, number>;
   joinedGroups: JoinedGroup[];
   barCounts: Record<string, string>;
+  boxColors: Record<string, string>;
 }
 
 export const DEFAULT_MODULAR_STATE: ModularGraphState = {
   boxWidths: {},
   joinedGroups: [],
   barCounts: {},
+  boxColors: {},
 };
+
+const DEFAULT_BOX_COLOR = '#E8E4DC';
 
 interface ModularGraphProps {
   sections: Section[];
