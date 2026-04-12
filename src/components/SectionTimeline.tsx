@@ -162,7 +162,7 @@ export default function SectionTimeline({
                 if (e.shiftKey) {
                   onShiftSelect(section.id);
                 } else {
-                  setSelectedId(isSelected ? null : section.id);
+                  setSelectedId(section.id);
                   onSeek(section.start);
                 }
               }}
