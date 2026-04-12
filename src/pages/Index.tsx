@@ -113,9 +113,29 @@ export default function Index() {
 
   const handleShiftSelect = useCallback((id: string) => {
     setShiftSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      const currentSections = sectionsRef.current;
+      const clickedIdx = currentSections.findIndex(s => s.id === id);
+      if (clickedIdx === -1) return prev;
+
+      if (prev.size === 0) {
+        // First shift-click: just select this one section
+        return new Set([id]);
+      }
+
+      // Find indices of all currently selected sections
+      const selectedIndices = Array.from(prev)
+        .map(sid => currentSections.findIndex(s => s.id === sid))
+        .filter(i => i !== -1);
+      selectedIndices.push(clickedIdx);
+
+      const minIdx = Math.min(...selectedIndices);
+      const maxIdx = Math.max(...selectedIndices);
+
+      // Select the full contiguous range
+      const next = new Set<string>();
+      for (let i = minIdx; i <= maxIdx; i++) {
+        next.add(currentSections[i].id);
+      }
       return next;
     });
     setSelectedSectionId(null);
