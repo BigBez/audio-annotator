@@ -3,7 +3,7 @@ import WaveSurfer from 'wavesurfer.js';
 import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
-import BarCountLayer from '@/components/BarCountLayer';
+import ModularGraph, { type ModularGraphState, DEFAULT_MODULAR_STATE } from '@/components/ModularGraph';
 import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -13,6 +13,7 @@ interface UndoSnapshot {
   boundaries: number[];
   vcuSpans: VcuSpan[];
   cmdSelectedIds: string[];
+  modularGraph: ModularGraphState;
 }
 
 export default function Index() {
@@ -26,6 +27,7 @@ export default function Index() {
   const [selectedVcuId, setSelectedVcuId] = useState<string | null>(null);
   const [shiftSelectedIds, setShiftSelectedIds] = useState<Set<string>>(new Set());
   const [cmdSelectedIds, setCmdSelectedIds] = useState<Set<string>>(new Set());
+  const [modularGraph, setModularGraph] = useState<ModularGraphState>(DEFAULT_MODULAR_STATE);
   const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
@@ -42,6 +44,8 @@ export default function Index() {
   cmdSelectedIdsRef.current = cmdSelectedIds;
   const shiftSelectedIdsRef = useRef<Set<string>>(new Set());
   shiftSelectedIdsRef.current = shiftSelectedIds;
+  const modularGraphRef = useRef<ModularGraphState>(DEFAULT_MODULAR_STATE);
+  modularGraphRef.current = modularGraph;
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
@@ -49,6 +53,7 @@ export default function Index() {
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
       cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
+      modularGraph: structuredClone(modularGraphRef.current),
     });
     redoStackRef.current = [];
   }, []);
@@ -224,6 +229,69 @@ export default function Index() {
     setSelectedSectionId(sectionIds[0]);
   }, [pushUndo]);
 
+  // Create modular graph joined group from selected sections (J key)
+  const handleJoinModular = useCallback(() => {
+    const cmd = cmdSelectedIdsRef.current;
+    const sel = selectedSectionIdRef.current;
+    const allSelected = new Set([...cmd]);
+    if (sel && allSelected.size === 0) {
+      // Single selection — nothing to join
+      return;
+    }
+    if (allSelected.size < 2) return;
+
+    const currentSections = sectionsRef.current;
+    const indices = Array.from(allSelected)
+      .map(id => currentSections.findIndex(s => s.id === id))
+      .filter(i => i !== -1)
+      .sort((a, b) => a - b);
+
+    if (indices.length < 2) return;
+
+    pushUndo();
+
+    const minIdx = indices[0];
+    const maxIdx = indices[indices.length - 1];
+    const sectionIds: string[] = [];
+    for (let i = minIdx; i <= maxIdx; i++) {
+      sectionIds.push(currentSections[i].id);
+    }
+
+    // Remove any existing groups that overlap
+    const currentGroups = modularGraphRef.current.joinedGroups.filter(
+      g => !g.sectionIds.some(id => sectionIds.includes(id))
+    );
+
+    const groupNumber = currentGroups.length + 1;
+    const newGroup = {
+      id: `mg-group-${Date.now()}`,
+      label: `Group ${groupNumber}`,
+      sectionIds,
+    };
+
+    setModularGraph(prev => ({
+      ...prev,
+      joinedGroups: [...currentGroups, newGroup],
+    }));
+    setCmdSelectedIds(new Set());
+    setSelectedSectionId(sectionIds[0]);
+  }, [pushUndo]);
+
+  // Split modular graph joined group (S key)
+  const handleSplitModular = useCallback(() => {
+    const selId = selectedSectionIdRef.current;
+    if (!selId) return;
+
+    const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(selId));
+    if (!group) return;
+
+    pushUndo();
+    setModularGraph(prev => ({
+      ...prev,
+      joinedGroups: prev.joinedGroups.filter(g => g.id !== group.id),
+    }));
+  }, [pushUndo]);
+
   // Undo
   const handleUndo = useCallback(() => {
     const snapshot = undoStackRef.current.pop();
@@ -233,11 +301,13 @@ export default function Index() {
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
       cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
+      modularGraph: structuredClone(modularGraphRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
     setVcuSpans(snapshot.vcuSpans);
     setCmdSelectedIds(new Set(snapshot.cmdSelectedIds));
+    setModularGraph(snapshot.modularGraph);
   }, []);
 
   // Redo
@@ -249,11 +319,13 @@ export default function Index() {
       boundaries: [...boundariesRef.current],
       vcuSpans: structuredClone(vcuSpansRef.current),
       cmdSelectedIds: Array.from(cmdSelectedIdsRef.current),
+      modularGraph: structuredClone(modularGraphRef.current),
     });
     setSections(snapshot.sections);
     boundariesRef.current = snapshot.boundaries;
     setVcuSpans(snapshot.vcuSpans);
     setCmdSelectedIds(new Set(snapshot.cmdSelectedIds));
+    setModularGraph(snapshot.modularGraph);
   }, []);
 
   // Save analysis as JSON
@@ -278,6 +350,11 @@ export default function Index() {
         label: v.label,
         sectionIds: v.sectionIds,
       })),
+      modularGraph: {
+        boxWidths: modularGraph.boxWidths,
+        joinedGroups: modularGraph.joinedGroups,
+        barCounts: modularGraph.barCounts,
+      },
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -286,7 +363,7 @@ export default function Index() {
     a.download = file.name.replace(/\.[^/.]+$/, '') + '.json';
     a.click();
     URL.revokeObjectURL(url);
-  }, [file, sections, vcuSpans]);
+  }, [file, sections, vcuSpans, modularGraph]);
 
   // Load analysis from JSON
   const handleImport = useCallback(() => {
@@ -334,6 +411,15 @@ export default function Index() {
           } else {
             setVcuSpans([]);
           }
+          if (data.modularGraph) {
+            setModularGraph({
+              boxWidths: data.modularGraph.boxWidths ?? {},
+              joinedGroups: data.modularGraph.joinedGroups ?? [],
+              barCounts: data.modularGraph.barCounts ?? {},
+            });
+          } else {
+            setModularGraph(DEFAULT_MODULAR_STATE);
+          }
         } catch {
           toast({ title: 'Import failed', description: 'Could not parse JSON file.' });
         }
@@ -371,6 +457,13 @@ export default function Index() {
       ...v,
       sectionIds: v.sectionIds.filter(sid => sid !== id),
     })).filter(v => v.sectionIds.length > 0));
+    // Clean up modular graph joined groups
+    setModularGraph(prev => ({
+      ...prev,
+      joinedGroups: prev.joinedGroups
+        .map(g => ({ ...g, sectionIds: g.sectionIds.filter(sid => sid !== id) }))
+        .filter(g => g.sectionIds.length > 1),
+    }));
     setTimeout(() => {
       if (absorbingId) setSelectedSectionId(absorbingId);
     }, 0);
@@ -405,6 +498,14 @@ export default function Index() {
       if (e.code === 'KeyG' && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         handleCreateGroup();
+      }
+      if (e.code === 'KeyJ' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        handleJoinModular();
+      }
+      if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        handleSplitModular();
       }
       if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
@@ -511,7 +612,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleJoinModular, handleSplitModular, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
@@ -599,6 +700,7 @@ export default function Index() {
     redoStackRef.current = [];
     setShiftSelectedIds(new Set());
     setCmdSelectedIds(new Set());
+    setModularGraph(DEFAULT_MODULAR_STATE);
   }, []);
 
   return (
@@ -673,6 +775,23 @@ export default function Index() {
                   />
               )}
             </div>
+
+            {duration > 0 && sections.length > 0 && (
+              <ModularGraph
+                sections={sections}
+                currentTime={currentTime}
+                selectedId={selectedSectionId}
+                cmdSelectedIds={cmdSelectedIds}
+                modularState={modularGraph}
+                onSelectedIdChange={handleSectionSelect}
+                onCmdSelect={handleCmdSelect}
+                onSeek={handleSeek}
+                onColorChange={handleColorChange}
+                onLabelChange={handleLabelChange}
+                onModularStateChange={setModularGraph}
+                pushUndo={pushUndo}
+              />
+            )}
           </>
         )}
       </main>
