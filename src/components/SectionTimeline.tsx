@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { formatTime, parseTime, type Section, type VcuSpan } from '@/lib/sections';
+import { formatTime, parseTime, type Section, type VcuSpan, type ChordLine } from '@/lib/sections';
+import { ChevronRight } from 'lucide-react';
+import ChordPanel from '@/components/ChordPanel';
 import { X, Pencil } from 'lucide-react';
 import ColorPickerButton from '@/components/ColorPickerButton';
 
@@ -22,6 +24,7 @@ interface SectionTimelineProps {
   onDelete: (id: string) => void;
   onBoundaryEdit: (id: string, field: 'start' | 'end', value: number) => void;
   onNotesChange: (id: string, notes: string) => void;
+  onChordLinesChange: (id: string, chordLines: ChordLine[]) => void;
   onColorChange: (ids: string[], color: string) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
@@ -47,6 +50,7 @@ export default function SectionTimeline({
   onDelete,
   onBoundaryEdit,
   onNotesChange,
+  onChordLinesChange,
   onColorChange,
   onVcuLabelChange,
   onDeleteVcu,
