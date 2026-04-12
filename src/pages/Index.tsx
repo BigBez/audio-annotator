@@ -829,6 +829,7 @@ export default function Index() {
                     onDelete={handleDeleteSection}
                     onBoundaryEdit={handleBoundaryEdit}
                     onNotesChange={handleNotesChange}
+                    onChordLinesChange={handleChordLinesChange}
                     onColorChange={handleColorChange}
                     onVcuLabelChange={handleVcuLabelChange}
                     onDeleteVcu={handleDeleteVcu}
