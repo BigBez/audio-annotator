@@ -22,13 +22,8 @@ export function getColorForIndex(index: number): string {
   return SECTION_COLORS[index % SECTION_COLORS.length];
 }
 
-const SECTION_LABELS = [
-  'Intro', 'Verse 1', 'Chorus 1', 'Verse 2', 'Chorus 2',
-  'Bridge', 'Chorus 3', 'Outro', 'Section 9', 'Section 10',
-];
-
 export function getDefaultLabel(index: number): string {
-  return index < SECTION_LABELS.length ? SECTION_LABELS[index] : `Section ${index + 1}`;
+  return String(index + 1);
 }
 
 export function formatTime(seconds: number): string {

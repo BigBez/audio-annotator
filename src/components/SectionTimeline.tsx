@@ -10,6 +10,7 @@ interface SectionTimelineProps {
   onLabelChange: (id: string, label: string) => void;
   onDelete: (id: string) => void;
   onBoundaryEdit: (id: string, field: 'start' | 'end', value: number) => void;
+  onNotesChange: (id: string, notes: string) => void;
 }
 
 export default function SectionTimeline({
@@ -20,6 +21,7 @@ export default function SectionTimeline({
   onLabelChange,
   onDelete,
   onBoundaryEdit,
+  onNotesChange,
 }: SectionTimelineProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
