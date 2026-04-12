@@ -248,6 +248,7 @@ export default function Index() {
     setDuration(0);
     boundariesRef.current = [];
     undoStackRef.current = [];
+    redoStackRef.current = [];
   }, []);
 
   return (
