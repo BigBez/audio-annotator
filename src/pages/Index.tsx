@@ -238,8 +238,9 @@ export default function Index() {
   // Create modular graph joined group from selected sections (J key)
   const handleJoinModular = useCallback(() => {
     const cmd = cmdSelectedIdsRef.current;
+    const shift = shiftSelectedIdsRef.current;
     const sel = selectedSectionIdRef.current;
-    const allSelected = new Set([...cmd]);
+    const allSelected = new Set([...cmd, ...shift]);
     if (sel && allSelected.size === 0) return;
     if (allSelected.size < 2) return;
 
