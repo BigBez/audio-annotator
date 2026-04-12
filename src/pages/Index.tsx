@@ -190,8 +190,8 @@ export default function Index() {
     setVcuSpans(prev => [...prev, newVcu]);
     setShiftSelectedIds(new Set());
     shiftAnchorRef.current = null;
-    setSelectedVcuId(newVcu.id);
-    setSelectedSectionId(null);
+    setSelectedVcuId(null);
+    setSelectedSectionId(sectionIds[0]);
   }, [shiftSelectedIds, pushUndo]);
 
   // Undo
