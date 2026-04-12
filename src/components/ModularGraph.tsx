@@ -34,7 +34,6 @@ interface ModularGraphProps {
   onSelectedIdChange: (id: string | null) => void;
   onCmdSelect: (id: string) => void;
   onSeek: (time: number) => void;
-  onColorChange: (ids: string[], color: string) => void;
   onLabelChange: (id: string, label: string) => void;
   onModularStateChange: (state: ModularGraphState) => void;
   pushUndo: () => void;
@@ -49,7 +48,6 @@ export default function ModularGraph({
   onSelectedIdChange,
   onCmdSelect,
   onSeek,
-  onColorChange,
   onLabelChange,
   onModularStateChange,
   pushUndo,
