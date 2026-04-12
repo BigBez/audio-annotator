@@ -227,7 +227,8 @@ export default function ModularGraph({
 
       {/* Boxes row with group labels */}
       <div className="overflow-x-auto">
-        <div className="flex items-end" style={{ gap: 0, justifyContent: 'flex-start' }}>
+        <div style={{ width: 'fit-content', margin: '0 auto' }}>
+        <div className="flex items-end" style={{ gap: 0 }}>
           {renderItems.map((item) => {
             if (item.type === 'single') {
               return (
