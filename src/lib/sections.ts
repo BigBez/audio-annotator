@@ -10,6 +10,13 @@ export interface ChordLine {
   suffix: string;
 }
 
+export interface LyricLine {
+  id: string;
+  text: string;
+  startTime: number | null;
+  endTime: number | null;
+}
+
 export interface Section {
   id: string;
   start: number;
@@ -19,6 +26,7 @@ export interface Section {
   notes: string;
   bars: string | null;
   chordLines: ChordLine[];
+  lyricLines: LyricLine[];
 }
 
 export interface VcuSpan {

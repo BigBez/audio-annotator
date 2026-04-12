@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { formatTime, parseTime, type Section, type VcuSpan, type ChordLine } from '@/lib/sections';
+import { formatTime, parseTime, type Section, type VcuSpan, type ChordLine, type LyricLine } from '@/lib/sections';
 import { ChevronRight } from 'lucide-react';
 import ChordPanel from '@/components/ChordPanel';
+import LyricsPanel from '@/components/LyricsPanel';
 import { X, Pencil } from 'lucide-react';
 import ColorPickerButton from '@/components/ColorPickerButton';
 
@@ -26,6 +27,7 @@ interface SectionTimelineProps {
   onNotesChange: (id: string, notes: string) => void;
   onChordLinesChange: (id: string, chordLines: ChordLine[]) => void;
   onColorChange: (ids: string[], color: string) => void;
+  onLyricLinesChange: (id: string, lyricLines: LyricLine[]) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
   
@@ -52,6 +54,7 @@ export default function SectionTimeline({
   onNotesChange,
   onChordLinesChange,
   onColorChange,
+  onLyricLinesChange,
   onVcuLabelChange,
   onDeleteVcu,
   
@@ -330,11 +333,14 @@ export default function SectionTimeline({
               className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
-              Lyrics
+              <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
             </button>
             {lyricsOpen && (
               <div className="px-3 pb-2">
-                <p className="text-xs text-muted-foreground/60 font-mono italic">Coming soon</p>
+                <LyricsPanel
+                  lyricLines={selectedSection.lyricLines}
+                  onChange={lines => onLyricLinesChange(selectedId!, lines)}
+                />
               </div>
             )}
           </div>
