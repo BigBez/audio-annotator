@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { formatTime, parseTime, type Section, type VcuSpan } from '@/lib/sections';
 import { X, Pencil } from 'lucide-react';
-import ColorSwatches from '@/components/ColorSwatches';
+import ColorPickerButton from '@/components/ColorPickerButton';
 
 interface SectionTimelineProps {
   sections: Section[];
@@ -187,15 +187,11 @@ export default function SectionTimeline({
 
       {/* Detail strip — State B: multi-select */}
       {isMultiSelect && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
-            <span className="text-xs text-muted-foreground">{multiSelectedIds.size} sections selected</span>
-            <div className="flex-1" />
-            <span className="text-[10px] text-muted-foreground">G to group</span>
-          </div>
-          <div className="px-2">
-            <ColorSwatches onColorSelect={(color) => onColorChange(Array.from(multiSelectedIds), color)} />
-          </div>
+        <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+          <ColorPickerButton mode="multi" onColorSelect={(color) => onColorChange(Array.from(multiSelectedIds), color)} />
+          <span className="text-xs text-muted-foreground">{multiSelectedIds.size} sections selected</span>
+          <div className="flex-1" />
+          <span className="text-[10px] text-muted-foreground">G to group</span>
         </div>
       )}
 
@@ -283,13 +279,10 @@ export default function SectionTimeline({
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
-            <div className="flex items-center gap-3 pl-5 pr-2 py-1.5 bg-card border border-border text-sm font-mono">
+            <div className="flex items-center gap-3 pl-5 pr-2 py-1.5 rounded-b-md bg-card border border-border border-t-0 text-sm font-mono">
               <span className="text-muted-foreground text-xs">↳</span>
-              <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: selectedSection.color }} />
+              <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
               {renderSectionControls(selectedSection)}
-            </div>
-            <div className="px-5 py-1.5 rounded-b-md bg-card border border-border border-t-0">
-              <ColorSwatches activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
             </div>
           </div>
         );
@@ -297,14 +290,9 @@ export default function SectionTimeline({
 
       {/* Detail strip — State 1: Section selected, no VCU */}
       {!isMultiSelect && selectedSection && !selectedSectionVcu && (
-        <div className="space-y-0">
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
-            <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: selectedSection.color }} />
-            {renderSectionControls(selectedSection)}
-          </div>
-          <div className="px-2 py-1.5 rounded-b-md bg-card border border-border border-t-0">
-            <ColorSwatches activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
-          </div>
+        <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+          <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+          {renderSectionControls(selectedSection)}
         </div>
       )}
 
