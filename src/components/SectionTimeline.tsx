@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatTime, parseTime, type Section, type VcuSpan } from '@/lib/sections';
 import { X, Pencil } from 'lucide-react';
+import ColorSwatches from '@/components/ColorSwatches';
 
 interface SectionTimelineProps {
   sections: Section[];
@@ -10,15 +11,18 @@ interface SectionTimelineProps {
   selectedId: string | null;
   selectedVcuId: string | null;
   shiftSelectedIds: Set<string>;
+  cmdSelectedIds: Set<string>;
   isPlaying: boolean;
   onSelectedIdChange: (id: string | null) => void;
   onSelectedVcuIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
+  onCmdSelect: (id: string) => void;
   onSeek: (time: number) => void;
   onLabelChange: (id: string, label: string) => void;
   onDelete: (id: string) => void;
   onBoundaryEdit: (id: string, field: 'start' | 'end', value: number) => void;
   onNotesChange: (id: string, notes: string) => void;
+  onColorChange: (ids: string[], color: string) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
   barCountLayer?: React.ReactNode;
@@ -32,15 +36,18 @@ export default function SectionTimeline({
   selectedId,
   selectedVcuId,
   shiftSelectedIds,
+  cmdSelectedIds,
   isPlaying,
   onSelectedIdChange,
   onSelectedVcuIdChange,
   onShiftSelect,
+  onCmdSelect,
   onSeek,
   onLabelChange,
   onDelete,
   onBoundaryEdit,
   onNotesChange,
+  onColorChange,
   onVcuLabelChange,
   onDeleteVcu,
   barCountLayer,
@@ -64,10 +71,8 @@ export default function SectionTimeline({
 
   const activeSection = sections.find(s => currentTime >= s.start && currentTime < s.end);
 
-  // Find VCU for a section
   const getVcuForSection = (sectionId: string) => vcuSpans.find(v => v.sectionIds.includes(sectionId));
 
-  // Compute VCU time range
   const getVcuTimeRange = (vcu: VcuSpan) => {
     const vcuSections = vcu.sectionIds.map(id => sections.find(s => s.id === id)).filter(Boolean) as Section[];
     if (vcuSections.length === 0) return { start: 0, end: 0 };
@@ -77,14 +82,17 @@ export default function SectionTimeline({
     };
   };
 
-  // Selected section and its VCU
   const selectedSection = selectedId ? sections.find(s => s.id === selectedId) : null;
   const selectedSectionVcu = selectedId ? getVcuForSection(selectedId) : null;
   const selectedVcu = selectedVcuId ? vcuSpans.find(v => v.id === selectedVcuId) : null;
 
+  // Determine if we're in multi-select mode
+  const multiSelectedIds = new Set([...shiftSelectedIds, ...cmdSelectedIds]);
+  const isMultiSelect = multiSelectedIds.size > 0;
+
   return (
     <div className="space-y-2" onClick={e => e.stopPropagation()}>
-      {/* VCU lane — only if VCUs exist */}
+      {/* VCU lane */}
       {vcuSpans.length > 0 && (
         <div className="relative w-full h-8 mb-1">
           {vcuSpans.map(vcu => {
@@ -109,19 +117,14 @@ export default function SectionTimeline({
                   onSelectedVcuIdChange(isSelected ? null : vcu.id);
                 }}
               >
-                {/* Label */}
                 <div className="absolute inset-x-0 top-0 flex justify-center">
                   <span className={`text-[10px] font-mono select-none ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {vcu.label}
                   </span>
                 </div>
-                {/* Bracket: horizontal line + vertical ticks */}
                 <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                  {/* Left tick */}
                   <line x1="0" y1="14" x2="0" y2="100%" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
-                  {/* Right tick */}
                   <line x1="100%" y1="14" x2="100%" y2="100%" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
-                  {/* Horizontal bar */}
                   <line x1="0" y1="14" x2="100%" y2="14" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" opacity={isSelected ? 0.8 : 0.4} />
                 </svg>
               </div>
@@ -130,8 +133,8 @@ export default function SectionTimeline({
         </div>
       )}
 
-      {/* Shift-select hint */}
-      {shiftSelectedIds.size > 0 && (
+      {/* Multi-select hint */}
+      {isMultiSelect && (
         <p className="text-[11px] font-mono text-muted-foreground text-center">Press G to group selected sections</p>
       )}
 
@@ -142,6 +145,7 @@ export default function SectionTimeline({
           const isActive = activeSection?.id === section.id;
           const isSelected = selectedId === section.id;
           const isShiftSelected = shiftSelectedIds.has(section.id);
+          const isCmdSelected = cmdSelectedIds.has(section.id);
 
           return (
             <div
@@ -150,8 +154,10 @@ export default function SectionTimeline({
               style={{
                 width: `${widthPercent}%`,
                 backgroundColor: section.color,
-                opacity: isActive ? 1 : isShiftSelected ? 0.9 : 0.7,
-                boxShadow: isActive
+                opacity: isActive ? 1 : (isShiftSelected || isCmdSelected) ? 0.9 : 0.7,
+                boxShadow: isCmdSelected
+                  ? 'inset 0 0 0 2px rgba(255, 255, 255, 0.9)'
+                  : isActive
                   ? 'inset 0 0 0 2px hsl(var(--foreground) / 0.5)'
                   : isShiftSelected
                   ? 'inset 0 0 0 2px hsl(var(--primary) / 0.8)'
@@ -161,6 +167,8 @@ export default function SectionTimeline({
                 e.stopPropagation();
                 if (e.shiftKey) {
                   onShiftSelect(section.id);
+                } else if (e.metaKey || e.ctrlKey) {
+                  onCmdSelect(section.id);
                 } else {
                   setSelectedId(section.id);
                   onSeek(section.start);
@@ -177,9 +185,22 @@ export default function SectionTimeline({
 
       {barCountLayer}
 
-      {/* Detail strip */}
-      {/* State 3: VCU selected directly */}
-      {selectedVcu && (() => {
+      {/* Detail strip — State B: multi-select */}
+      {isMultiSelect && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+            <span className="text-xs text-muted-foreground">{multiSelectedIds.size} sections selected</span>
+            <div className="flex-1" />
+            <span className="text-[10px] text-muted-foreground">G to group</span>
+          </div>
+          <div className="px-2">
+            <ColorSwatches onColorSelect={(color) => onColorChange(Array.from(multiSelectedIds), color)} />
+          </div>
+        </div>
+      )}
+
+      {/* Detail strip — State 3: VCU selected directly */}
+      {!isMultiSelect && selectedVcu && (() => {
         const range = getVcuTimeRange(selectedVcu);
         return (
           <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
@@ -221,12 +242,11 @@ export default function SectionTimeline({
         );
       })()}
 
-      {/* State 2: Section selected that belongs to a VCU */}
-      {selectedSection && selectedSectionVcu && (() => {
+      {/* Detail strip — State 2: Section selected that belongs to a VCU */}
+      {!isMultiSelect && selectedSection && selectedSectionVcu && (() => {
         const range = getVcuTimeRange(selectedSectionVcu);
         return (
           <div className="space-y-0">
-            {/* VCU row */}
             <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
               {editingVcuLabel === selectedSectionVcu.id ? (
                 <input
@@ -263,21 +283,28 @@ export default function SectionTimeline({
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
-            {/* Section row (indented) */}
-            <div className="flex items-center gap-3 pl-5 pr-2 py-1.5 rounded-b-md bg-card border border-border text-sm font-mono">
+            <div className="flex items-center gap-3 pl-5 pr-2 py-1.5 bg-card border border-border text-sm font-mono">
               <span className="text-muted-foreground text-xs">↳</span>
               <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: selectedSection.color }} />
               {renderSectionControls(selectedSection)}
+            </div>
+            <div className="px-5 py-1.5 rounded-b-md bg-card border border-border border-t-0">
+              <ColorSwatches activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
             </div>
           </div>
         );
       })()}
 
-      {/* State 1: Section selected, no VCU */}
-      {selectedSection && !selectedSectionVcu && (
-        <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
-          <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: selectedSection.color }} />
-          {renderSectionControls(selectedSection)}
+      {/* Detail strip — State 1: Section selected, no VCU */}
+      {!isMultiSelect && selectedSection && !selectedSectionVcu && (
+        <div className="space-y-0">
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
+            <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: selectedSection.color }} />
+            {renderSectionControls(selectedSection)}
+          </div>
+          <div className="px-2 py-1.5 rounded-b-md bg-card border border-border border-t-0">
+            <ColorSwatches activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+          </div>
         </div>
       )}
 
@@ -300,7 +327,6 @@ export default function SectionTimeline({
   function renderSectionControls(section: Section) {
     return (
       <>
-        {/* Editable label */}
         {editingLabel === section.id ? (
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             <input
@@ -328,7 +354,6 @@ export default function SectionTimeline({
 
         <span className="text-muted-foreground text-xs">|</span>
 
-        {/* Editable start time */}
         {editingTime?.id === section.id && editingTime.field === 'start' ? (
           <input
             autoFocus
@@ -360,7 +385,6 @@ export default function SectionTimeline({
 
         <span className="text-muted-foreground text-xs">–</span>
 
-        {/* Editable end time */}
         {editingTime?.id === section.id && editingTime.field === 'end' ? (
           <input
             autoFocus
