@@ -438,20 +438,31 @@ export default function Index() {
 
   const handleDeleteSection = useCallback((id: string) => {
     pushUndo();
+
+    // Determine which section absorbs the deleted one before updating state
+    const current = sectionsRef.current;
+    const idx = current.findIndex(s => s.id === id);
+    if (idx === -1) return;
+
+    let absorberId: string | null = null;
+    if (current.length > 1) {
+      absorberId = idx > 0 ? current[idx - 1].id : current[1].id;
+    }
+
     setSections(prev => {
-      const idx = prev.findIndex(s => s.id === id);
-      if (idx === -1) return prev;
-      const deleted = prev[idx];
+      const i = prev.findIndex(s => s.id === id);
+      if (i === -1) return prev;
+      const deleted = prev[i];
       const next = [...prev];
-      next.splice(idx, 1);
+      next.splice(i, 1);
 
       if (next.length === 0) {
         boundariesRef.current = [];
         return [];
       }
 
-      if (idx > 0) {
-        next[idx - 1] = { ...next[idx - 1], end: deleted.end };
+      if (i > 0) {
+        next[i - 1] = { ...next[i - 1], end: deleted.end };
       } else if (next.length > 0) {
         next[0] = { ...next[0], start: deleted.start };
       }
@@ -461,6 +472,8 @@ export default function Index() {
 
       return next;
     });
+
+    setSelectedSectionId(absorberId);
     // Also remove deleted section from any VCU spans
     setVcuSpans(prev => prev.map(v => ({
       ...v,
