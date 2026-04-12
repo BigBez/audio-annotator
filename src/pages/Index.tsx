@@ -280,15 +280,23 @@ export default function Index() {
   // Split modular graph joined group (S key)
   const handleSplitModular = useCallback(() => {
     const selId = selectedSectionIdRef.current;
-    if (!selId) return;
+    const cmdIds = cmdSelectedIdsRef.current;
+    const allIds = new Set<string>();
+    if (selId) allIds.add(selId);
+    cmdIds.forEach(id => allIds.add(id));
+    if (allIds.size === 0) return;
 
-    const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(selId));
-    if (!group) return;
+    const groupsToRemove = new Set<string>();
+    for (const id of allIds) {
+      const group = modularGraphRef.current.joinedGroups.find(g => g.sectionIds.includes(id));
+      if (group) groupsToRemove.add(group.id);
+    }
+    if (groupsToRemove.size === 0) return;
 
     pushUndo();
     setModularGraph(prev => ({
       ...prev,
-      joinedGroups: prev.joinedGroups.filter(g => g.id !== group.id),
+      joinedGroups: prev.joinedGroups.filter(g => !groupsToRemove.has(g.id)),
     }));
   }, [pushUndo]);
 
