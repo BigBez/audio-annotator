@@ -144,7 +144,7 @@ export default function SectionTimeline({
 
       {/* VCU lane — below section blocks, brackets open downward */}
       {vcuSpans.length > 0 && (
-        <div className="relative w-full h-4 -mt-2 mb-4">
+        <div className="relative w-full h-4 -mt-2">
           {vcuSpans.map(vcu => {
             const range = getVcuTimeRange(vcu);
             if (range.end <= range.start) return null;
@@ -185,7 +185,7 @@ export default function SectionTimeline({
 
       {/* Detail strip — State B: multi-select */}
       {isMultiSelect && (
-        <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+        <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
           <ColorPickerButton mode="multi" onColorSelect={(color) => onColorChange(Array.from(multiSelectedIds), color)} />
           <span className="text-xs text-muted-foreground">{multiSelectedIds.size} sections selected</span>
           <div className="flex-1" />
@@ -197,7 +197,7 @@ export default function SectionTimeline({
       {!isMultiSelect && selectedVcu && (() => {
         const range = getVcuTimeRange(selectedVcu);
         return (
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+           <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
             {editingVcuLabel === selectedVcu.id ? (
               <input
                 autoFocus
@@ -240,7 +240,7 @@ export default function SectionTimeline({
       {!isMultiSelect && selectedSection && selectedSectionVcu && (() => {
         const range = getVcuTimeRange(selectedSectionVcu);
         return (
-          <div className="space-y-0">
+          <div className="mt-2 space-y-0">
             <div className="flex items-center gap-3 px-2 py-1.5 rounded-t-md bg-card border border-border border-b-0 text-sm font-mono">
               {editingVcuLabel === selectedSectionVcu.id ? (
                 <input
@@ -288,7 +288,7 @@ export default function SectionTimeline({
 
       {/* Detail strip — State 1: Section selected, no VCU */}
       {!isMultiSelect && selectedSection && !selectedSectionVcu && (
-        <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+        <div className="mt-2 flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
           <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
           {renderSectionControls(selectedSection)}
         </div>
