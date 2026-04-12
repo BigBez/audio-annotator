@@ -147,7 +147,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   />
                 ) : (
                   line.prefix && (
-                    <span className="text-xs font-mono text-muted-foreground shrink-0 mr-1">{line.prefix}</span>
+                    renderBarlineSymbol(line.prefix) || <span className="text-xs font-mono text-muted-foreground shrink-0 mr-1">{line.prefix}</span>
                   )
                 )}
 
@@ -194,7 +194,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   />
                 ) : (
                   line.suffix && (
-                    <span className="text-xs font-mono text-muted-foreground shrink-0 ml-1">{line.suffix}</span>
+                    renderBarlineSymbol(line.suffix) || <span className="text-xs font-mono text-muted-foreground shrink-0 ml-1">{line.suffix}</span>
                   )
                 )}
 
