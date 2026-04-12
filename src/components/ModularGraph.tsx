@@ -402,7 +402,9 @@ export default function ModularGraph({
             </div>
           )}
           {/* Section detail row */}
-          <div className={`flex items-center gap-3 px-2 py-1.5 bg-card border border-border text-sm font-mono ${
+          <div
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            className={`flex items-center gap-3 px-2 py-1.5 bg-card border border-border text-sm font-mono ${
             selectedGroup ? 'rounded-b-md border-t-0 pl-5' : 'rounded-md'
           }`}>
             {selectedGroup && <span className="text-muted-foreground text-xs">↳</span>}
