@@ -66,43 +66,36 @@ export default function Index() {
     if (dur <= 0) return;
     const boundaries = boundariesRef.current;
 
-    // Prevent duplicate boundaries too close together
-    for (const b of boundaries) {
-      if (Math.abs(time - b) < 0.05) return;
-    }
+    if (boundaries.length > 0 && Math.abs(time - boundaries[boundaries.length - 1]) < 0.05) return;
 
     pushUndo();
 
     boundaries.push(time);
 
-    setSections(prev => {
-      if (prev.length === 0) {
-        // First boundary: create two sections spanning 0→time and time→dur
-        return [
-          { id: `section-${Date.now()}-a`, start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null },
-          { id: `section-${Date.now()}-b`, start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null },
-        ];
-      }
+    const allPoints = [0, ...boundaries, dur];
+    const unique = [...new Set(allPoints)].sort((a, b) => a - b);
 
-      // Find the section containing the playhead
-      const idx = prev.findIndex(s => time > s.start + 0.01 && time < s.end - 0.01);
-      if (idx === -1) return prev; // playhead is on an existing boundary
-
-      const original = prev[idx];
-      const firstHalf: Section = { ...original, end: time };
-      const secondHalf: Section = {
-        id: `section-${Date.now()}`,
-        start: time,
-        end: original.end,
-        label: getDefaultLabel(prev.length),
-        color: getColorForIndex(prev.length),
+    const newSections: Section[] = [];
+    for (let i = 0; i < unique.length - 1; i++) {
+      if (unique[i + 1] - unique[i] < 0.01) continue;
+      newSections.push({
+        id: `section-${i}`,
+        start: unique[i],
+        end: unique[i + 1],
+        label: getDefaultLabel(i),
+        color: getColorForIndex(i),
         notes: '',
         bars: null,
-      };
-
-      const next = [...prev];
-      next.splice(idx, 1, firstHalf, secondHalf);
-      return next;
+      });
+    }
+    setSections(prev => {
+      return newSections.map((ns, i) => {
+        const existing = prev.find(p => p.id === ns.id);
+        if (existing) {
+          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars, color: existing.color };
+        }
+        return ns;
+      });
     });
   }, []);
 
