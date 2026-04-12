@@ -75,19 +75,6 @@ export default function SectionTimeline({
                 {section.label}
               </span>
 
-              {/* Delete button */}
-              {isSelected && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedId(null);
-                    onDelete(section.id);
-                  }}
-                  className="absolute top-0.5 right-0.5 bg-background/80 rounded-full p-0.5 hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              )}
             </div>
           );
         })}
@@ -99,7 +86,7 @@ export default function SectionTimeline({
         if (!section) return null;
 
         return (
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono">
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono flex-1">
             {/* Color dot */}
             <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: section.color }} />
 
