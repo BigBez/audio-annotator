@@ -55,6 +55,7 @@ export default function ModularGraph({
   currentTime,
   selectedId,
   cmdSelectedIds,
+  shiftSelectedIds,
   modularState,
   onSelectedIdChange,
   onShiftSelect,
@@ -84,7 +85,7 @@ export default function ModularGraph({
 
   const activeSection = sections.find(s => currentTime >= s.start && currentTime < s.end);
 
-  const multiSelectedIds = new Set([...cmdSelectedIds]);
+  const multiSelectedIds = new Set([...cmdSelectedIds, ...shiftSelectedIds]);
   const isMultiSelect = multiSelectedIds.size > 0;
 
   const selectedSection = selectedId ? sections.find(s => s.id === selectedId) : null;
