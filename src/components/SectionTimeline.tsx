@@ -311,7 +311,7 @@ export default function SectionTimeline({
               className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
-              Chords
+              <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
             </button>
             {chordsOpen && (
               <div className="px-3 pb-2">

@@ -7,6 +7,37 @@ interface ChordPanelProps {
   onChange: (chordLines: ChordLine[]) => void;
 }
 
+const barlineStyle = { width: '1px', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', height: '1em', verticalAlign: 'middle' };
+const dotStyle = { width: '3px', height: '3px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block', verticalAlign: 'middle' };
+
+function renderBarlineSymbol(text: string) {
+  const t = text.trim();
+  if (t === '|:') return (
+    <span className="shrink-0 mr-1 inline-flex items-center gap-[2px]">
+      <span style={barlineStyle} />
+      <span style={dotStyle} />
+    </span>
+  );
+  if (t === ':|') return (
+    <span className="shrink-0 ml-1 inline-flex items-center gap-[2px]">
+      <span style={dotStyle} />
+      <span style={barlineStyle} />
+    </span>
+  );
+  if (t === '||') return (
+    <span className="shrink-0 inline-flex items-center gap-[1px]">
+      <span style={barlineStyle} />
+      <span style={barlineStyle} />
+    </span>
+  );
+  if (t === '|') return (
+    <span className="shrink-0 inline-flex items-center">
+      <span style={barlineStyle} />
+    </span>
+  );
+  return null;
+}
+
 export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
   const [editMode, setEditMode] = useState(false);
 
@@ -116,7 +147,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   />
                 ) : (
                   line.prefix && (
-                    <span className="text-xs font-mono text-muted-foreground shrink-0 mr-1">{line.prefix}</span>
+                    renderBarlineSymbol(line.prefix) || <span className="text-xs font-mono text-muted-foreground shrink-0 mr-1">{line.prefix}</span>
                   )
                 )}
 
@@ -163,7 +194,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
                   />
                 ) : (
                   line.suffix && (
-                    <span className="text-xs font-mono text-muted-foreground shrink-0 ml-1">{line.suffix}</span>
+                    renderBarlineSymbol(line.suffix) || <span className="text-xs font-mono text-muted-foreground shrink-0 ml-1">{line.suffix}</span>
                   )
                 )}
 
