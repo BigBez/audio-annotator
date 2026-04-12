@@ -6,6 +6,11 @@ import SectionTimeline from '@/components/SectionTimeline';
 import { type Section, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music } from 'lucide-react';
 
+interface UndoSnapshot {
+  sections: Section[];
+  boundaries: number[];
+}
+
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
@@ -16,6 +21,18 @@ export default function Index() {
   const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
+  const undoStackRef = useRef<UndoSnapshot[]>([]);
+
+  const pushUndo = useCallback(() => {
+    undoStackRef.current.push({
+      sections: structuredClone(sectionsRef.current),
+      boundaries: [...boundariesRef.current],
+    });
+  }, []);
+
+  // Keep a ref to current sections so pushUndo always reads latest
+  const sectionsRef = useRef<Section[]>([]);
+  sectionsRef.current = sections;
 
   const handleBoundary = useCallback(() => {
     const ws = wavesurferRef.current;
