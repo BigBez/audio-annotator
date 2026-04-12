@@ -148,51 +148,54 @@ export default function Index() {
     URL.revokeObjectURL(url);
   }, [file, sections]);
 
-  // Load analysis from JSON
+  // Process a JSON file for import
+  const processJsonImport = useCallback((f: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string);
+        if (!data.sections || !Array.isArray(data.sections)) {
+          toast({ title: 'Invalid file', description: 'No sections found in JSON.' });
+          return;
+        }
+        if (file && data.audioFilename && data.audioFilename !== file.name) {
+          toast({
+            title: 'Filename mismatch',
+            description: `This analysis was saved for "${data.audioFilename}" but the current file is "${file.name}".`,
+          });
+        }
+        const imported: Section[] = data.sections.map((s: any) => ({
+          id: s.id,
+          start: s.start,
+          end: s.end,
+          label: s.label,
+          color: s.color,
+          notes: s.content?.notes ?? s.notes ?? '',
+        }));
+        setSections(imported);
+        if (imported.length > 0) {
+          boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
+        } else {
+          boundariesRef.current = [];
+        }
+      } catch {
+        toast({ title: 'Import failed', description: 'Could not parse JSON file.' });
+      }
+    };
+    reader.readAsText(f);
+  }, [file]);
+
+  // Load analysis from JSON via file picker
   const handleImport = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
     input.onchange = () => {
       const f = input.files?.[0];
-      if (!f) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result as string);
-          if (!data.sections || !Array.isArray(data.sections)) {
-            toast({ title: 'Invalid file', description: 'No sections found in JSON.' });
-            return;
-          }
-          if (file && data.audioFilename && data.audioFilename !== file.name) {
-            toast({
-              title: 'Filename mismatch',
-              description: `This analysis was saved for "${data.audioFilename}" but the current file is "${file.name}".`,
-            });
-          }
-          const imported: Section[] = data.sections.map((s: any) => ({
-            id: s.id,
-            start: s.start,
-            end: s.end,
-            label: s.label,
-            color: s.color,
-            notes: s.content?.notes ?? s.notes ?? '',
-          }));
-          setSections(imported);
-          // Rebuild boundaries from imported sections
-          if (imported.length > 0) {
-            boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
-          } else {
-            boundariesRef.current = [];
-          }
-        } catch {
-          toast({ title: 'Import failed', description: 'Could not parse JSON file.' });
-        }
-      };
-      reader.readAsText(f);
+      if (f) processJsonImport(f);
     };
     input.click();
-  }, [file]);
+  }, [processJsonImport]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -350,7 +353,7 @@ export default function Index() {
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         {!file ? (
-          <AudioUpload onFileLoaded={setFile} />
+          <AudioUpload onFileLoaded={setFile} onJsonImport={processJsonImport} />
         ) : (
           <>
             <div className="flex items-center gap-3">
