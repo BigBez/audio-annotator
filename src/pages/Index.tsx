@@ -172,6 +172,10 @@ export default function Index() {
     shiftAnchorRef.current = null;
     setCmdSelectedIds(prev => {
       const next = new Set(prev);
+      // If starting a cmd selection, include the currently selected section as anchor
+      if (next.size === 0 && selectedSectionId && selectedSectionId !== id) {
+        next.add(selectedSectionId);
+      }
       if (next.has(id)) {
         next.delete(id);
       } else {
@@ -181,7 +185,7 @@ export default function Index() {
     });
     setSelectedSectionId(null);
     setSelectedVcuId(null);
-  }, []);
+  }, [selectedSectionId]);
 
   // Create VCU group from shift or cmd selected sections
   const handleCreateGroup = useCallback(() => {
