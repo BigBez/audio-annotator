@@ -79,6 +79,10 @@ export default function Index() {
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
   }, []);
 
+  const handleNotesChange = useCallback((id: string, notes: string) => {
+    setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
+  }, []);
+
   const handleDeleteSection = useCallback((id: string) => {
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === id);
@@ -216,7 +220,7 @@ export default function Index() {
                 onLabelChange={handleLabelChange}
                 onDelete={handleDeleteSection}
                 onBoundaryEdit={handleBoundaryEdit}
-              />
+                onNotesChange={handleNotesChange}
             )}
           </>
         )}
