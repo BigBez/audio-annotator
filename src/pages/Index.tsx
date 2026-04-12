@@ -4,7 +4,8 @@ import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
 import { type Section, getColorForIndex, getDefaultLabel } from '@/lib/sections';
-import { Music } from 'lucide-react';
+import { Music, Upload } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface UndoSnapshot {
   sections: Section[];
@@ -121,12 +122,89 @@ export default function Index() {
     boundariesRef.current = snapshot.boundaries;
   }, []);
 
+  // Save analysis as JSON
+  const handleSave = useCallback(() => {
+    if (!file || sections.length === 0) return;
+    const data = {
+      schemaVersion: 1,
+      audioFilename: file.name,
+      sections: sections.map(s => ({
+        id: s.id,
+        start: s.start,
+        end: s.end,
+        label: s.label,
+        color: s.color,
+        content: {
+          notes: s.notes,
+        },
+      })),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name.replace(/\.[^/.]+$/, '') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [file, sections]);
+
+  // Load analysis from JSON
+  const handleImport = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = () => {
+      const f = input.files?.[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result as string);
+          if (!data.sections || !Array.isArray(data.sections)) {
+            toast({ title: 'Invalid file', description: 'No sections found in JSON.' });
+            return;
+          }
+          if (file && data.audioFilename && data.audioFilename !== file.name) {
+            toast({
+              title: 'Filename mismatch',
+              description: `This analysis was saved for "${data.audioFilename}" but the current file is "${file.name}".`,
+            });
+          }
+          const imported: Section[] = data.sections.map((s: any) => ({
+            id: s.id,
+            start: s.start,
+            end: s.end,
+            label: s.label,
+            color: s.color,
+            notes: s.content?.notes ?? s.notes ?? '',
+          }));
+          setSections(imported);
+          // Rebuild boundaries from imported sections
+          if (imported.length > 0) {
+            boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
+          } else {
+            boundariesRef.current = [];
+          }
+        } catch {
+          toast({ title: 'Import failed', description: 'Could not parse JSON file.' });
+        }
+      };
+      reader.readAsText(f);
+    };
+    input.click();
+  }, [file]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
 
+      if (e.code === 'KeyS' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleSave();
+        return;
+      }
       if (e.code === 'Space') {
         e.preventDefault();
         wavesurferRef.current?.playPause();
@@ -145,7 +223,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo]);
+  }, [handleBoundary, handleUndo, handleSave]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
@@ -275,7 +353,17 @@ export default function Index() {
           <AudioUpload onFileLoaded={setFile} />
         ) : (
           <>
-            <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleImport(); }}
+                className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                title="Import analysis JSON"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Import
+              </button>
+            </div>
 
             <WaveformPlayer
               file={file}
