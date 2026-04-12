@@ -222,7 +222,6 @@ export default function Index() {
 
             <WaveformPlayer
               file={file}
-              sections={sections}
               onTimeUpdate={setCurrentTime}
               onDurationReady={setDuration}
               onPlayStateChange={setIsPlaying}
@@ -237,6 +236,7 @@ export default function Index() {
                 currentTime={currentTime}
                 duration={duration}
                 selectedId={selectedSectionId}
+                isPlaying={isPlaying}
                 onSelectedIdChange={handleSectionSelect}
                 onSeek={handleSeek}
                 onLabelChange={handleLabelChange}
