@@ -34,6 +34,8 @@ export default function Index() {
   sectionsRef.current = sections;
   const vcuSpansRef = useRef<VcuSpan[]>([]);
   vcuSpansRef.current = vcuSpans;
+  const selectedSectionIdRef = useRef<string | null>(null);
+  selectedSectionIdRef.current = selectedSectionId;
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
