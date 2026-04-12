@@ -3,6 +3,7 @@ import WaveSurfer from 'wavesurfer.js';
 import AudioUpload from '@/components/AudioUpload';
 import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
+import BarCountLayer from '@/components/BarCountLayer';
 import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@/lib/sections';
 import { Music, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -563,6 +564,13 @@ export default function Index() {
                 onVcuLabelChange={handleVcuLabelChange}
                 onDeleteVcu={handleDeleteVcu}
               />
+              {sections.length > 0 && (
+                <BarCountLayer
+                  sections={sections}
+                  duration={duration}
+                  onBarsChange={handleBarsChange}
+                />
+              )}
             )}
           </>
         )}
