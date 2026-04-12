@@ -72,8 +72,8 @@ export default function Index() {
       if (prev.length === 0) {
         if (time < 0.01 || dur - time < 0.01) return prev;
         return [
-          { id: crypto.randomUUID(), start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null, chordLines: [] },
-          { id: crypto.randomUUID(), start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null, chordLines: [] },
+          { id: crypto.randomUUID(), start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null, chordLines: [], lyricLines: [] },
+          { id: crypto.randomUUID(), start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null, chordLines: [], lyricLines: [] },
         ];
       }
 
@@ -98,6 +98,7 @@ export default function Index() {
         notes: '',
         bars: null,
         chordLines: [],
+        lyricLines: [],
       };
 
       const result = [...prev];
@@ -396,6 +397,7 @@ export default function Index() {
         },
         bars: s.bars,
         chordLines: s.chordLines,
+        lyricLines: s.lyricLines,
       })),
       vcuSpans: vcuSpans.map(v => ({
         id: v.id,
@@ -449,6 +451,7 @@ export default function Index() {
             notes: s.content?.notes ?? s.notes ?? '',
             bars: s.bars ?? null,
             chordLines: s.chordLines ?? s.content?.chordLines ?? [],
+            lyricLines: s.lyricLines ?? s.content?.lyricLines ?? [],
           }));
           setSections(imported);
           if (imported.length > 0) {
@@ -683,6 +686,10 @@ export default function Index() {
     setSections(prev => prev.map(s => s.id === id ? { ...s, chordLines } : s));
   }, [pushUndo]);
 
+  const handleLyricLinesChange = useCallback((id: string, lyricLines: import('@/lib/sections').LyricLine[]) => {
+    pushUndo();
+    setSections(prev => prev.map(s => s.id === id ? { ...s, lyricLines } : s));
+  }, [pushUndo]);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
     pushUndo();
@@ -831,6 +838,7 @@ export default function Index() {
                     onNotesChange={handleNotesChange}
                     onChordLinesChange={handleChordLinesChange}
                     onColorChange={handleColorChange}
+                    onLyricLinesChange={handleLyricLinesChange}
                     onVcuLabelChange={handleVcuLabelChange}
                     onDeleteVcu={handleDeleteVcu}
                   />
