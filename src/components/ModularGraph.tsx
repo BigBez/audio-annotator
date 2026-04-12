@@ -39,6 +39,7 @@ interface ModularGraphProps {
   currentTime: number;
   selectedId: string | null;
   cmdSelectedIds: Set<string>;
+  shiftSelectedIds: Set<string>;
   modularState: ModularGraphState;
   onSelectedIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
@@ -54,6 +55,7 @@ export default function ModularGraph({
   currentTime,
   selectedId,
   cmdSelectedIds,
+  shiftSelectedIds,
   modularState,
   onSelectedIdChange,
   onShiftSelect,
@@ -83,7 +85,7 @@ export default function ModularGraph({
 
   const activeSection = sections.find(s => currentTime >= s.start && currentTime < s.end);
 
-  const multiSelectedIds = new Set([...cmdSelectedIds]);
+  const multiSelectedIds = new Set([...cmdSelectedIds, ...shiftSelectedIds]);
   const isMultiSelect = multiSelectedIds.size > 0;
 
   const selectedSection = selectedId ? sections.find(s => s.id === selectedId) : null;
@@ -137,6 +139,7 @@ export default function ModularGraph({
     const isActive = activeSection?.id === section.id;
     const isSelected = selectedId === section.id;
     const isCmdSelected = cmdSelectedIds.has(section.id);
+    const isShiftSelected = shiftSelectedIds.has(section.id);
 
     return (
       <div
@@ -151,7 +154,7 @@ export default function ModularGraph({
             width: w,
             height: 64,
             backgroundColor: getBoxColor(section.id),
-            boxShadow: isCmdSelected
+            boxShadow: isCmdSelected || isShiftSelected
               ? 'inset 0 0 0 2px rgba(255,255,255,0.9)'
               : isSelected
               ? 'inset 0 0 0 2px rgba(255,255,255,0.8)'
