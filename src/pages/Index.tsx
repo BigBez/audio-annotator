@@ -226,6 +226,7 @@ export default function Index() {
     setCurrentTime(0);
     setDuration(0);
     boundariesRef.current = [];
+    undoStackRef.current = [];
   }, []);
 
   return (
