@@ -183,19 +183,17 @@ export default function SectionTimeline({
             <div className="flex-1" />
 
             {/* Delete button — only on manual selection, not playback-driven */}
-            {!isPlaying && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedId(null);
-                  onDelete(section.id);
-                }}
-                className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
-                title="Delete section"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedId(null);
+                onDelete(section.id);
+              }}
+              className="shrink-0 p-1 rounded hover:bg-destructive hover:text-destructive-foreground text-muted-foreground transition-colors"
+              title="Delete section"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
         );
       })()}
