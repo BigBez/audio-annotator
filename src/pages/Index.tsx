@@ -12,6 +12,8 @@ export default function Index() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const manualSelectRef = useRef(false);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const boundariesRef = useRef<number[]>([]);
 
@@ -54,6 +56,24 @@ export default function Index() {
         return ns;
       });
     });
+  }, []);
+
+  // Playhead-driven selection
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (manualSelectRef.current) {
+      manualSelectRef.current = false;
+      return;
+    }
+    const active = sections.find(s => currentTime >= s.start && currentTime < s.end);
+    if (active && active.id !== selectedSectionId) {
+      setSelectedSectionId(active.id);
+    }
+  }, [currentTime, isPlaying, sections, selectedSectionId]);
+
+  const handleSectionSelect = useCallback((id: string | null) => {
+    manualSelectRef.current = true;
+    setSelectedSectionId(id);
   }, []);
 
   // Keyboard shortcuts
@@ -175,7 +195,7 @@ export default function Index() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" onClick={() => setSelectedSectionId(null)}>
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -216,6 +236,8 @@ export default function Index() {
                 sections={sections}
                 currentTime={currentTime}
                 duration={duration}
+                selectedId={selectedSectionId}
+                onSelectedIdChange={handleSectionSelect}
                 onSeek={handleSeek}
                 onLabelChange={handleLabelChange}
                 onDelete={handleDeleteSection}
