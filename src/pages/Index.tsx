@@ -312,6 +312,39 @@ export default function Index() {
     input.click();
   }, [file]);
 
+  const handleDeleteSection = useCallback((id: string) => {
+    pushUndo();
+    let absorbingId: string | null = null;
+    setSections(prev => {
+      const idx = prev.findIndex(s => s.id === id);
+      if (idx === -1) return prev;
+      const deleted = prev[idx];
+      const next = [...prev];
+      next.splice(idx, 1);
+      if (next.length === 0) {
+        boundariesRef.current = [];
+        return [];
+      }
+      if (idx > 0) {
+        next[idx - 1] = { ...next[idx - 1], end: deleted.end };
+        absorbingId = next[idx - 1].id;
+      } else {
+        next[0] = { ...next[0], start: deleted.start };
+        absorbingId = next[0].id;
+      }
+      const newBoundaries = [next[0].start, ...next.map(s => s.end)];
+      boundariesRef.current = newBoundaries;
+      return next;
+    });
+    setVcuSpans(prev => prev.map(v => ({
+      ...v,
+      sectionIds: v.sectionIds.filter(sid => sid !== id),
+    })).filter(v => v.sectionIds.length > 0));
+    setTimeout(() => {
+      if (absorbingId) setSelectedSectionId(absorbingId);
+    }, 0);
+  }, [pushUndo]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -393,29 +426,7 @@ export default function Index() {
         e.preventDefault();
         const selSection = selectedSectionIdRef.current;
         if (selSection) {
-          pushUndo();
-          setSections(prev => {
-            const idx = prev.findIndex(s => s.id === selSection);
-            if (idx === -1) return prev;
-            const deleted = prev[idx];
-            const next = [...prev];
-            next.splice(idx, 1);
-            boundariesRef.current = boundariesRef.current.filter(
-              b => b !== deleted.start && b !== deleted.end
-            );
-            if (idx > 0) {
-              next[idx - 1] = { ...next[idx - 1], end: deleted.end };
-            } else if (next.length > 0) {
-              next[0] = { ...next[0], start: deleted.start };
-            }
-            boundariesRef.current = [0, ...next.map(s => s.end)];
-            return next;
-          });
-          setVcuSpans(prev => prev.map(v => ({
-            ...v,
-            sectionIds: v.sectionIds.filter(sid => sid !== selSection),
-          })).filter(v => v.sectionIds.length > 0));
-          setSelectedSectionId(null);
+          handleDeleteSection(selSection);
         } else if (selectedVcuId) {
           pushUndo();
           setVcuSpans(prev => prev.filter(v => v.id !== selectedVcuId));
@@ -425,7 +436,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleDeleteSection, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     pushUndo();
@@ -436,38 +447,6 @@ export default function Index() {
     setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
   }, []);
 
-  const handleDeleteSection = useCallback((id: string) => {
-    pushUndo();
-    let absorbingId: string | null = null;
-    setSections(prev => {
-      const idx = prev.findIndex(s => s.id === id);
-      if (idx === -1) return prev;
-      const deleted = prev[idx];
-      const next = [...prev];
-      next.splice(idx, 1);
-      if (next.length === 0) {
-        boundariesRef.current = [];
-        return [];
-      }
-      if (idx > 0) {
-        next[idx - 1] = { ...next[idx - 1], end: deleted.end };
-        absorbingId = next[idx - 1].id;
-      } else {
-        next[0] = { ...next[0], start: deleted.start };
-        absorbingId = next[0].id;
-      }
-      const newBoundaries = [next[0].start, ...next.map(s => s.end)];
-      boundariesRef.current = newBoundaries;
-      return next;
-    });
-    setVcuSpans(prev => prev.map(v => ({
-      ...v,
-      sectionIds: v.sectionIds.filter(sid => sid !== id),
-    })).filter(v => v.sectionIds.length > 0));
-    setTimeout(() => {
-      if (absorbingId) setSelectedSectionId(absorbingId);
-    }, 0);
-  }, [pushUndo]);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
     pushUndo();
