@@ -218,12 +218,6 @@ export default function ModularGraph({
 
   return (
     <div className="space-y-0" onClick={e => e.stopPropagation()}>
-      {/* Divider label */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Analysis</span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
 
       {/* Boxes row with group labels */}
       <div className="overflow-x-auto">
