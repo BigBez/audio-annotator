@@ -544,7 +544,6 @@ export default function Index() {
             />
 
             {duration > 0 && (
-              <div>
                 <SectionTimeline
                   sections={sections}
                   vcuSpans={vcuSpans}
@@ -564,15 +563,14 @@ export default function Index() {
                   onNotesChange={handleNotesChange}
                   onVcuLabelChange={handleVcuLabelChange}
                   onDeleteVcu={handleDeleteVcu}
+                  barCountLayer={sections.length > 0 ? (
+                    <BarCountLayer
+                      sections={sections}
+                      duration={duration}
+                      onBarsChange={handleBarsChange}
+                    />
+                  ) : undefined}
                 />
-                {sections.length > 0 && (
-                  <BarCountLayer
-                    sections={sections}
-                    duration={duration}
-                    onBarsChange={handleBarsChange}
-                  />
-                )}
-              </div>
             )}
           </>
         )}

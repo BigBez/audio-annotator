@@ -21,6 +21,7 @@ interface SectionTimelineProps {
   onNotesChange: (id: string, notes: string) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
+  barCountLayer?: React.ReactNode;
 }
 
 export default function SectionTimeline({
@@ -42,6 +43,7 @@ export default function SectionTimeline({
   onNotesChange,
   onVcuLabelChange,
   onDeleteVcu,
+  barCountLayer,
 }: SectionTimelineProps) {
   const setSelectedId = onSelectedIdChange;
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
@@ -172,6 +174,8 @@ export default function SectionTimeline({
           );
         })}
       </div>
+
+      {barCountLayer}
 
       {/* Detail strip */}
       {/* State 3: VCU selected directly */}
