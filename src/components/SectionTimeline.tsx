@@ -71,26 +71,10 @@ export default function SectionTimeline({
                 onSeek(section.start);
               }}
             >
-              {editingLabel === section.id ? (
-                <input
-                  autoFocus
-                  value={labelValue}
-                  onChange={e => setLabelValue(e.target.value)}
-                  onFocus={e => e.target.select()}
-                  onKeyDown={e => {
-                    e.stopPropagation();
-                    if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
-                    if (e.key === 'Escape') setEditingLabel(null);
-                  }}
-                  onBlur={() => { onLabelChange(section.id, labelValue); setEditingLabel(null); }}
-                  onClick={e => e.stopPropagation()}
-                  className="bg-secondary/80 border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-20 text-center"
-                />
-              ) : (
-                <span className="text-xs font-display font-medium text-white truncate px-1 drop-shadow-sm select-none">
-                  {section.label}
-                </span>
-              )}
+              <span className="text-xs font-display font-medium text-white truncate px-1 drop-shadow-sm select-none">
+                {section.label}
+              </span>
+
             </div>
           );
         })}
@@ -102,7 +86,7 @@ export default function SectionTimeline({
         if (!section) return null;
 
         return (
-          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono flex-1" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-md bg-card border border-border text-sm font-mono flex-1">
             {/* Color dot */}
             <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: section.color }} />
 
@@ -113,25 +97,17 @@ export default function SectionTimeline({
                   autoFocus
                   value={labelValue}
                   onChange={e => setLabelValue(e.target.value)}
-                  onFocus={e => e.target.select()}
                   onKeyDown={e => {
-                    e.stopPropagation();
                     if (e.key === 'Enter') { onLabelChange(section.id, labelValue); setEditingLabel(null); }
                     if (e.key === 'Escape') setEditingLabel(null);
                   }}
                   onBlur={() => { onLabelChange(section.id, labelValue); setEditingLabel(null); }}
-                  onClick={e => e.stopPropagation()}
                   className="bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-display text-foreground outline-none focus:ring-1 focus:ring-ring w-24"
                 />
               </div>
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedId(section.id);
-                  setEditingLabel(section.id);
-                  setLabelValue(section.label);
-                }}
+                onClick={() => { setEditingLabel(section.id); setLabelValue(section.label); }}
                 className="text-xs font-display font-medium text-foreground hover:text-primary flex items-center gap-1"
               >
                 {section.label}
@@ -160,16 +136,11 @@ export default function SectionTimeline({
                   if (parsed !== null) onBoundaryEdit(section.id, 'start', parsed);
                   setEditingTime(null);
                 }}
-                onClick={e => e.stopPropagation()}
                 className="bg-secondary border border-border rounded px-1 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring w-14 text-center"
               />
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingTime({ id: section.id, field: 'start' });
-                  setTimeValue(formatTime(section.start));
-                }}
+                onClick={() => { setEditingTime({ id: section.id, field: 'start' }); setTimeValue(formatTime(section.start)); }}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
                 {formatTime(section.start)}
@@ -197,16 +168,11 @@ export default function SectionTimeline({
                   if (parsed !== null) onBoundaryEdit(section.id, 'end', parsed);
                   setEditingTime(null);
                 }}
-                onClick={e => e.stopPropagation()}
                 className="bg-secondary border border-border rounded px-1 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring w-14 text-center"
               />
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingTime({ id: section.id, field: 'end' });
-                  setTimeValue(formatTime(section.end));
-                }}
+                onClick={() => { setEditingTime({ id: section.id, field: 'end' }); setTimeValue(formatTime(section.end)); }}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
                 {formatTime(section.end)}

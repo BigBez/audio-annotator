@@ -3,23 +3,18 @@ import { Upload } from 'lucide-react';
 
 interface AudioUploadProps {
   onFileLoaded: (file: File) => void;
-  onJsonImport?: (file: File) => void;
 }
 
 const ACCEPTED = ['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/x-flac', 'audio/mp4', 'audio/x-m4a'];
 
-export default function AudioUpload({ onFileLoaded, onJsonImport }: AudioUploadProps) {
+export default function AudioUpload({ onFileLoaded }: AudioUploadProps) {
   const [dragging, setDragging] = useState(false);
 
   const handleFile = useCallback((file: File) => {
-    if (file.name.endsWith('.json') && onJsonImport) {
-      onJsonImport(file);
-      return;
-    }
     if (ACCEPTED.some(t => file.type === t) || /\.(mp3|wav|flac|m4a)$/i.test(file.name)) {
       onFileLoaded(file);
     }
-  }, [onFileLoaded, onJsonImport]);
+  }, [onFileLoaded]);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -38,7 +33,7 @@ export default function AudioUpload({ onFileLoaded, onJsonImport }: AudioUploadP
       onClick={() => {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.mp3,.wav,.flac,.m4a,.json';
+        input.accept = '.mp3,.wav,.flac,.m4a';
         input.onchange = () => { if (input.files?.[0]) handleFile(input.files[0]); };
         input.click();
       }}
@@ -46,7 +41,7 @@ export default function AudioUpload({ onFileLoaded, onJsonImport }: AudioUploadP
       <Upload className="h-10 w-10 text-muted-foreground" />
       <div className="text-center">
         <p className="text-lg font-medium font-display">Drop an audio file here</p>
-        <p className="text-sm text-muted-foreground font-mono mt-1">MP3, WAV, FLAC, M4A, or analysis JSON</p>
+        <p className="text-sm text-muted-foreground font-mono mt-1">MP3, WAV, FLAC, M4A</p>
       </div>
     </div>
   );
