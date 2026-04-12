@@ -72,8 +72,8 @@ export default function Index() {
       if (prev.length === 0) {
         if (time < 0.01 || dur - time < 0.01) return prev;
         return [
-          { id: crypto.randomUUID(), start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null },
-          { id: crypto.randomUUID(), start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null },
+          { id: crypto.randomUUID(), start: 0, end: time, label: getDefaultLabel(0), color: getColorForIndex(0), notes: '', bars: null, chordLines: [] },
+          { id: crypto.randomUUID(), start: time, end: dur, label: getDefaultLabel(1), color: getColorForIndex(1), notes: '', bars: null, chordLines: [] },
         ];
       }
 
@@ -97,6 +97,7 @@ export default function Index() {
         color: getColorForIndex(newIndex),
         notes: '',
         bars: null,
+        chordLines: [],
       };
 
       const result = [...prev];
@@ -394,6 +395,7 @@ export default function Index() {
           notes: s.notes,
         },
         bars: s.bars,
+        chordLines: s.chordLines,
       })),
       vcuSpans: vcuSpans.map(v => ({
         id: v.id,
@@ -446,6 +448,7 @@ export default function Index() {
             color: s.color,
             notes: s.content?.notes ?? s.notes ?? '',
             bars: s.bars ?? null,
+            chordLines: s.chordLines ?? s.content?.chordLines ?? [],
           }));
           setSections(imported);
           if (imported.length > 0) {
