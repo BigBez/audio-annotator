@@ -118,7 +118,21 @@ export default function Index() {
       if (clickedIdx === -1) return prev;
 
       if (prev.size === 0) {
-        // First shift-click: just select this one section
+        // First shift-click: use the currently selected section as anchor if available
+        const anchorId = selectedSectionIdRef.current;
+        if (anchorId) {
+          const anchorIdx = currentSections.findIndex(s => s.id === anchorId);
+          if (anchorIdx !== -1) {
+            const minIdx = Math.min(anchorIdx, clickedIdx);
+            const maxIdx = Math.max(anchorIdx, clickedIdx);
+            const next = new Set<string>();
+            for (let i = minIdx; i <= maxIdx; i++) {
+              next.add(currentSections[i].id);
+            }
+            return next;
+          }
+        }
+        // No anchor — just select this one section
         return new Set([id]);
       }
 
