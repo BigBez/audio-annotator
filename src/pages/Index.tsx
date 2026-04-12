@@ -234,14 +234,22 @@ export default function Index() {
     const cmd = cmdSelectedIdsRef.current;
     const sel = selectedSectionIdRef.current;
     const allSelected = new Set([...cmd]);
-    if (sel && allSelected.size === 0) {
-      // Single selection — nothing to join
-      return;
-    }
+    if (sel && allSelected.size === 0) return;
     if (allSelected.size < 2) return;
 
     const currentSections = sectionsRef.current;
-    const indices = Array.from(allSelected)
+    const currentGroups = modularGraphRef.current.joinedGroups;
+
+    // Expand each selected section to include its entire existing group
+    const expanded = new Set<string>();
+    for (const id of allSelected) {
+      expanded.add(id);
+      const group = currentGroups.find(g => g.sectionIds.includes(id));
+      if (group) group.sectionIds.forEach(sid => expanded.add(sid));
+    }
+
+    // Find index range and fill contiguously
+    const indices = Array.from(expanded)
       .map(id => currentSections.findIndex(s => s.id === id))
       .filter(i => i !== -1)
       .sort((a, b) => a - b);
@@ -257,12 +265,12 @@ export default function Index() {
       sectionIds.push(currentSections[i].id);
     }
 
-    // Remove any existing groups that overlap
-    const currentGroups = modularGraphRef.current.joinedGroups.filter(
+    // Remove any existing groups that overlap with the new merged group
+    const remainingGroups = currentGroups.filter(
       g => !g.sectionIds.some(id => sectionIds.includes(id))
     );
 
-    const groupNumber = currentGroups.length + 1;
+    const groupNumber = remainingGroups.length + 1;
     const newGroup = {
       id: `mg-group-${Date.now()}`,
       label: `Group ${groupNumber}`,
@@ -271,7 +279,7 @@ export default function Index() {
 
     setModularGraph(prev => ({
       ...prev,
-      joinedGroups: [...currentGroups, newGroup],
+      joinedGroups: [...remainingGroups, newGroup],
     }));
     setCmdSelectedIds(new Set());
     setSelectedSectionId(sectionIds[0]);
