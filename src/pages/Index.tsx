@@ -73,13 +73,14 @@ export default function Index() {
         label: getDefaultLabel(i),
         color: getColorForIndex(i),
         notes: '',
+        bars: null,
       });
     }
     setSections(prev => {
       return newSections.map((ns, i) => {
         const existing = prev.find(p => p.id === ns.id);
         if (existing) {
-          return { ...ns, label: existing.label, notes: existing.notes };
+          return { ...ns, label: existing.label, notes: existing.notes, bars: existing.bars };
         }
         return ns;
       });
