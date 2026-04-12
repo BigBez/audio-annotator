@@ -312,6 +312,39 @@ export default function Index() {
     input.click();
   }, [file]);
 
+  const handleDeleteSection = useCallback((id: string) => {
+    pushUndo();
+    let absorbingId: string | null = null;
+    setSections(prev => {
+      const idx = prev.findIndex(s => s.id === id);
+      if (idx === -1) return prev;
+      const deleted = prev[idx];
+      const next = [...prev];
+      next.splice(idx, 1);
+      if (next.length === 0) {
+        boundariesRef.current = [];
+        return [];
+      }
+      if (idx > 0) {
+        next[idx - 1] = { ...next[idx - 1], end: deleted.end };
+        absorbingId = next[idx - 1].id;
+      } else {
+        next[0] = { ...next[0], start: deleted.start };
+        absorbingId = next[0].id;
+      }
+      const newBoundaries = [next[0].start, ...next.map(s => s.end)];
+      boundariesRef.current = newBoundaries;
+      return next;
+    });
+    setVcuSpans(prev => prev.map(v => ({
+      ...v,
+      sectionIds: v.sectionIds.filter(sid => sid !== id),
+    })).filter(v => v.sectionIds.length > 0));
+    setTimeout(() => {
+      if (absorbingId) setSelectedSectionId(absorbingId);
+    }, 0);
+  }, [pushUndo]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
