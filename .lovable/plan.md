@@ -1,29 +1,10 @@
 
 
-## Problem
+## Fix: Increase scrollbar clearance in chord panel
 
-The BarCountLayer renders but is visually invisible because:
-1. **Gap**: The parent `main` element uses `space-y-6` (24px gap), which separates the BarCountLayer from the SectionTimeline above it. They should be flush against each other.
-2. **No visual presence**: Empty cells have no background or border, making the 24px strip invisible until values are entered.
+**Problem**: The `pb-2` (8px) bottom padding on the scrollable chord container is not enough to prevent the horizontal scrollbar from overlapping chord content.
 
-## Plan
+**Change**: In `src/components/ChordPanel.tsx`, change `pb-2` to `pb-4` (16px) on all instances of the `overflow-x-auto` container (line 348 and any other occurrences in edit mode). This gives the scrollbar more room below the chord symbols.
 
-**File: `src/pages/Index.tsx`**
-
-Wrap `SectionTimeline` and `BarCountLayer` together in a single `<div>` (no gap) so they render as one visual unit, eliminating the `space-y-6` gap between them.
-
-```tsx
-{duration > 0 && (
-  <div>
-    <SectionTimeline ... />
-    {sections.length > 0 && (
-      <BarCountLayer ... />
-    )}
-  </div>
-)}
-```
-
-**File: `src/components/BarCountLayer.tsx`**
-
-Add a subtle background color to the strip so it's visible even when no bar counts are entered (e.g., `bg-muted/30`), making cells clickable and discoverable.
+**Files**: `src/components/ChordPanel.tsx` only. No other changes.
 
