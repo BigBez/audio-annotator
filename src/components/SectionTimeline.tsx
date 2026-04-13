@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { formatTime, parseTime, type Section, type VcuSpan, type ChordLine, type LyricLine } from '@/lib/sections';
 import { ChevronRight } from 'lucide-react';
 import ChordPanel from '@/components/ChordPanel';
@@ -70,6 +70,41 @@ export default function SectionTimeline({
   const [lyricsOpen, setLyricsOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+
+  // Height-locking during playback to prevent layout shifts
+  const [lockedHeights, setLockedHeights] = useState<{ chords: number; lyrics: number; notes: number } | null>(null);
+  const chordsContentRef = useRef<HTMLDivElement>(null);
+  const lyricsContentRef = useRef<HTMLDivElement>(null);
+  const notesContentRef = useRef<HTMLDivElement>(null);
+  const wasPlayingRef = useRef(false);
+
+  useEffect(() => {
+    if (isPlaying && !wasPlayingRef.current) {
+      setLockedHeights({
+        chords: chordsContentRef.current?.scrollHeight ?? 0,
+        lyrics: lyricsContentRef.current?.scrollHeight ?? 0,
+        notes: notesContentRef.current?.scrollHeight ?? 0,
+      });
+    } else if (!isPlaying && wasPlayingRef.current) {
+      setLockedHeights(null);
+    }
+    wasPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!isPlaying || !lockedHeights) return;
+    const raf = requestAnimationFrame(() => {
+      setLockedHeights(prev => {
+        if (!prev) return prev;
+        return {
+          chords: Math.max(prev.chords, chordsContentRef.current?.scrollHeight ?? 0),
+          lyrics: Math.max(prev.lyrics, lyricsContentRef.current?.scrollHeight ?? 0),
+          notes: Math.max(prev.notes, notesContentRef.current?.scrollHeight ?? 0),
+        };
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [isPlaying, selectedId, lockedHeights]);
 
   if (sections.length === 0) {
     return (
@@ -336,7 +371,7 @@ export default function SectionTimeline({
                 <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
               </button>
               {chordsOpen && (
-                <div className="px-3 pb-2">
+                <div ref={chordsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.chords } : undefined}>
                   <ChordPanel
                     chordLines={selectedSection.chordLines}
                     currentTime={currentTime}
@@ -362,7 +397,7 @@ export default function SectionTimeline({
                 <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
               </button>
               {lyricsOpen && (
-                <div className="px-3 pb-2">
+                <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.lyrics } : undefined}>
                   <LyricsPanel
                     lyricLines={selectedSection.lyricLines}
                     currentTime={currentTime}
@@ -386,7 +421,7 @@ export default function SectionTimeline({
               Notes
             </button>
             {notesOpen && (
-              <div className="px-3 pb-2">
+              <div ref={notesContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.notes } : undefined}>
                 <textarea
                   value={selectedSection.notes}
                   onChange={e => {
