@@ -773,7 +773,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background" onClick={() => { setSelectedSectionId(null); setSelectedVcuId(null); setShiftSelectedIds(new Set()); setCmdSelectedIds(new Set()); }}>
       <header className="border-b border-border px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Music className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-semibold font-display tracking-tight">Formal Analysis</h1>
@@ -789,7 +789,7 @@ export default function Index() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {!file ? (
           <AudioUpload onFileLoaded={setFile} />
         ) : (
