@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { formatTime, parseTime, type Section, type VcuSpan, type ChordLine, type LyricLine } from '@/lib/sections';
 import { ChevronRight } from 'lucide-react';
 import ChordPanel from '@/components/ChordPanel';
