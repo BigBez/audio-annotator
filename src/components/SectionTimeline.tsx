@@ -73,38 +73,46 @@ export default function SectionTimeline({
 
   // Height-locking during playback to prevent layout shifts
   const [lockedHeights, setLockedHeights] = useState<{ chords: number; lyrics: number; notes: number } | null>(null);
+  const [measuring, setMeasuring] = useState(false);
   const chordsContentRef = useRef<HTMLDivElement>(null);
   const lyricsContentRef = useRef<HTMLDivElement>(null);
   const notesContentRef = useRef<HTMLDivElement>(null);
+  const measureContainerRef = useRef<HTMLDivElement>(null);
   const wasPlayingRef = useRef(false);
 
+  // When playback starts, trigger measurement; when it stops, release
   useEffect(() => {
     if (isPlaying && !wasPlayingRef.current) {
-      setLockedHeights({
-        chords: chordsContentRef.current?.scrollHeight ?? 0,
-        lyrics: lyricsContentRef.current?.scrollHeight ?? 0,
-        notes: notesContentRef.current?.scrollHeight ?? 0,
-      });
+      setMeasuring(true);
     } else if (!isPlaying && wasPlayingRef.current) {
       setLockedHeights(null);
+      setMeasuring(false);
     }
     wasPlayingRef.current = isPlaying;
   }, [isPlaying]);
 
+  // After measurement container renders, read max heights and lock
   useEffect(() => {
-    if (!isPlaying || !lockedHeights) return;
+    if (!measuring || !measureContainerRef.current) return;
     const raf = requestAnimationFrame(() => {
-      setLockedHeights(prev => {
-        if (!prev) return prev;
-        return {
-          chords: Math.max(prev.chords, chordsContentRef.current?.scrollHeight ?? 0),
-          lyrics: Math.max(prev.lyrics, lyricsContentRef.current?.scrollHeight ?? 0),
-          notes: Math.max(prev.notes, notesContentRef.current?.scrollHeight ?? 0),
-        };
+      const container = measureContainerRef.current;
+      if (!container) return;
+      let maxChords = 0, maxLyrics = 0, maxNotes = 0;
+      const items = container.querySelectorAll('[data-measure-section]');
+      items.forEach(item => {
+        const c = item.querySelector('[data-measure-chords]');
+        const l = item.querySelector('[data-measure-lyrics]');
+        const n = item.querySelector('[data-measure-notes]');
+        if (c) maxChords = Math.max(maxChords, c.scrollHeight);
+        if (l) maxLyrics = Math.max(maxLyrics, l.scrollHeight);
+        if (n) maxNotes = Math.max(maxNotes, n.scrollHeight);
       });
+      setLockedHeights({ chords: maxChords, lyrics: maxLyrics, notes: maxNotes });
+      setMeasuring(false);
     });
     return () => cancelAnimationFrame(raf);
-  }, [isPlaying, selectedId, lockedHeights]);
+  }, [measuring]);
+
 
   if (sections.length === 0) {
     return (
