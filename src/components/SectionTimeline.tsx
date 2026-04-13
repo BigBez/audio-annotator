@@ -397,7 +397,7 @@ export default function SectionTimeline({
                 <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
               </button>
               {lyricsOpen && (
-                <div className="px-3 pb-2">
+                <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.lyrics } : undefined}>
                   <LyricsPanel
                     lyricLines={selectedSection.lyricLines}
                     currentTime={currentTime}
@@ -421,7 +421,7 @@ export default function SectionTimeline({
               Notes
             </button>
             {notesOpen && (
-              <div className="px-3 pb-2">
+              <div ref={notesContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.notes } : undefined}>
                 <textarea
                   value={selectedSection.notes}
                   onChange={e => {
