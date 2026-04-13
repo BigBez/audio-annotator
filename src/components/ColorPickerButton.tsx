@@ -9,7 +9,7 @@ interface ColorPickerButtonProps {
   onColorSelect: (color: string) => void;
 }
 
-export default function ColorPickerButton({ activeColor, mode, onColorSelect }: ColorPickerButtonProps) {
+export default function ColorPickerButton({ activeColor, mode, size, onColorSelect }: ColorPickerButtonProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -32,7 +32,7 @@ export default function ColorPickerButton({ activeColor, mode, onColorSelect }: 
         {mode === 'single' ? (
           <div
             className="rounded-full"
-            style={{ width: 18, height: 18, backgroundColor: activeColor }}
+            style={{ width: size ?? 18, height: size ?? 18, backgroundColor: activeColor }}
           />
         ) : (
           <Palette className="h-4 w-4 text-muted-foreground" />
