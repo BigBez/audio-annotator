@@ -197,12 +197,20 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
       {/* Header controls */}
       <div className="flex justify-end gap-2 mb-1.5">
         {syncMode ? (
-          <button
-            onClick={commitSync}
-            className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
-          >
-            <Check className="h-3 w-3" /> Done
-          </button>
+          <>
+            <button
+              onClick={discardSync}
+              className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+            >
+              <X className="h-3 w-3" /> Cancel
+            </button>
+            <button
+              onClick={commitSync}
+              className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
+            >
+              <Check className="h-3 w-3" /> Done
+            </button>
+          </>
         ) : (
           <>
             {hasAnyTimecodes && (
