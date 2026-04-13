@@ -339,6 +339,10 @@ export default function SectionTimeline({
                 <div className="px-3 pb-2">
                   <ChordPanel
                     chordLines={selectedSection.chordLines}
+                    currentTime={currentTime}
+                    sectionStart={selectedSection.start}
+                    sectionEnd={selectedSection.end}
+                    isPlaying={isPlaying}
                     onChange={lines => onChordLinesChange(selectedId, lines)}
                   />
                 </div>
