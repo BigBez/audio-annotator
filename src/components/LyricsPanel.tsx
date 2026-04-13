@@ -4,13 +4,20 @@ import { Pencil, Check, Plus, X } from 'lucide-react';
 
 interface LyricsPanelProps {
   lyricLines: LyricLine[];
+  currentTime: number;
+  sectionEnd: number;
+  isPlaying: boolean;
   onChange: (lyricLines: LyricLine[]) => void;
 }
 
-export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) {
+export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPlaying, onChange }: LyricsPanelProps) {
   const [editMode, setEditMode] = useState(false);
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
+  const [syncMode, setSyncMode] = useState(false);
+  const [syncLineIdx, setSyncLineIdx] = useState(0);
+  const [syncDraft, setSyncDraft] = useState<LyricLine[]>([]);
   const textareaRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
+  const syncContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (focusIdx !== null && textareaRefs.current[focusIdx]) {
@@ -56,6 +63,130 @@ export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) 
     onChange(next);
   };
 
+  // Enter sync mode
+  const enterSync = () => {
+    setSyncDraft(structuredClone(lyricLines));
+    setSyncLineIdx(0);
+    setSyncMode(true);
+    setEditMode(false);
+  };
+
+  // Exit sync mode — commit
+  const commitSync = () => {
+    onChange(syncDraft);
+    setSyncMode(false);
+  };
+
+  // Exit sync mode — discard
+  const discardSync = () => {
+    setSyncMode(false);
+  };
+
+  // Stamp current line
+  const stampLine = useCallback(() => {
+    setSyncDraft(prev => {
+      const next = [...prev];
+      // Set startTime of current line
+      next[syncLineIdx] = { ...next[syncLineIdx], startTime: currentTime };
+      // Set endTime of previous line
+      if (syncLineIdx > 0) {
+        next[syncLineIdx - 1] = { ...next[syncLineIdx - 1], endTime: currentTime };
+      }
+      return next;
+    });
+    if (syncLineIdx >= lyricLines.length - 1) {
+      // Last line — set its endTime to section end and commit
+      setSyncDraft(prev => {
+        const next = [...prev];
+        next[syncLineIdx] = { ...next[syncLineIdx], startTime: currentTime, endTime: sectionEnd };
+        if (syncLineIdx > 0) {
+          next[syncLineIdx - 1] = { ...next[syncLineIdx - 1], endTime: currentTime };
+        }
+        return next;
+      });
+      // Use setTimeout to let state settle before committing
+      setTimeout(() => {
+        setSyncMode(false);
+        // Commit will happen via effect
+      }, 0);
+    } else {
+      setSyncLineIdx(prev => prev + 1);
+    }
+  }, [syncLineIdx, currentTime, sectionEnd, lyricLines.length]);
+
+  // Auto-commit when sync mode ends after last line stamp
+  const syncModeRef = useRef(syncMode);
+  const prevSyncModeRef = useRef(syncMode);
+  const syncDraftRef = useRef(syncDraft);
+  syncModeRef.current = syncMode;
+  syncDraftRef.current = syncDraft;
+
+  useEffect(() => {
+    if (prevSyncModeRef.current && !syncMode && syncDraftRef.current.length > 0) {
+      // Sync mode just ended — check if last line was stamped (auto-exit)
+      const lastLine = syncDraftRef.current[syncDraftRef.current.length - 1];
+      if (lastLine.startTime !== null) {
+        onChange(syncDraftRef.current);
+      }
+    }
+    prevSyncModeRef.current = syncMode;
+  }, [syncMode, onChange]);
+
+  // Undo last stamp in sync mode
+  const undoLastStamp = useCallback(() => {
+    if (syncLineIdx === 0) return;
+    setSyncDraft(prev => {
+      const next = [...prev];
+      // Clear current line's startTime (it may not have been stamped yet)
+      next[syncLineIdx] = { ...next[syncLineIdx], startTime: null };
+      // Go back one line
+      const prevIdx = syncLineIdx - 1;
+      next[prevIdx] = { ...next[prevIdx], startTime: null, endTime: null };
+      // Restore endTime of line before that
+      if (prevIdx > 0) {
+        next[prevIdx - 1] = { ...next[prevIdx - 1], endTime: null };
+      }
+      return next;
+    });
+    setSyncLineIdx(prev => prev - 1);
+  }, [syncLineIdx]);
+
+  // Tab key handler for sync mode
+  useEffect(() => {
+    if (!syncMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+        stampLine();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        discardSync();
+      }
+      if (e.key === 'z' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        undoLastStamp();
+      }
+    };
+    window.addEventListener('keydown', handler, true); // capture phase
+    return () => window.removeEventListener('keydown', handler, true);
+  }, [syncMode, stampLine, undoLastStamp]);
+
+  // Determine active lyric line during playback
+  const getActiveLyricIdx = (): number => {
+    if (!isPlaying) return -1;
+    for (let i = 0; i < lyricLines.length; i++) {
+      const line = lyricLines[i];
+      if (line.startTime === null) continue;
+      const end = line.endTime ?? sectionEnd;
+      if (currentTime >= line.startTime && currentTime < end) return i;
+    }
+    return -1;
+  };
+  const activeLyricIdx = getActiveLyricIdx();
+
   if (lyricLines.length === 0 && !editMode) {
     return (
       <div className="flex justify-end">
@@ -70,31 +201,57 @@ export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) 
   }
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0" ref={syncContainerRef}>
       {/* Header controls */}
-      <div className="flex justify-end mb-1.5">
-        {editMode ? (
+      <div className="flex justify-end gap-2 mb-1.5">
+        {syncMode ? (
           <button
-            onClick={() => setEditMode(false)}
+            onClick={commitSync}
             className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
           >
             <Check className="h-3 w-3" /> Done
           </button>
         ) : (
-          <button
-            onClick={() => setEditMode(true)}
-            className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
-          >
-            <Pencil className="h-3 w-3" /> Edit
-          </button>
+          <>
+            {lyricLines.length > 0 && (
+              <button
+                onClick={enterSync}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sync
+              </button>
+            )}
+            {editMode ? (
+              <button
+                onClick={() => setEditMode(false)}
+                className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
+              >
+                <Check className="h-3 w-3" /> Done
+              </button>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )}
+          </>
         )}
       </div>
 
+      {/* Sync mode hint */}
+      {syncMode && (
+        <p className="text-[10px] font-mono text-muted-foreground mb-1">
+          Press <kbd className="px-0.5 border border-border rounded text-[9px]">Tab</kbd> to stamp · <kbd className="px-0.5 border border-border rounded text-[9px]">Esc</kbd> to cancel
+        </p>
+      )}
+
       {/* Lyric lines */}
       <div className="space-y-1">
-        {lyricLines.map((line, lineIdx) => (
+        {(syncMode ? syncDraft : lyricLines).map((line, lineIdx) => (
           <div key={line.id}>
-            {editMode ? (
+            {editMode && !syncMode ? (
               <div className="flex items-start gap-1">
                 <textarea
                   ref={el => {
@@ -133,7 +290,19 @@ export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) 
                 </button>
               </div>
             ) : (
-              <p className="text-sm font-mono text-foreground leading-relaxed">
+              <p
+                className={`text-sm font-mono leading-relaxed transition-colors ${
+                  syncMode && lineIdx === syncLineIdx
+                    ? 'border-l-2 border-primary pl-2 text-foreground bg-primary/5'
+                    : syncMode && lineIdx < syncLineIdx
+                    ? 'border-l-2 border-transparent pl-2 text-muted-foreground'
+                    : syncMode
+                    ? 'border-l-2 border-transparent pl-2 text-muted-foreground/60'
+                    : activeLyricIdx === lineIdx
+                    ? 'border-l-2 border-primary pl-2 text-foreground'
+                    : 'text-foreground'
+                }`}
+              >
                 {line.text || '\u00A0'}
               </p>
             )}
@@ -142,7 +311,7 @@ export default function LyricsPanel({ lyricLines, onChange }: LyricsPanelProps) 
       </div>
 
       {/* Add line button */}
-      {editMode && (
+      {editMode && !syncMode && (
         <button
           onClick={() => addLine()}
           className="mt-1.5 text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
