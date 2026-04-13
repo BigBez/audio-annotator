@@ -458,7 +458,7 @@ export default function SectionTimeline({
                       el.style.height = el.scrollHeight + 'px';
                     }
                   }}
-                  placeholder="Add notes for this section…"
+                  placeholder=""
                   className="w-full min-h-[32px] bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
                 />
               </div>

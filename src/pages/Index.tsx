@@ -610,6 +610,9 @@ export default function Index() {
         if (!ws) return;
         const newTime = Math.max(0, ws.getCurrentTime() - 5);
         ws.seekTo(newTime / ws.getDuration());
+        const secs = sectionsRef.current;
+        const active = secs.find(s => newTime >= s.start && newTime < s.end);
+        if (active) handleSectionSelect(active.id);
         return;
       }
       if (e.code === 'ArrowRight' && e.shiftKey) {
@@ -619,6 +622,9 @@ export default function Index() {
         const dur = ws.getDuration();
         const newTime = Math.min(dur, ws.getCurrentTime() + 5);
         ws.seekTo(newTime / dur);
+        const secs = sectionsRef.current;
+        const active = secs.find(s => newTime >= s.start && newTime < s.end);
+        if (active) handleSectionSelect(active.id);
         return;
       }
       if (e.code === 'Backspace' || e.code === 'Delete') {
@@ -908,6 +914,10 @@ export default function Index() {
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
                 onCollapseChange={setWaveformCollapsed}
+                onSeek={(time: number) => {
+                  const active = sectionsRef.current.find(s => time >= s.start && time < s.end);
+                  if (active) handleSectionSelect(active.id);
+                }}
                 wavesurferRef={wavesurferRef}
               />
 

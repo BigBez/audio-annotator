@@ -280,12 +280,12 @@ export default function ModularGraph({
                         setEditingGroupLabel(group.id);
                         setGroupLabelValue(group.label);
                       }}
-                      className={`text-[10px] font-display font-medium flex items-center gap-0.5 ${
+                      className={`text-[10px] font-display font-medium flex items-center gap-0.5 group/label ${
                         isGroupSelected ? 'text-foreground' : 'text-muted-foreground'
                       } hover:text-primary`}
                     >
                       {group.label}
-                      <Pencil className="h-2 w-2" />
+                      <Pencil className={`h-2 w-2 ${isGroupSelected ? 'opacity-100' : 'opacity-0 group-hover/label:opacity-100'} transition-opacity`} />
                     </button>
                   )}
                 </div>
