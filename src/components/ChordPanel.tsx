@@ -345,7 +345,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
         {renderLines.map((line, lineIdx) => (
           <div key={line.id}>
             {lineIdx > 0 && <hr className="border-border my-1" />}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto pb-2">
               <div className="flex items-center gap-0 min-w-0">
                 {/* Prefix */}
                 {editMode ? (
