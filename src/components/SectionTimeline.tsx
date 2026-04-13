@@ -16,6 +16,7 @@ interface SectionTimelineProps {
   shiftSelectedIds: Set<string>;
   cmdSelectedIds: Set<string>;
   isPlaying: boolean;
+  waveformCollapsed: boolean;
   onSelectedIdChange: (id: string | null) => void;
   onSelectedVcuIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
@@ -43,6 +44,7 @@ export default function SectionTimeline({
   shiftSelectedIds,
   cmdSelectedIds,
   isPlaying,
+  waveformCollapsed,
   onSelectedIdChange,
   onSelectedVcuIdChange,
   onShiftSelect,
@@ -152,7 +154,7 @@ export default function SectionTimeline({
       )}
 
       {/* Horizontal timeline blocks */}
-      <div className="flex w-full h-7 rounded-lg overflow-hidden border border-border">
+      <div className="relative flex w-full h-7 rounded-lg overflow-hidden border border-border">
         {sections.map(section => {
           const widthPercent = ((section.end - section.start) / duration) * 100;
           const isActive = activeSection?.id === section.id;
@@ -194,6 +196,18 @@ export default function SectionTimeline({
             </div>
           );
         })}
+        {/* Playhead on color strip when waveform is collapsed */}
+        {waveformCollapsed && duration > 0 && (
+          <div
+            className="absolute top-0 bottom-0 pointer-events-none z-10"
+            style={{
+              left: `${(currentTime / duration) * 100}%`,
+              width: '2px',
+              backgroundColor: 'hsl(40, 90%, 60%)',
+              transform: 'translateX(-1px)',
+            }}
+          />
+        )}
       </div>
 
       {/* VCU lane — below section blocks, brackets open downward */}

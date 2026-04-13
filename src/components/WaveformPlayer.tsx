@@ -7,6 +7,7 @@ interface WaveformPlayerProps {
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
+  onCollapseChange?: (collapsed: boolean) => void;
   wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
 }
 
@@ -15,6 +16,7 @@ export default function WaveformPlayer({
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
+  onCollapseChange,
   wavesurferRef,
 }: WaveformPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +67,7 @@ export default function WaveformPlayer({
   return (
     <div>
       <button
-        onClick={() => setWaveformCollapsed(prev => !prev)}
+        onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
         className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors mb-1"
         title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
       >
