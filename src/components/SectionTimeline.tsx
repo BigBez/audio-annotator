@@ -309,7 +309,7 @@ export default function SectionTimeline({
               })()}
               {!selectedSectionVcu && (
                 <div className="flex items-center gap-3 px-0 py-1 text-sm font-mono">
-                  <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+                  <ColorPickerButton mode="single" usePortal activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
                   {renderSectionControls(selectedSection)}
                 </div>
               )}
