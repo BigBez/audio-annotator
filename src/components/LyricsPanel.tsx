@@ -5,12 +5,13 @@ import { Pencil, Check, Plus, X } from 'lucide-react';
 interface LyricsPanelProps {
   lyricLines: LyricLine[];
   currentTime: number;
+  sectionStart: number;
   sectionEnd: number;
   isPlaying: boolean;
   onChange: (lyricLines: LyricLine[]) => void;
 }
 
-export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPlaying, onChange }: LyricsPanelProps) {
+export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sectionEnd, isPlaying, onChange }: LyricsPanelProps) {
   const [editMode, setEditMode] = useState(false);
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   const [syncMode, setSyncMode] = useState(false);
@@ -63,9 +64,13 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPla
     onChange(next);
   };
 
-  // Enter sync mode
+  // Enter sync mode — auto-stamp first line's startTime to section start
   const enterSync = () => {
-    setSyncDraft(structuredClone(lyricLines));
+    const draft = structuredClone(lyricLines);
+    if (draft.length > 0) {
+      draft[0] = { ...draft[0], startTime: sectionStart };
+    }
+    setSyncDraft(draft);
     setSyncLineIdx(0);
     setSyncMode(true);
     setEditMode(false);
@@ -82,34 +87,26 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPla
     setSyncMode(false);
   };
 
-  // Stamp current line
+  // Stamp current line — Tab means "this line just ended"
   const stampLine = useCallback(() => {
-    setSyncDraft(prev => {
-      const next = [...prev];
-      // Set startTime of current line
-      next[syncLineIdx] = { ...next[syncLineIdx], startTime: currentTime };
-      // Set endTime of previous line
-      if (syncLineIdx > 0) {
-        next[syncLineIdx - 1] = { ...next[syncLineIdx - 1], endTime: currentTime };
-      }
-      return next;
-    });
     if (syncLineIdx >= lyricLines.length - 1) {
-      // Last line — set its endTime to section end and commit
+      // Last line — set its endTime to section end and auto-exit
       setSyncDraft(prev => {
         const next = [...prev];
-        next[syncLineIdx] = { ...next[syncLineIdx], startTime: currentTime, endTime: sectionEnd };
-        if (syncLineIdx > 0) {
-          next[syncLineIdx - 1] = { ...next[syncLineIdx - 1], endTime: currentTime };
-        }
+        next[syncLineIdx] = { ...next[syncLineIdx], endTime: sectionEnd };
         return next;
       });
-      // Use setTimeout to let state settle before committing
       setTimeout(() => {
         setSyncMode(false);
-        // Commit will happen via effect
       }, 0);
     } else {
+      // Set endTime of current line, startTime of next line
+      setSyncDraft(prev => {
+        const next = [...prev];
+        next[syncLineIdx] = { ...next[syncLineIdx], endTime: currentTime };
+        next[syncLineIdx + 1] = { ...next[syncLineIdx + 1], startTime: currentTime };
+        return next;
+      });
       setSyncLineIdx(prev => prev + 1);
     }
   }, [syncLineIdx, currentTime, sectionEnd, lyricLines.length]);
@@ -137,19 +134,23 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPla
     if (syncLineIdx === 0) return;
     setSyncDraft(prev => {
       const next = [...prev];
-      // Clear current line's startTime (it may not have been stamped yet)
+      // Clear current line's startTime
       next[syncLineIdx] = { ...next[syncLineIdx], startTime: null };
-      // Go back one line
+      // Clear previous line's endTime
       const prevIdx = syncLineIdx - 1;
-      next[prevIdx] = { ...next[prevIdx], startTime: null, endTime: null };
-      // Restore endTime of line before that
-      if (prevIdx > 0) {
-        next[prevIdx - 1] = { ...next[prevIdx - 1], endTime: null };
-      }
+      next[prevIdx] = { ...next[prevIdx], endTime: null };
       return next;
     });
     setSyncLineIdx(prev => prev - 1);
   }, [syncLineIdx]);
+
+  // Clear all timecodes
+  const clearTimecodes = () => {
+    const cleared = lyricLines.map(line => ({ ...line, startTime: null, endTime: null }));
+    onChange(cleared);
+  };
+
+  const hasAnyTimecodes = lyricLines.some(l => l.startTime !== null);
 
   // Tab key handler for sync mode
   useEffect(() => {
@@ -213,6 +214,14 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionEnd, isPla
           </button>
         ) : (
           <>
+            {hasAnyTimecodes && (
+              <button
+                onClick={clearTimecodes}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear
+              </button>
+            )}
             {lyricLines.length > 0 && (
               <button
                 onClick={enterSync}
