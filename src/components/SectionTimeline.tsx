@@ -452,6 +452,53 @@ export default function SectionTimeline({
           </div>
         </div>
       )}
+
+      {/* Hidden off-screen container to pre-measure all sections' panel heights */}
+      {measuring && (
+        <div
+          ref={measureContainerRef}
+          aria-hidden
+          style={{ position: 'absolute', left: '-9999px', top: 0, visibility: 'hidden', pointerEvents: 'none', width: chordsContentRef.current?.offsetWidth || 400 }}
+        >
+          {sections.map(sec => (
+            <div key={sec.id} data-measure-section>
+              <div data-measure-chords className="px-3 pb-2">
+                <ChordPanel
+                  chordLines={sec.chordLines}
+                  currentTime={0}
+                  sectionStart={sec.start}
+                  sectionEnd={sec.end}
+                  isPlaying={false}
+                  onChange={() => {}}
+                />
+              </div>
+              <div data-measure-lyrics className="px-3 pb-2">
+                <LyricsPanel
+                  lyricLines={sec.lyricLines}
+                  currentTime={0}
+                  sectionStart={sec.start}
+                  sectionEnd={sec.end}
+                  isPlaying={false}
+                  onChange={() => {}}
+                />
+              </div>
+              <div data-measure-notes className="px-3 pb-2">
+                <textarea
+                  readOnly
+                  value={sec.notes}
+                  ref={el => {
+                    if (el) {
+                      el.style.height = 'auto';
+                      el.style.height = el.scrollHeight + 'px';
+                    }
+                  }}
+                  className="w-full min-h-[32px] bg-transparent text-sm font-mono resize-none overflow-hidden"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
