@@ -907,6 +907,7 @@ export default function Index() {
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
+                onCollapseChange={setWaveformCollapsed}
                 wavesurferRef={wavesurferRef}
               />
 
@@ -921,6 +922,7 @@ export default function Index() {
                     shiftSelectedIds={shiftSelectedIds}
                     cmdSelectedIds={cmdSelectedIds}
                     isPlaying={isPlaying}
+                    waveformCollapsed={waveformCollapsed}
                     onSelectedIdChange={handleSectionSelect}
                     onSelectedVcuIdChange={handleVcuSelect}
                     onShiftSelect={handleShiftSelect}
