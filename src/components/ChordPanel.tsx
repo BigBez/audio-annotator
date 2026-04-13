@@ -449,7 +449,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                           />
                         ) : (
                           <div
-                            className={`min-w-[110px] flex items-center justify-around px-1.5 py-0.5 transition-colors ${
+                            className={`min-w-[110px] flex items-center justify-around px-1.5 py-1 transition-colors ${
                               isActiveSyncBar
                                 ? 'bg-primary/10 ring-1 ring-primary/40'
                                 : isSyncStamped
@@ -461,9 +461,9 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                           >
                             {bar.content.trim() && bar.content.trim().includes(' ')
                               ? bar.content.trim().split(/\s+/).map((token, ti) => (
-                                  <span key={ti} className="text-xs font-mono text-foreground text-center" style={chordFontStyle}>{token}</span>
+                                  <span key={ti} className="font-mono text-foreground text-center" style={{ fontSize: '15px', ...chordFontStyle }}>{token}</span>
                                 ))
-                              : <span className="text-xs font-mono text-foreground text-center" style={chordFontStyle}>{bar.content || '\u00A0'}</span>
+                              : <span className="font-mono text-foreground text-center" style={{ fontSize: '15px', ...chordFontStyle }}>{bar.content || '\u00A0'}</span>
                             }
                           </div>
                         )}
