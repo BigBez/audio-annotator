@@ -204,6 +204,13 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
     prevSyncModeRef.current = syncMode;
   }, [syncMode, onChange]);
 
+  // Auto-exit sync mode when playhead passes section end
+  useEffect(() => {
+    if (syncMode && currentTime >= sectionEnd) {
+      commitSync();
+    }
+  }, [syncMode, currentTime, sectionEnd]);
+
   const undoLastStamp = useCallback(() => {
     if (syncFlatIdx === 0) return;
     const flatBars = flattenBars(syncDraft);

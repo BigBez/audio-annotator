@@ -129,6 +129,13 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
     prevSyncModeRef.current = syncMode;
   }, [syncMode, onChange]);
 
+  // Auto-exit sync mode when playhead passes section end
+  useEffect(() => {
+    if (syncMode && currentTime >= sectionEnd) {
+      commitSync();
+    }
+  }, [syncMode, currentTime, sectionEnd]);
+
   // Undo last stamp in sync mode
   const undoLastStamp = useCallback(() => {
     if (syncLineIdx === 0) return;
