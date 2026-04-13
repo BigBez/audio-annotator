@@ -85,6 +85,11 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   const [syncDraft, setSyncDraft] = useState<ChordLine[]>([]);
   const [syncSnapshot, setSyncSnapshot] = useState<ChordLine[]>([]);
   const [focusBarKey, setFocusBarKey] = useState<string | null>(null);
+  const [chordFont, setChordFont] = useState<'standard' | 'musanalysis'>('standard');
+
+  const chordFontStyle: React.CSSProperties = chordFont === 'musanalysis'
+    ? { fontFamily: "'MusAnalysis', monospace" }
+    : {};
 
   const addLine = (afterIndex?: number) => {
     const newLine: ChordLine = {
@@ -287,7 +292,23 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   return (
     <div className="space-y-0">
       {/* Header controls */}
-      <div className="flex justify-end gap-2 mb-1.5">
+      <div className="flex justify-end items-center gap-2 mb-1.5">
+        {/* Font toggle */}
+        <span className="flex items-center gap-0.5 mr-auto">
+          {(['standard', 'musanalysis'] as const).map(opt => (
+            <button
+              key={opt}
+              onClick={() => setChordFont(opt)}
+              className={`text-[10px] font-mono px-1 py-0.5 rounded transition-colors ${
+                chordFont === opt
+                  ? 'bg-secondary text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {opt === 'standard' ? 'Std' : 'Mus'}
+            </button>
+          ))}
+        </span>
         {syncMode ? (
           <>
             <button
@@ -424,6 +445,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                               }
                             }}
                             className="min-w-[110px] bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
+                            style={chordFontStyle}
                           />
                         ) : (
                           <div
@@ -439,9 +461,9 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                           >
                             {bar.content.trim() && bar.content.trim().includes(' ')
                               ? bar.content.trim().split(/\s+/).map((token, ti) => (
-                                  <span key={ti} className="text-xs font-mono text-foreground text-center">{token}</span>
+                                  <span key={ti} className="text-xs font-mono text-foreground text-center" style={chordFontStyle}>{token}</span>
                                 ))
-                              : <span className="text-xs font-mono text-foreground text-center">{bar.content || '\u00A0'}</span>
+                              : <span className="text-xs font-mono text-foreground text-center" style={chordFontStyle}>{bar.content || '\u00A0'}</span>
                             }
                           </div>
                         )}
