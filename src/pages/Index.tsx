@@ -853,6 +853,7 @@ export default function Index() {
                 cmdSelectedIds={cmdSelectedIds}
                 shiftSelectedIds={shiftSelectedIds}
                 modularState={modularGraph}
+                isPlaying={isPlaying}
                 onSelectedIdChange={handleSectionSelect}
                 onShiftSelect={handleShiftSelect}
                 onCmdSelect={handleCmdSelect}

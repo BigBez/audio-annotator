@@ -248,7 +248,7 @@ export default function SectionTimeline({
       })()}
 
       {/* Detail strip — collapsible, for section selected with or without VCU */}
-      {!isMultiSelect && selectedSection && (
+      {!isPlaying && !isMultiSelect && selectedSection && (
         <div className="mt-2 rounded-md bg-card border border-border overflow-hidden">
           <button
             onClick={() => setDetailsOpen(prev => !prev)}
