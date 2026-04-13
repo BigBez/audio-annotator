@@ -362,6 +362,7 @@ export default function SectionTimeline({
                   <LyricsPanel
                     lyricLines={selectedSection.lyricLines}
                     currentTime={currentTime}
+                    sectionStart={selectedSection.start}
                     sectionEnd={selectedSection.end}
                     isPlaying={isPlaying}
                     onChange={lines => onLyricLinesChange(selectedId!, lines)}
