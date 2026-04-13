@@ -17,6 +17,7 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
   const [syncMode, setSyncMode] = useState(false);
   const [syncLineIdx, setSyncLineIdx] = useState(0);
   const [syncDraft, setSyncDraft] = useState<LyricLine[]>([]);
+  const [syncSnapshot, setSyncSnapshot] = useState<LyricLine[]>([]);
   const textareaRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const syncContainerRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +67,7 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
 
   // Enter sync mode — auto-stamp first line's startTime to section start
   const enterSync = () => {
+    setSyncSnapshot(structuredClone(lyricLines));
     const draft = structuredClone(lyricLines);
     if (draft.length > 0) {
       draft[0] = { ...draft[0], startTime: sectionStart };
@@ -84,6 +86,7 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
 
   // Exit sync mode — discard
   const discardSync = () => {
+    onChange(syncSnapshot);
     setSyncMode(false);
   };
 
