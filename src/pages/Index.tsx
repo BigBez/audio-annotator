@@ -882,6 +882,22 @@ export default function Index() {
                 <Upload className="h-3.5 w-3.5" />
                 Import
               </button>
+              <div className="flex-1" />
+              <button
+                onClick={handleStop}
+                className="flex items-center justify-center h-6 w-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-opacity shrink-0"
+                title="Stop"
+              >
+                <Square className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => wavesurferRef.current?.playPause()}
+                className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
+                title="Play/Pause"
+              >
+                {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 ml-0.5" />}
+              </button>
+              <span className="text-[10px] text-muted-foreground font-mono shrink-0">Space · Enter</span>
             </div>
 
             <div>
@@ -890,7 +906,6 @@ export default function Index() {
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
-                onStop={handleStop}
                 wavesurferRef={wavesurferRef}
               />
 
