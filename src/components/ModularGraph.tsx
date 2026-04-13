@@ -33,6 +33,7 @@ interface ModularGraphProps {
   cmdSelectedIds: Set<string>;
   shiftSelectedIds: Set<string>;
   modularState: ModularGraphState;
+  isPlaying: boolean;
   onSelectedIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
   onCmdSelect: (id: string) => void;
@@ -49,6 +50,7 @@ export default function ModularGraph({
   cmdSelectedIds,
   shiftSelectedIds,
   modularState,
+  isPlaying,
   onSelectedIdChange,
   onShiftSelect,
   onCmdSelect,
