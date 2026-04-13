@@ -314,7 +314,7 @@ export default function ModularGraph({
             <div className="px-2 pb-1.5">
               {isMultiSelect && (
                 <div className="flex items-center gap-3 py-1 text-sm font-mono">
-                  <ColorPickerButton mode="multi" onColorSelect={(color) => {
+                  <ColorPickerButton mode="multi" usePortal onColorSelect={(color) => {
                     pushUndo();
                     const next = { ...boxColors };
                     multiSelectedIds.forEach(id => { next[id] = color; });
@@ -428,7 +428,7 @@ export default function ModularGraph({
                   )}
                   <div className={`flex items-center gap-3 py-1 text-sm font-mono ${selectedGroup ? 'pl-3' : ''}`}>
                     {selectedGroup && <span className="text-muted-foreground text-xs">↳</span>}
-                    <ColorPickerButton mode="single" activeColor={getBoxColor(selectedSection.id)} onColorSelect={(color) => {
+                    <ColorPickerButton mode="single" usePortal activeColor={getBoxColor(selectedSection.id)} onColorSelect={(color) => {
                       pushUndo();
                       updateState({ boxColors: { ...boxColors, [selectedSection.id]: color } });
                     }} />
