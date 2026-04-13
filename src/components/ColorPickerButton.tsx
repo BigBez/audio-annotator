@@ -5,6 +5,7 @@ import { SECTION_COLORS } from '@/lib/sections';
 interface ColorPickerButtonProps {
   activeColor?: string;
   mode: 'single' | 'multi';
+  size?: number;
   onColorSelect: (color: string) => void;
 }
 
