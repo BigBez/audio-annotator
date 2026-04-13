@@ -271,6 +271,25 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
                     updateText(lineIdx, e.target.value);
                     autoResize(e.target);
                   }}
+                  onPaste={e => {
+                    const text = e.clipboardData.getData('text');
+                    if (text.includes('\n')) {
+                      e.preventDefault();
+                      const chunks = text.split(/\r?\n/).filter(s => s.length > 0);
+                      if (chunks.length === 0) return;
+                      const next = [...lyricLines];
+                      next[lineIdx] = { ...next[lineIdx], text: (next[lineIdx].text + chunks[0]) };
+                      const newLines = chunks.slice(1).map(t => ({
+                        id: crypto.randomUUID(),
+                        text: t,
+                        startTime: null,
+                        endTime: null,
+                      }));
+                      next.splice(lineIdx + 1, 0, ...newLines);
+                      onChange(next);
+                      setFocusIdx(lineIdx + chunks.length - 1);
+                    }
+                  }}
                   onKeyDown={e => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
