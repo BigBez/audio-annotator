@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ChordLine, ChordBar } from '@/lib/sections';
-import { Pencil, Check, Plus, Minus, X } from 'lucide-react';
+import { Pencil, Check, Plus, Minus, X, Copy, ClipboardPaste } from 'lucide-react';
+
+let chordClipboard: ChordLine[] | null = null;
 
 interface ChordPanelProps {
   chordLines: ChordLine[];
@@ -303,6 +305,29 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
           </>
         ) : (
           <>
+            {chordLines.length > 0 && (
+              <button
+                onClick={() => { chordClipboard = structuredClone(chordLines); }}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <Copy className="h-3 w-3" /> Copy
+              </button>
+            )}
+            {chordClipboard && (
+              <button
+                onClick={() => {
+                  const pasted = structuredClone(chordClipboard!).map(line => ({
+                    ...line,
+                    id: crypto.randomUUID(),
+                    bars: line.bars.map(b => ({ ...b, id: crypto.randomUUID(), startTime: null, endTime: null })),
+                  }));
+                  onChange(pasted);
+                }}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <ClipboardPaste className="h-3 w-3" /> Paste
+              </button>
+            )}
             {hasAnyTimecodes && (
               <button
                 onClick={clearTimecodes}

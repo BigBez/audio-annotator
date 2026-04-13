@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { LyricLine } from '@/lib/sections';
-import { Pencil, Check, Plus, X } from 'lucide-react';
+import { Pencil, Check, Plus, X, Copy, ClipboardPaste } from 'lucide-react';
+
+let lyricsClipboard: LyricLine[] | null = null;
 
 interface LyricsPanelProps {
   lyricLines: LyricLine[];
@@ -213,6 +215,30 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
           </>
         ) : (
           <>
+            {lyricLines.length > 0 && (
+              <button
+                onClick={() => { lyricsClipboard = structuredClone(lyricLines); }}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <Copy className="h-3 w-3" /> Copy
+              </button>
+            )}
+            {lyricsClipboard && (
+              <button
+                onClick={() => {
+                  const pasted = structuredClone(lyricsClipboard!).map(line => ({
+                    ...line,
+                    id: crypto.randomUUID(),
+                    startTime: null,
+                    endTime: null,
+                  }));
+                  onChange(pasted);
+                }}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <ClipboardPaste className="h-3 w-3" /> Paste
+              </button>
+            )}
             {hasAnyTimecodes && (
               <button
                 onClick={clearTimecodes}
