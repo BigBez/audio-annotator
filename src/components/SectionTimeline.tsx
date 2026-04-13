@@ -301,7 +301,7 @@ export default function SectionTimeline({
                     </div>
                     <div className="flex items-center gap-3 pl-3 py-1 text-sm font-mono">
                       <span className="text-muted-foreground text-xs">↳</span>
-                      <ColorPickerButton mode="single" activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
+                      <ColorPickerButton mode="single" usePortal activeColor={selectedSection.color} onColorSelect={(color) => onColorChange([selectedSection.id], color)} />
                       {renderSectionControls(selectedSection)}
                     </div>
                   </div>
