@@ -332,8 +332,8 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
                   }}
                   rows={1}
                   placeholder="Lyric line…"
-                className="flex-1 bg-secondary border border-border rounded px-2 py-1 text-sm text-foreground outline-none focus:ring-1 focus:ring-ring resize-none overflow-hidden"
-                  style={{ fontFamily: "'EB Garamond', serif" }}
+                className="flex-1 bg-secondary border border-border rounded px-2 py-1 text-foreground outline-none focus:ring-1 focus:ring-ring resize-none overflow-hidden"
+                  style={{ fontFamily: "'EB Garamond', serif", fontSize: '16px' }}
                 />
                 <button
                   onClick={() => removeLine(lineIdx)}
@@ -345,8 +345,8 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
               </div>
             ) : (
               <p
-                style={{ fontFamily: "'EB Garamond', serif" }}
-                className={`text-sm leading-relaxed transition-colors ${
+                style={{ fontFamily: "'EB Garamond', serif", fontSize: '16px' }}
+                className={`leading-relaxed transition-colors ${
                   syncMode && lineIdx === syncLineIdx
                     ? 'border-l-2 border-primary pl-2 text-foreground bg-primary/5'
                     : syncMode && lineIdx < syncLineIdx

@@ -459,8 +459,8 @@ export default function SectionTimeline({
                     }
                   }}
                   placeholder=""
-className="w-full min-h-[32px] bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
-                  style={{ fontFamily: "'EB Garamond', serif" }}
+className="w-full min-h-[32px] bg-transparent text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
+                  style={{ fontFamily: "'EB Garamond', serif", fontSize: '16px' }}
                 />
               </div>
             )}
