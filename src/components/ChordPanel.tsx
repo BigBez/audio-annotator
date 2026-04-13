@@ -173,7 +173,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
         next[f.lineIdx].bars[f.barIdx] = { ...next[f.lineIdx].bars[f.barIdx], endTime: sectionEnd };
         return next;
       });
-      setTimeout(() => setSyncMode(false), 0);
+      setTimeout(() => commitSync(), 0);
     } else {
       setSyncDraft(prev => {
         const next = structuredClone(prev);
@@ -187,22 +187,6 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
     }
   }, [syncDraft, syncFlatIdx, currentTime, sectionEnd]);
 
-  // Auto-commit on sync exit after last bar
-  const syncModeRef = useRef(syncMode);
-  const prevSyncModeRef = useRef(syncMode);
-  const syncDraftRef = useRef(syncDraft);
-  syncModeRef.current = syncMode;
-  syncDraftRef.current = syncDraft;
-
-  useEffect(() => {
-    if (prevSyncModeRef.current && !syncMode && syncDraftRef.current.length > 0) {
-      const flatBars = flattenBars(syncDraftRef.current);
-      if (flatBars.length > 0 && flatBars[flatBars.length - 1].bar.startTime !== null) {
-        onChange(syncDraftRef.current);
-      }
-    }
-    prevSyncModeRef.current = syncMode;
-  }, [syncMode, onChange]);
 
   // Auto-exit sync mode when playhead passes section end
   useEffect(() => {

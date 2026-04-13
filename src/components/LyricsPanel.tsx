@@ -111,23 +111,6 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
     }
   }, [syncLineIdx, currentTime, sectionEnd, lyricLines.length]);
 
-  // Auto-commit when sync mode ends after last line stamp
-  const syncModeRef = useRef(syncMode);
-  const prevSyncModeRef = useRef(syncMode);
-  const syncDraftRef = useRef(syncDraft);
-  syncModeRef.current = syncMode;
-  syncDraftRef.current = syncDraft;
-
-  useEffect(() => {
-    if (prevSyncModeRef.current && !syncMode && syncDraftRef.current.length > 0) {
-      // Sync mode just ended — check if last line was stamped (auto-exit)
-      const lastLine = syncDraftRef.current[syncDraftRef.current.length - 1];
-      if (lastLine.startTime !== null) {
-        onChange(syncDraftRef.current);
-      }
-    }
-    prevSyncModeRef.current = syncMode;
-  }, [syncMode, onChange]);
 
   // Auto-exit sync mode when playhead passes section end
   useEffect(() => {
