@@ -21,8 +21,6 @@ export default function WaveformPlayer({
   wavesurferRef,
 }: WaveformPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [waveformCollapsed, setWaveformCollapsed] = useState(false);
 
@@ -38,7 +36,7 @@ export default function WaveformPlayer({
       barWidth: 2,
       barGap: 1,
       barRadius: 2,
-      height: 60,
+      height: 42,
       normalize: true,
     });
 
@@ -46,19 +44,16 @@ export default function WaveformPlayer({
 
     ws.on('ready', () => {
       const d = ws.getDuration();
-      setDuration(d);
       onDurationReady(d);
     });
 
     ws.on('audioprocess', () => {
       const t = ws.getCurrentTime();
-      setCurrentTime(t);
       onTimeUpdate(t);
     });
 
     ws.on('seeking', () => {
       const t = ws.getCurrentTime();
-      setCurrentTime(t);
       onTimeUpdate(t);
     });
 
@@ -76,23 +71,23 @@ export default function WaveformPlayer({
   }, []);
 
   return (
-    <div className="space-y-2">
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-2">
+    <div className="space-y-1">
+      {/* Transport controls in title bar */}
+      <div className="flex items-center gap-1.5">
         <button
           onClick={onStop}
-          className="flex items-center justify-center h-9 w-9 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-opacity"
+          className="flex items-center justify-center h-6 w-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-opacity"
           title="Stop"
         >
-          <Square className="h-4 w-4" />
+          <Square className="h-3 w-3" />
         </button>
         <button
           onClick={togglePlay}
-          className="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+          className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
         >
-          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+          {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 ml-0.5" />}
         </button>
-        <span className="ml-3 text-xs text-muted-foreground font-mono">Space to play/pause · Enter to mark section</span>
+        <span className="ml-1 text-[10px] text-muted-foreground font-mono">Space to play/pause · Enter to mark section</span>
       </div>
 
       {/* Waveform with collapse toggle */}
