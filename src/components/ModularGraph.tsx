@@ -355,10 +355,6 @@ export default function ModularGraph({
           </div>
         </div>
       )}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
