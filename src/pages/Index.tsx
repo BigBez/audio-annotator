@@ -23,6 +23,7 @@ export default function Index() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [waveformCollapsed, setWaveformCollapsed] = useState(false);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [selectedVcuId, setSelectedVcuId] = useState<string | null>(null);
   const [shiftSelectedIds, setShiftSelectedIds] = useState<Set<string>>(new Set());
