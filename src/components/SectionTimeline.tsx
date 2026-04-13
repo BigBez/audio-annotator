@@ -16,6 +16,7 @@ interface SectionTimelineProps {
   shiftSelectedIds: Set<string>;
   cmdSelectedIds: Set<string>;
   isPlaying: boolean;
+  waveformCollapsed: boolean;
   onSelectedIdChange: (id: string | null) => void;
   onSelectedVcuIdChange: (id: string | null) => void;
   onShiftSelect: (id: string) => void;
@@ -43,6 +44,7 @@ export default function SectionTimeline({
   shiftSelectedIds,
   cmdSelectedIds,
   isPlaying,
+  waveformCollapsed,
   onSelectedIdChange,
   onSelectedVcuIdChange,
   onShiftSelect,
