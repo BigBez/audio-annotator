@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, X, ChevronRight } from 'lucide-react';
+import { Pencil, X } from 'lucide-react';
 import type { Section } from '@/lib/sections';
 import ColorPickerButton from '@/components/ColorPickerButton';
 
@@ -78,8 +78,6 @@ export default function ModularGraph({
   const multiSelectedIds = new Set([...cmdSelectedIds, ...shiftSelectedIds]);
   const isMultiSelect = multiSelectedIds.size > 0;
 
-  const selectedSection = selectedId ? sections.find(s => s.id === selectedId) : null;
-  const selectedGroup = selectedId ? getGroupForSection(selectedId) : null;
 
   // Build render groups: consecutive sections that are joined together
   const renderItems: Array<{ type: 'single'; section: Section } | { type: 'group'; group: JoinedGroup; sections: Section[] }> = [];
