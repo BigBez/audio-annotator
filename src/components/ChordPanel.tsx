@@ -1,9 +1,13 @@
-import { useState } from 'react';
-import type { ChordLine } from '@/lib/sections';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import type { ChordLine, ChordBar } from '@/lib/sections';
 import { Pencil, Check, Plus, Minus, X } from 'lucide-react';
 
 interface ChordPanelProps {
   chordLines: ChordLine[];
+  currentTime: number;
+  sectionStart: number;
+  sectionEnd: number;
+  isPlaying: boolean;
   onChange: (chordLines: ChordLine[]) => void;
 }
 
@@ -61,14 +65,28 @@ function renderBarline(text: string, isPrefix: boolean): React.ReactNode | null 
   return null;
 }
 
-export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
+/** Flatten all bars across all chord lines into a sequential list with indices */
+function flattenBars(chordLines: ChordLine[]): { lineIdx: number; barIdx: number; bar: ChordBar }[] {
+  const result: { lineIdx: number; barIdx: number; bar: ChordBar }[] = [];
+  chordLines.forEach((line, li) => {
+    line.bars.forEach((bar, bi) => {
+      result.push({ lineIdx: li, barIdx: bi, bar });
+    });
+  });
+  return result;
+}
+
+export default function ChordPanel({ chordLines, currentTime, sectionStart, sectionEnd, isPlaying, onChange }: ChordPanelProps) {
   const [editMode, setEditMode] = useState(false);
+  const [syncMode, setSyncMode] = useState(false);
+  const [syncFlatIdx, setSyncFlatIdx] = useState(0);
+  const [syncDraft, setSyncDraft] = useState<ChordLine[]>([]);
 
   const addLine = (afterIndex?: number) => {
     const newLine: ChordLine = {
       id: crypto.randomUUID(),
       prefix: '',
-      bars: [{ id: crypto.randomUUID(), content: '' }],
+      bars: [{ id: crypto.randomUUID(), content: '', startTime: null, endTime: null }],
       suffix: '',
     };
     const next = [...chordLines];
@@ -84,7 +102,7 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
   const addBar = (lineIdx: number) => {
     const next = chordLines.map((line, i) =>
       i === lineIdx
-        ? { ...line, bars: [...line.bars, { id: crypto.randomUUID(), content: '' }] }
+        ? { ...line, bars: [...line.bars, { id: crypto.randomUUID(), content: '', startTime: null, endTime: null }] }
         : line
     );
     onChange(next);
@@ -118,6 +136,142 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
     onChange(next);
   };
 
+  // --- Sync mode ---
+  const enterSync = () => {
+    const draft = structuredClone(chordLines);
+    const flat = flattenBars(draft);
+    if (flat.length > 0) {
+      const f = flat[0];
+      draft[f.lineIdx].bars[f.barIdx] = { ...draft[f.lineIdx].bars[f.barIdx], startTime: sectionStart };
+    }
+    setSyncDraft(draft);
+    setSyncFlatIdx(0);
+    setSyncMode(true);
+    setEditMode(false);
+  };
+
+  const commitSync = () => {
+    onChange(syncDraft);
+    setSyncMode(false);
+  };
+
+  const discardSync = () => {
+    setSyncMode(false);
+  };
+
+  const flat = syncMode ? flattenBars(syncDraft) : flattenBars(chordLines);
+  const totalBars = flat.length;
+
+  const stampBar = useCallback(() => {
+    const flatBars = flattenBars(syncDraft);
+    const idx = syncFlatIdx;
+    if (idx >= flatBars.length - 1) {
+      // Last bar
+      setSyncDraft(prev => {
+        const next = structuredClone(prev);
+        const f = flatBars[idx];
+        next[f.lineIdx].bars[f.barIdx] = { ...next[f.lineIdx].bars[f.barIdx], endTime: sectionEnd };
+        return next;
+      });
+      setTimeout(() => setSyncMode(false), 0);
+    } else {
+      setSyncDraft(prev => {
+        const next = structuredClone(prev);
+        const curr = flatBars[idx];
+        const nxt = flatBars[idx + 1];
+        next[curr.lineIdx].bars[curr.barIdx] = { ...next[curr.lineIdx].bars[curr.barIdx], endTime: currentTime };
+        next[nxt.lineIdx].bars[nxt.barIdx] = { ...next[nxt.lineIdx].bars[nxt.barIdx], startTime: currentTime };
+        return next;
+      });
+      setSyncFlatIdx(prev => prev + 1);
+    }
+  }, [syncDraft, syncFlatIdx, currentTime, sectionEnd]);
+
+  // Auto-commit on sync exit after last bar
+  const syncModeRef = useRef(syncMode);
+  const prevSyncModeRef = useRef(syncMode);
+  const syncDraftRef = useRef(syncDraft);
+  syncModeRef.current = syncMode;
+  syncDraftRef.current = syncDraft;
+
+  useEffect(() => {
+    if (prevSyncModeRef.current && !syncMode && syncDraftRef.current.length > 0) {
+      const flatBars = flattenBars(syncDraftRef.current);
+      if (flatBars.length > 0 && flatBars[flatBars.length - 1].bar.startTime !== null) {
+        onChange(syncDraftRef.current);
+      }
+    }
+    prevSyncModeRef.current = syncMode;
+  }, [syncMode, onChange]);
+
+  const undoLastStamp = useCallback(() => {
+    if (syncFlatIdx === 0) return;
+    const flatBars = flattenBars(syncDraft);
+    setSyncDraft(prev => {
+      const next = structuredClone(prev);
+      const curr = flatBars[syncFlatIdx];
+      const prevBar = flatBars[syncFlatIdx - 1];
+      next[curr.lineIdx].bars[curr.barIdx] = { ...next[curr.lineIdx].bars[curr.barIdx], startTime: null };
+      next[prevBar.lineIdx].bars[prevBar.barIdx] = { ...next[prevBar.lineIdx].bars[prevBar.barIdx], endTime: null };
+      return next;
+    });
+    setSyncFlatIdx(prev => prev - 1);
+  }, [syncFlatIdx, syncDraft]);
+
+  // Clear all timecodes
+  const clearTimecodes = () => {
+    const cleared = chordLines.map(line => ({
+      ...line,
+      bars: line.bars.map(b => ({ ...b, startTime: null, endTime: null })),
+    }));
+    onChange(cleared);
+  };
+
+  const hasAnyTimecodes = chordLines.some(line => line.bars.some(b => b.startTime !== null));
+
+  // Tab/Escape/Cmd+Z handler for chord sync mode
+  useEffect(() => {
+    if (!syncMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+        stampBar();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        discardSync();
+      }
+      if (e.key === 'z' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        undoLastStamp();
+      }
+    };
+    window.addEventListener('keydown', handler, true);
+    return () => window.removeEventListener('keydown', handler, true);
+  }, [syncMode, stampBar, undoLastStamp]);
+
+  // Playback highlighting — find active bar
+  const getActiveBarKey = (): string | null => {
+    if (!isPlaying) return null;
+    for (const line of chordLines) {
+      for (const bar of line.bars) {
+        if (bar.startTime === null) continue;
+        const end = bar.endTime ?? sectionEnd;
+        if (currentTime >= bar.startTime && currentTime < end) return bar.id;
+      }
+    }
+    return null;
+  };
+  const activeBarId = getActiveBarKey();
+
+  // Sync mode — find the active flat index's bar id
+  const syncActiveBarId = syncMode ? flattenBars(syncDraft)[syncFlatIdx]?.bar.id ?? null : null;
+
+  // Determine which lines to render
+  const renderLines = syncMode ? syncDraft : chordLines;
+
   if (chordLines.length === 0 && !editMode) {
     return (
       <div className="flex justify-end">
@@ -134,27 +288,61 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
   return (
     <div className="space-y-0">
       {/* Header controls */}
-      <div className="flex justify-end mb-1.5">
-        {editMode ? (
+      <div className="flex justify-end gap-2 mb-1.5">
+        {syncMode ? (
           <button
-            onClick={() => setEditMode(false)}
+            onClick={commitSync}
             className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
           >
             <Check className="h-3 w-3" /> Done
           </button>
         ) : (
-          <button
-            onClick={() => setEditMode(true)}
-            className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
-          >
-            <Pencil className="h-3 w-3" /> Edit
-          </button>
+          <>
+            {hasAnyTimecodes && (
+              <button
+                onClick={clearTimecodes}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear
+              </button>
+            )}
+            {totalBars > 0 && (
+              <button
+                onClick={enterSync}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sync
+              </button>
+            )}
+            {editMode ? (
+              <button
+                onClick={() => setEditMode(false)}
+                className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
+              >
+                <Check className="h-3 w-3" /> Done
+              </button>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )}
+          </>
         )}
       </div>
 
+      {/* Sync mode hint */}
+      {syncMode && (
+        <p className="text-[10px] font-mono text-muted-foreground mb-1">
+          Press <kbd className="px-0.5 border border-border rounded text-[9px]">Tab</kbd> to stamp · <kbd className="px-0.5 border border-border rounded text-[9px]">Esc</kbd> to cancel
+        </p>
+      )}
+
       {/* Chord lines */}
       <div className="space-y-0">
-        {chordLines.map((line, lineIdx) => (
+        {renderLines.map((line, lineIdx) => (
           <div key={line.id}>
             {lineIdx > 0 && <hr className="border-border my-1" />}
             <div className="overflow-x-auto">
@@ -175,35 +363,55 @@ export default function ChordPanel({ chordLines, onChange }: ChordPanelProps) {
 
                 {/* Bar cells */}
                 <div className="flex items-stretch">
-                  {line.bars.map((bar, barIdx) => (
-                    <div key={bar.id} className="flex items-stretch">
-                      {barIdx > 0 && (
-                        <div className="self-stretch" style={{ width: '1px', backgroundColor: 'rgba(255,255,255,0.3)' }} />
-                      )}
-                      {editMode ? (
-                        <input
-                          value={bar.content}
-                          onChange={e => updateBarContent(lineIdx, barIdx, e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && e.shiftKey) {
-                              e.preventDefault();
-                              addLine(lineIdx);
+                  {line.bars.map((bar, barIdx) => {
+                    const isActivePlayback = !syncMode && activeBarId === bar.id;
+                    const isActiveSyncBar = syncMode && syncActiveBarId === bar.id;
+                    const isSyncStamped = syncMode && syncFlatIdx > 0 && (() => {
+                      const flatBars = flattenBars(syncDraft);
+                      const flatIdx = flatBars.findIndex(f => f.bar.id === bar.id);
+                      return flatIdx >= 0 && flatIdx < syncFlatIdx;
+                    })();
+
+                    return (
+                      <div key={bar.id} className="flex items-stretch">
+                        {barIdx > 0 && (
+                          <div className="self-stretch" style={{ width: '1px', backgroundColor: 'rgba(255,255,255,0.3)' }} />
+                        )}
+                        {editMode ? (
+                          <input
+                            value={bar.content}
+                            onChange={e => updateBarContent(lineIdx, barIdx, e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && e.shiftKey) {
+                                e.preventDefault();
+                                addLine(lineIdx);
+                              }
+                            }}
+                            className="min-w-[110px] bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
+                          />
+                        ) : (
+                          <div
+                            className={`min-w-[110px] flex items-center justify-around px-1.5 py-0.5 transition-colors ${
+                              isActiveSyncBar
+                                ? 'bg-primary/10 ring-1 ring-primary/40'
+                                : isSyncStamped
+                                ? 'opacity-50'
+                                : isActivePlayback
+                                ? 'bg-primary/10 ring-1 ring-primary/40'
+                                : ''
+                            }`}
+                          >
+                            {bar.content.trim() && bar.content.trim().includes(' ')
+                              ? bar.content.trim().split(/\s+/).map((token, ti) => (
+                                  <span key={ti} className="text-xs font-mono text-foreground text-center">{token}</span>
+                                ))
+                              : <span className="text-xs font-mono text-foreground text-center">{bar.content || '\u00A0'}</span>
                             }
-                          }}
-                          className="min-w-[110px] bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
-                        />
-                      ) : (
-                        <div className="min-w-[110px] flex items-center justify-around px-1.5 py-0.5">
-                          {bar.content.trim() && bar.content.trim().includes(' ')
-                            ? bar.content.trim().split(/\s+/).map((token, ti) => (
-                                <span key={ti} className="text-xs font-mono text-foreground text-center">{token}</span>
-                              ))
-                            : <span className="text-xs font-mono text-foreground text-center">{bar.content || '\u00A0'}</span>
-                          }
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Suffix */}

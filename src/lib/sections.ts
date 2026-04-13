@@ -1,6 +1,8 @@
 export interface ChordBar {
   id: string;
   content: string;
+  startTime: number | null;
+  endTime: number | null;
 }
 
 export interface ChordLine {
