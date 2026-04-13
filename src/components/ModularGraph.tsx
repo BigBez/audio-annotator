@@ -301,7 +301,7 @@ export default function ModularGraph({
       </div>
 
       {/* Collapsible modular detail strip */}
-      {(isMultiSelect || selectedSection) && (
+      {!isPlaying && (isMultiSelect || selectedSection) && (
         <div className="mt-2 rounded-md bg-card border border-border overflow-hidden">
           <button
             onClick={() => setDetailsOpen(prev => !prev)}
