@@ -444,8 +444,8 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                                 addLine(lineIdx);
                               }
                             }}
-                            className="min-w-[110px] bg-secondary border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
-                            style={chordFontStyle}
+                            className="min-w-[110px] bg-secondary border border-border rounded px-1.5 py-1 font-mono text-foreground outline-none focus:ring-1 focus:ring-ring text-center"
+                            style={{ fontSize: '15px', ...chordFontStyle }}
                           />
                         ) : (
                           <div
