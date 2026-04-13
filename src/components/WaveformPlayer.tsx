@@ -8,6 +8,7 @@ interface WaveformPlayerProps {
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
   onCollapseChange?: (collapsed: boolean) => void;
+  onSeek?: (time: number) => void;
   wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
 }
 
@@ -17,6 +18,7 @@ export default function WaveformPlayer({
   onDurationReady,
   onPlayStateChange,
   onCollapseChange,
+  onSeek,
   wavesurferRef,
 }: WaveformPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +55,7 @@ export default function WaveformPlayer({
     ws.on('seeking', () => {
       const t = ws.getCurrentTime();
       onTimeUpdate(t);
+      onSeek?.(t);
     });
 
     ws.on('play', () => onPlayStateChange(true));

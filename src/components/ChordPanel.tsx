@@ -82,6 +82,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   const [syncFlatIdx, setSyncFlatIdx] = useState(0);
   const [syncDraft, setSyncDraft] = useState<ChordLine[]>([]);
   const [syncSnapshot, setSyncSnapshot] = useState<ChordLine[]>([]);
+  const [focusBarKey, setFocusBarKey] = useState<string | null>(null);
 
   const addLine = (afterIndex?: number) => {
     const newLine: ChordLine = {
@@ -101,12 +102,14 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   };
 
   const addBar = (lineIdx: number) => {
+    const newId = crypto.randomUUID();
     const next = chordLines.map((line, i) =>
       i === lineIdx
-        ? { ...line, bars: [...line.bars, { id: crypto.randomUUID(), content: '', startTime: null, endTime: null }] }
+        ? { ...line, bars: [...line.bars, { id: newId, content: '', startTime: null, endTime: null }] }
         : line
     );
     onChange(next);
+    setFocusBarKey(newId);
   };
 
   const removeBar = (lineIdx: number) => {
@@ -381,6 +384,12 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
                         )}
                         {editMode ? (
                           <input
+                            ref={el => {
+                              if (el && focusBarKey === bar.id) {
+                                el.focus();
+                                setFocusBarKey(null);
+                              }
+                            }}
                             value={bar.content}
                             onChange={e => updateBarContent(lineIdx, barIdx, e.target.value)}
                             onKeyDown={e => {
