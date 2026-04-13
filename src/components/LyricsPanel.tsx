@@ -96,9 +96,7 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
         next[syncLineIdx] = { ...next[syncLineIdx], endTime: sectionEnd };
         return next;
       });
-      setTimeout(() => {
-        setSyncMode(false);
-      }, 0);
+      setTimeout(() => commitSync(), 0);
     } else {
       // Set endTime of current line, startTime of next line
       setSyncDraft(prev => {
