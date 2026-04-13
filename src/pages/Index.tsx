@@ -872,7 +872,7 @@ export default function Index() {
           <AudioUpload onFileLoaded={setFile} />
         ) : (
           <>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-1">
               <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
               <button
                 onClick={(e) => { e.stopPropagation(); handleImport(); }}
@@ -900,7 +900,7 @@ export default function Index() {
               <span className="text-[10px] text-muted-foreground font-mono shrink-0">Space = Play/Pause · Enter = Mark Section</span>
             </div>
 
-            <div>
+            <div className="space-y-0">
               <WaveformPlayer
                 file={file}
                 onTimeUpdate={setCurrentTime}
