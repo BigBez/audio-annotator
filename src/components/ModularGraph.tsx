@@ -169,7 +169,7 @@ export default function ModularGraph({
         >
           {/* Per-box color swatch */}
           <div style={{ position: 'absolute', top: 4, left: 4, zIndex: 2 }} onClick={e => e.stopPropagation()}>
-            <ColorPickerButton mode="single" activeColor={getBoxColor(section.id)} onColorSelect={(color) => {
+            <ColorPickerButton mode="single" size={10} activeColor={getBoxColor(section.id)} onColorSelect={(color) => {
               pushUndo();
               updateState({ boxColors: { ...boxColors, [section.id]: color } });
             }} />
