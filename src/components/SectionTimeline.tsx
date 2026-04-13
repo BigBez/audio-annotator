@@ -71,6 +71,41 @@ export default function SectionTimeline({
   const [notesOpen, setNotesOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
+  // Height-locking during playback to prevent layout shifts
+  const [lockedHeights, setLockedHeights] = useState<{ chords: number; lyrics: number; notes: number } | null>(null);
+  const chordsContentRef = useRef<HTMLDivElement>(null);
+  const lyricsContentRef = useRef<HTMLDivElement>(null);
+  const notesContentRef = useRef<HTMLDivElement>(null);
+  const wasPlayingRef = useRef(false);
+
+  useEffect(() => {
+    if (isPlaying && !wasPlayingRef.current) {
+      setLockedHeights({
+        chords: chordsContentRef.current?.scrollHeight ?? 0,
+        lyrics: lyricsContentRef.current?.scrollHeight ?? 0,
+        notes: notesContentRef.current?.scrollHeight ?? 0,
+      });
+    } else if (!isPlaying && wasPlayingRef.current) {
+      setLockedHeights(null);
+    }
+    wasPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!isPlaying || !lockedHeights) return;
+    const raf = requestAnimationFrame(() => {
+      setLockedHeights(prev => {
+        if (!prev) return prev;
+        return {
+          chords: Math.max(prev.chords, chordsContentRef.current?.scrollHeight ?? 0),
+          lyrics: Math.max(prev.lyrics, lyricsContentRef.current?.scrollHeight ?? 0),
+          notes: Math.max(prev.notes, notesContentRef.current?.scrollHeight ?? 0),
+        };
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [isPlaying, selectedId, lockedHeights]);
+
   if (sections.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card p-4 text-center">
