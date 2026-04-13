@@ -371,7 +371,7 @@ export default function SectionTimeline({
                 <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
               </button>
               {chordsOpen && (
-                <div className="px-3 pb-2">
+                <div ref={chordsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.chords } : undefined}>
                   <ChordPanel
                     chordLines={selectedSection.chordLines}
                     currentTime={currentTime}
