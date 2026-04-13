@@ -81,6 +81,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   const [syncMode, setSyncMode] = useState(false);
   const [syncFlatIdx, setSyncFlatIdx] = useState(0);
   const [syncDraft, setSyncDraft] = useState<ChordLine[]>([]);
+  const [syncSnapshot, setSyncSnapshot] = useState<ChordLine[]>([]);
 
   const addLine = (afterIndex?: number) => {
     const newLine: ChordLine = {
@@ -138,6 +139,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
 
   // --- Sync mode ---
   const enterSync = () => {
+    setSyncSnapshot(structuredClone(chordLines));
     const draft = structuredClone(chordLines);
     const flat = flattenBars(draft);
     if (flat.length > 0) {
@@ -156,6 +158,7 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
   };
 
   const discardSync = () => {
+    onChange(syncSnapshot);
     setSyncMode(false);
   };
 
@@ -281,12 +284,20 @@ export default function ChordPanel({ chordLines, currentTime, sectionStart, sect
       {/* Header controls */}
       <div className="flex justify-end gap-2 mb-1.5">
         {syncMode ? (
-          <button
-            onClick={commitSync}
-            className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
-          >
-            <Check className="h-3 w-3" /> Done
-          </button>
+          <>
+            <button
+              onClick={discardSync}
+              className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5"
+            >
+              <X className="h-3 w-3" /> Cancel
+            </button>
+            <button
+              onClick={commitSync}
+              className="text-[10px] font-mono text-primary hover:text-primary/80 transition-colors flex items-center gap-0.5"
+            >
+              <Check className="h-3 w-3" /> Done
+            </button>
+          </>
         ) : (
           <>
             {hasAnyTimecodes && (
