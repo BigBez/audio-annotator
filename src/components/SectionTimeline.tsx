@@ -361,6 +361,9 @@ export default function SectionTimeline({
                 <div className="px-3 pb-2">
                   <LyricsPanel
                     lyricLines={selectedSection.lyricLines}
+                    currentTime={currentTime}
+                    sectionEnd={selectedSection.end}
+                    isPlaying={isPlaying}
                     onChange={lines => onLyricLinesChange(selectedId!, lines)}
                   />
                 </div>
