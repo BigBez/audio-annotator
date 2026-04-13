@@ -646,9 +646,49 @@ export default function Index() {
           pushUndo();
           setSections(prev => {
             const updated = [...prev];
-            updated[idx] = { ...updated[idx], end: newEnd };
+            const cur = { ...updated[idx], end: newEnd };
+            // Update last bar/lyric endTime for current section
+            if (cur.chordLines.length > 0) {
+              const lastLine = cur.chordLines[cur.chordLines.length - 1];
+              if (lastLine.bars.length > 0) {
+                const lastBar = lastLine.bars[lastLine.bars.length - 1];
+                if (lastBar.endTime !== null) {
+                  const newLines = [...cur.chordLines];
+                  const newBars = [...lastLine.bars];
+                  newBars[newBars.length - 1] = { ...lastBar, endTime: newEnd };
+                  newLines[newLines.length - 1] = { ...lastLine, bars: newBars };
+                  cur.chordLines = newLines;
+                }
+              }
+            }
+            if (cur.lyricLines.length > 0) {
+              const lastLyric = cur.lyricLines[cur.lyricLines.length - 1];
+              if (lastLyric.endTime !== null) {
+                const newLyrics = [...cur.lyricLines];
+                newLyrics[newLyrics.length - 1] = { ...lastLyric, endTime: newEnd };
+                cur.lyricLines = newLyrics;
+              }
+            }
+            updated[idx] = cur;
             if (idx < prev.length - 1) {
-              updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+              const nxt = { ...updated[idx + 1], start: newEnd };
+              // Update first bar/lyric startTime for next section
+              if (nxt.chordLines.length > 0 && nxt.chordLines[0].bars.length > 0) {
+                const firstBar = nxt.chordLines[0].bars[0];
+                if (firstBar.startTime !== null) {
+                  const newLines = [...nxt.chordLines];
+                  const newBars = [...newLines[0].bars];
+                  newBars[0] = { ...firstBar, startTime: newEnd };
+                  newLines[0] = { ...newLines[0], bars: newBars };
+                  nxt.chordLines = newLines;
+                }
+              }
+              if (nxt.lyricLines.length > 0 && nxt.lyricLines[0].startTime !== null) {
+                const newLyrics = [...nxt.lyricLines];
+                newLyrics[0] = { ...newLyrics[0], startTime: newEnd };
+                nxt.lyricLines = newLyrics;
+              }
+              updated[idx + 1] = nxt;
             }
             boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
             return updated;
@@ -660,8 +700,46 @@ export default function Index() {
           pushUndo();
           setSections(prev => {
             const updated = [...prev];
-            updated[idx] = { ...updated[idx], end: newEnd };
-            updated[idx + 1] = { ...updated[idx + 1], start: newEnd };
+            const cur = { ...updated[idx], end: newEnd };
+            if (cur.chordLines.length > 0) {
+              const lastLine = cur.chordLines[cur.chordLines.length - 1];
+              if (lastLine.bars.length > 0) {
+                const lastBar = lastLine.bars[lastLine.bars.length - 1];
+                if (lastBar.endTime !== null) {
+                  const newLines = [...cur.chordLines];
+                  const newBars = [...lastLine.bars];
+                  newBars[newBars.length - 1] = { ...lastBar, endTime: newEnd };
+                  newLines[newLines.length - 1] = { ...lastLine, bars: newBars };
+                  cur.chordLines = newLines;
+                }
+              }
+            }
+            if (cur.lyricLines.length > 0) {
+              const lastLyric = cur.lyricLines[cur.lyricLines.length - 1];
+              if (lastLyric.endTime !== null) {
+                const newLyrics = [...cur.lyricLines];
+                newLyrics[newLyrics.length - 1] = { ...lastLyric, endTime: newEnd };
+                cur.lyricLines = newLyrics;
+              }
+            }
+            updated[idx] = cur;
+            const nxt = { ...updated[idx + 1], start: newEnd };
+            if (nxt.chordLines.length > 0 && nxt.chordLines[0].bars.length > 0) {
+              const firstBar = nxt.chordLines[0].bars[0];
+              if (firstBar.startTime !== null) {
+                const newLines = [...nxt.chordLines];
+                const newBars = [...newLines[0].bars];
+                newBars[0] = { ...firstBar, startTime: newEnd };
+                newLines[0] = { ...newLines[0], bars: newBars };
+                nxt.chordLines = newLines;
+              }
+            }
+            if (nxt.lyricLines.length > 0 && nxt.lyricLines[0].startTime !== null) {
+              const newLyrics = [...nxt.lyricLines];
+              newLyrics[0] = { ...newLyrics[0], startTime: newEnd };
+              nxt.lyricLines = newLyrics;
+            }
+            updated[idx + 1] = nxt;
             boundariesRef.current = [updated[0].start, ...updated.map(s => s.end)];
             return updated;
           });
