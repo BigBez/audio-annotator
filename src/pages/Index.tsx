@@ -5,7 +5,7 @@ import WaveformPlayer from '@/components/WaveformPlayer';
 import SectionTimeline from '@/components/SectionTimeline';
 import ModularGraph, { type ModularGraphState, DEFAULT_MODULAR_STATE } from '@/components/ModularGraph';
 import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@/lib/sections';
-import { Music, Upload } from 'lucide-react';
+import { Music, Upload, Play, Pause, Square } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface UndoSnapshot {
