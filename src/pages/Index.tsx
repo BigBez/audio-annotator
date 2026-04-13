@@ -897,7 +897,7 @@ export default function Index() {
               >
                 {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 ml-0.5" />}
               </button>
-              <span className="text-[10px] text-muted-foreground font-mono shrink-0">Space · Enter</span>
+              <span className="text-[10px] text-muted-foreground font-mono shrink-0">Space = Play/Pause · Enter = Mark Section</span>
             </div>
 
             <div>
