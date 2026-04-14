@@ -18,8 +18,6 @@ interface WaveformPlayerProps {
   onSeek?: (time: number) => void;
   wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
 }
-  wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
-}
 
 export default function WaveformPlayer({
   file,
