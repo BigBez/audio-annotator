@@ -2,7 +2,8 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-function formatTime(seconds: number): string {
+function formatTime(seconds: number | undefined): string {
+  if (seconds == null || !isFinite(seconds)) return '0:00';
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
