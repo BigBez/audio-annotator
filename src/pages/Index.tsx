@@ -8,6 +8,13 @@ import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@
 import { Music, Upload, Play, Pause, Square } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
+function formatTime(seconds: number): string {
+  if (!isFinite(seconds)) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 interface UndoSnapshot {
   sections: Section[];
   boundaries: number[];
