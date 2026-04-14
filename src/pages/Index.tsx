@@ -910,6 +910,8 @@ export default function Index() {
             <div className="space-y-0">
               <WaveformPlayer
                 file={file}
+                currentTime={currentTime}
+                duration={duration}
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}

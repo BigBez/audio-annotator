@@ -2,8 +2,16 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 interface WaveformPlayerProps {
   file: File;
+  currentTime: number;
+  duration: number;
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
@@ -14,6 +22,8 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
+  currentTime,
+  duration,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
@@ -69,13 +79,17 @@ export default function WaveformPlayer({
 
   return (
     <div>
-      <button
-        onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
-        className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors mb-1"
-        title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
-      >
-        {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
-      </button>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+        <button
+          onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
+          className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+          title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
+        >
+          {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+        </button>
+        <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
+      </div>
       <div
         ref={containerRef}
         className="rounded-lg bg-secondary/50 p-2"
