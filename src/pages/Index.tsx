@@ -8,6 +8,13 @@ import { type Section, type VcuSpan, getColorForIndex, getDefaultLabel } from '@
 import { Music, Upload, Play, Pause, Square } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
+function formatTime(seconds: number): string {
+  if (!isFinite(seconds)) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 interface UndoSnapshot {
   sections: Section[];
   boundaries: number[];
@@ -908,10 +915,12 @@ export default function Index() {
             </div>
 
             <div className="space-y-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+                <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
+              </div>
               <WaveformPlayer
                 file={file}
-                currentTime={currentTime}
-                duration={duration}
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
