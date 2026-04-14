@@ -2,8 +2,16 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 interface WaveformPlayerProps {
   file: File;
+  currentTime: number;
+  duration: number;
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
