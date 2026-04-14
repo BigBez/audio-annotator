@@ -11,9 +11,9 @@ function formatTime(seconds: number | undefined): string {
 
 interface WaveformPlayerProps {
   file: File;
-  currentTime: number;
-  duration: number;
   onTimeUpdate: (time: number) => void;
+  onDurationReady: (duration: number) => void;
+  onPlayStateChange: (playing: boolean) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
   onCollapseChange?: (collapsed: boolean) => void;
@@ -23,8 +23,6 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
-  currentTime,
-  duration,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
@@ -80,8 +78,7 @@ export default function WaveformPlayer({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+      <div className="flex items-center justify-end mb-1">
         <button
           onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
           className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
@@ -89,7 +86,6 @@ export default function WaveformPlayer({
         >
           {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
         </button>
-        <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
       </div>
       <div
         ref={containerRef}
