@@ -89,11 +89,6 @@ export default function WaveformPlayer({
           {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
         </button>
         <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
-      </div>
-        title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
-      >
-        {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
-      </button>
       <div
         ref={containerRef}
         className="rounded-lg bg-secondary/50 p-2"
