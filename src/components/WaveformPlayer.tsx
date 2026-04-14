@@ -22,6 +22,8 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
+  currentTime,
+  duration,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
@@ -77,9 +79,17 @@ export default function WaveformPlayer({
 
   return (
     <div>
-      <button
-        onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
-        className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors mb-1"
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+        <button
+          onClick={() => setWaveformCollapsed(prev => { const next = !prev; onCollapseChange?.(next); return next; })}
+          className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+          title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
+        >
+          {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+        </button>
+        <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
+      </div>
         title={waveformCollapsed ? 'Show waveform' : 'Hide waveform'}
       >
         {waveformCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
