@@ -14,10 +14,10 @@ interface WaveformPlayerProps {
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
-  onDurationReady: (duration: number) => void;
-  onPlayStateChange: (playing: boolean) => void;
   onCollapseChange?: (collapsed: boolean) => void;
   onSeek?: (time: number) => void;
+  wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
+}
   wavesurferRef: React.MutableRefObject<WaveSurfer | null>;
 }
 

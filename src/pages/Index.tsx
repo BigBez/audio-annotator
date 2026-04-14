@@ -908,10 +908,12 @@ export default function Index() {
             </div>
 
             <div className="space-y-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+                <span className="text-xs font-mono text-muted-foreground">{formatTime(duration)}</span>
+              </div>
               <WaveformPlayer
                 file={file}
-                currentTime={currentTime}
-                duration={duration}
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
