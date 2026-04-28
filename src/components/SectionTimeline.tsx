@@ -112,12 +112,13 @@ export default function SectionTimeline({
         const c = item.querySelector('[data-measure-chords]');
         const l = item.querySelector('[data-measure-lyrics] [data-lyrics-lines]');
         const n = item.querySelector('[data-measure-notes]');
-        if (c) maxChords = Math.max(maxChords, c.scrollHeight);
-        if (l) maxLyrics = Math.max(maxLyrics, (l as HTMLElement).scrollHeight);
+      if (c) maxChords = Math.max(maxChords, c.scrollHeight);
         if (n) maxNotes = Math.max(maxNotes, n.scrollHeight);
       });
-      // Lyrics: snug fit with ~8px top/bottom padding
-      setLockedHeights({ chords: maxChords, lyrics: maxLyrics > 0 ? maxLyrics + 16 : 0, notes: maxNotes });
+      // Lyrics: calculate mathematically from data — no DOM measurement
+      const maxLyricLines = sections.reduce((m, s) => Math.max(m, s.lyricLines?.length ?? 0), 0);
+      const lyricsHeight = maxLyricLines > 0 ? maxLyricLines * 28 + 32 : 0;
+      setLockedHeights({ chords: maxChords, lyrics: lyricsHeight, notes: maxNotes });
       setMeasuring(false);
     });
     return () => cancelAnimationFrame(raf);
