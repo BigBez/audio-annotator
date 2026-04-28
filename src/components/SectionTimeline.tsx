@@ -76,22 +76,29 @@ export default function SectionTimeline({
   // Height-locking during playback to prevent layout shifts
   const [lockedHeights, setLockedHeights] = useState<{ chords: number; lyrics: number; notes: number } | null>(null);
   const [measuring, setMeasuring] = useState(false);
+  // Locked panel visibility during playback (determined at play start)
+  const [lockedVisibility, setLockedVisibility] = useState<{ chords: boolean; lyrics: boolean; notes: boolean } | null>(null);
   const chordsContentRef = useRef<HTMLDivElement>(null);
   const lyricsContentRef = useRef<HTMLDivElement>(null);
   const notesContentRef = useRef<HTMLDivElement>(null);
   const measureContainerRef = useRef<HTMLDivElement>(null);
   const wasPlayingRef = useRef(false);
 
-  // When playback starts, trigger measurement; when it stops, release
+  // When playback starts, trigger measurement and lock visibility; when it stops, release
   useEffect(() => {
     if (isPlaying && !wasPlayingRef.current) {
       setMeasuring(true);
+      const anyChords = sections.some(s => s.chordLines && s.chordLines.length > 0);
+      const anyLyrics = sections.some(s => s.lyricLines && s.lyricLines.length > 0);
+      const anyNotes = sections.some(s => s.notes && s.notes.trim().length > 0);
+      setLockedVisibility({ chords: anyChords, lyrics: anyLyrics, notes: anyNotes });
     } else if (!isPlaying && wasPlayingRef.current) {
       setLockedHeights(null);
       setMeasuring(false);
+      setLockedVisibility(null);
     }
     wasPlayingRef.current = isPlaying;
-  }, [isPlaying]);
+  }, [isPlaying, sections]);
 
   // After measurement container renders, read max heights and lock
   useEffect(() => {
@@ -379,92 +386,109 @@ export default function SectionTimeline({
       {selectedId && selectedSection && (
         <div className="space-y-0">
           {/* Chords + Lyrics side by side */}
-          <div className="flex gap-0">
-            {/* Chords panel */}
-            <div
-              className="border border-border bg-card overflow-hidden rounded-tl-lg transition-all min-w-0"
-              style={{ flex: chordsOpen && !lyricsOpen ? '1 1 100%' : !chordsOpen && lyricsOpen ? '0 0 auto' : '1 1 50%' }}
-            >
-              <button
-                onClick={() => setChordsOpen(prev => !prev)}
-                className={`w-full flex items-center gap-1.5 px-3 ${chordsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
-              >
-                <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
-                <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
-              </button>
-              {chordsOpen && (
-                <div ref={chordsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.chords } : undefined}>
-                  <ChordPanel
-                    chordLines={selectedSection.chordLines}
-                    currentTime={currentTime}
-                    sectionStart={selectedSection.start}
-                    sectionEnd={selectedSection.end}
-                    isPlaying={isPlaying}
-                    onChange={lines => onChordLinesChange(selectedId, lines)}
-                  />
-                </div>
-              )}
-            </div>
+          {(() => {
+            const showChords = lockedVisibility ? lockedVisibility.chords : true;
+            const showLyrics = lockedVisibility ? lockedVisibility.lyrics : true;
+            const showNotes = lockedVisibility ? lockedVisibility.notes : true;
+            return (
+              <>
+                {(showChords || showLyrics) && (
+                  <div className="flex gap-0">
+                    {/* Chords panel */}
+                    {showChords && (
+                      <div
+                        className={`border border-border bg-card overflow-hidden ${showLyrics ? 'rounded-tl-lg' : 'rounded-t-lg'} transition-all min-w-0`}
+                        style={{ flex: chordsOpen && (!lyricsOpen || !showLyrics) ? '1 1 100%' : !chordsOpen && lyricsOpen && showLyrics ? '0 0 auto' : showLyrics ? '1 1 50%' : '1 1 100%' }}
+                      >
+                        <button
+                          onClick={() => setChordsOpen(prev => !prev)}
+                          className={`w-full flex items-center gap-1.5 px-3 ${chordsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+                        >
+                          <ChevronRight className={`h-3 w-3 transition-transform ${chordsOpen ? 'rotate-90' : ''}`} />
+                          <span className={chordsOpen ? 'text-[10px] text-muted-foreground' : ''}>Chords</span>
+                        </button>
+                        {chordsOpen && (
+                          <div ref={chordsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.chords } : undefined}>
+                            <ChordPanel
+                              chordLines={selectedSection.chordLines}
+                              currentTime={currentTime}
+                              sectionStart={selectedSection.start}
+                              sectionEnd={selectedSection.end}
+                              isPlaying={isPlaying}
+                              onChange={lines => onChordLinesChange(selectedId, lines)}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-            {/* Lyrics panel */}
-            <div
-              className="border border-l-0 border-border bg-card overflow-hidden rounded-tr-lg transition-all min-w-0"
-              style={{ flex: lyricsOpen && !chordsOpen ? '1 1 100%' : !lyricsOpen && chordsOpen ? '0 0 auto' : '1 1 50%' }}
-            >
-              <button
-                onClick={() => setLyricsOpen(prev => !prev)}
-                className={`w-full flex items-center gap-1.5 px-3 ${lyricsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
-              >
-                <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
-                <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
-              </button>
-              {lyricsOpen && (
-                <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.lyrics } : undefined}>
-                  <LyricsPanel
-                    lyricLines={selectedSection.lyricLines}
-                    currentTime={currentTime}
-                    sectionStart={selectedSection.start}
-                    sectionEnd={selectedSection.end}
-                    isPlaying={isPlaying}
-                    onChange={lines => onLyricLinesChange(selectedId!, lines)}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+                    {/* Lyrics panel */}
+                    {showLyrics && (
+                      <div
+                        className={`border ${showChords ? 'border-l-0' : ''} border-border bg-card overflow-hidden ${showChords ? 'rounded-tr-lg' : 'rounded-t-lg'} transition-all min-w-0`}
+                        style={{ flex: lyricsOpen && (!chordsOpen || !showChords) ? '1 1 100%' : !lyricsOpen && chordsOpen && showChords ? '0 0 auto' : showChords ? '1 1 50%' : '1 1 100%' }}
+                      >
+                        <button
+                          onClick={() => setLyricsOpen(prev => !prev)}
+                          className={`w-full flex items-center gap-1.5 px-3 ${lyricsOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+                        >
+                          <ChevronRight className={`h-3 w-3 transition-transform ${lyricsOpen ? 'rotate-90' : ''}`} />
+                          <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
+                        </button>
+                        {lyricsOpen && (
+                          <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.lyrics } : undefined}>
+                            <LyricsPanel
+                              lyricLines={selectedSection.lyricLines}
+                              currentTime={currentTime}
+                              sectionStart={selectedSection.start}
+                              sectionEnd={selectedSection.end}
+                              isPlaying={isPlaying}
+                              onChange={lines => onLyricLinesChange(selectedId!, lines)}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-          {/* Notes panel */}
-          <div className="rounded-b-lg border-x border-b border-border bg-card overflow-hidden">
-            <button
-              onClick={() => setNotesOpen(prev => !prev)}
-              className={`w-full flex items-center gap-1.5 px-3 ${notesOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
-            >
-              <ChevronRight className={`h-3 w-3 transition-transform ${notesOpen ? 'rotate-90' : ''}`} />
-              Notes
-            </button>
-            {notesOpen && (
-              <div ref={notesContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.notes } : undefined}>
-                <textarea
-                  value={selectedSection.notes}
-                  onChange={e => {
-                    onNotesChange(selectedId, e.target.value);
-                    const el = e.target;
-                    el.style.height = 'auto';
-                    el.style.height = el.scrollHeight + 'px';
-                  }}
-                  ref={el => {
-                    if (el) {
-                      el.style.height = 'auto';
-                      el.style.height = el.scrollHeight + 'px';
-                    }
-                  }}
-                  placeholder=""
-className="w-full min-h-[32px] bg-transparent text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
-                  style={{ fontFamily: "'EB Garamond', serif", fontSize: '16px' }}
-                />
-              </div>
-            )}
-          </div>
+                {/* Notes panel */}
+                {showNotes && (
+                  <div className={`${(showChords || showLyrics) ? 'rounded-b-lg border-x border-b' : 'rounded-lg border'} border-border bg-card overflow-hidden`}>
+                    <button
+                      onClick={() => setNotesOpen(prev => !prev)}
+                      className={`w-full flex items-center gap-1.5 px-3 ${notesOpen ? 'py-0.5' : 'py-1.5'} text-xs font-mono text-muted-foreground hover:text-foreground transition-colors`}
+                    >
+                      <ChevronRight className={`h-3 w-3 transition-transform ${notesOpen ? 'rotate-90' : ''}`} />
+                      Notes
+                    </button>
+                    {notesOpen && (
+                      <div ref={notesContentRef} className="px-3 pb-2" style={lockedHeights ? { minHeight: lockedHeights.notes } : undefined}>
+                        <textarea
+                          value={selectedSection.notes}
+                          onChange={e => {
+                            onNotesChange(selectedId, e.target.value);
+                            const el = e.target;
+                            el.style.height = 'auto';
+                            el.style.height = el.scrollHeight + 'px';
+                          }}
+                          ref={el => {
+                            if (el) {
+                              el.style.height = 'auto';
+                              el.style.height = el.scrollHeight + 'px';
+                            }
+                          }}
+                          placeholder=""
+                          className="w-full min-h-[32px] bg-transparent text-foreground placeholder:text-muted-foreground outline-none resize-none overflow-hidden"
+                          style={{ fontFamily: "'EB Garamond', serif", fontSize: '16px' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       )}
 
