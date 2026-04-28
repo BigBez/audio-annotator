@@ -489,6 +489,8 @@ export default function SectionTimeline({
               </>
             );
           })()}
+        </div>
+      )}
 
       {/* Hidden off-screen container to pre-measure all sections' panel heights */}
       {measuring && (
