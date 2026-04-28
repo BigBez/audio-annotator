@@ -282,7 +282,7 @@ export default function LyricsPanel({ lyricLines, currentTime, sectionStart, sec
       )}
 
       {/* Lyric lines */}
-      <div className="space-y-1">
+      <div className="space-y-1" data-lyrics-lines>
         {(syncMode ? syncDraft : lyricLines).map((line, lineIdx) => (
           <div key={line.id}>
             {editMode && !syncMode ? (
