@@ -110,13 +110,14 @@ export default function SectionTimeline({
       const items = container.querySelectorAll('[data-measure-section]');
       items.forEach(item => {
         const c = item.querySelector('[data-measure-chords]');
-        const l = item.querySelector('[data-measure-lyrics]');
+        const l = item.querySelector('[data-measure-lyrics] [data-lyrics-lines]');
         const n = item.querySelector('[data-measure-notes]');
         if (c) maxChords = Math.max(maxChords, c.scrollHeight);
-        if (l) maxLyrics = Math.max(maxLyrics, l.scrollHeight);
+        if (l) maxLyrics = Math.max(maxLyrics, (l as HTMLElement).scrollHeight);
         if (n) maxNotes = Math.max(maxNotes, n.scrollHeight);
       });
-      setLockedHeights({ chords: maxChords, lyrics: maxLyrics, notes: maxNotes });
+      // Lyrics: snug fit with ~8px top/bottom padding
+      setLockedHeights({ chords: maxChords, lyrics: maxLyrics > 0 ? maxLyrics + 16 : 0, notes: maxNotes });
       setMeasuring(false);
     });
     return () => cancelAnimationFrame(raf);
