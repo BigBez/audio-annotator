@@ -437,7 +437,7 @@ export default function SectionTimeline({
                           <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
                         </button>
                         {lyricsOpen && (
-                          <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { height: 'auto', maxHeight: lockedHeights.lyrics } : undefined}>
+                          <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { height: lockedHeights.lyrics } : undefined}>
                             <LyricsPanel
                               lyricLines={selectedSection.lyricLines}
                               currentTime={currentTime}
