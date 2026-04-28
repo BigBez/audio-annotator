@@ -76,22 +76,29 @@ export default function SectionTimeline({
   // Height-locking during playback to prevent layout shifts
   const [lockedHeights, setLockedHeights] = useState<{ chords: number; lyrics: number; notes: number } | null>(null);
   const [measuring, setMeasuring] = useState(false);
+  // Locked panel visibility during playback (determined at play start)
+  const [lockedVisibility, setLockedVisibility] = useState<{ chords: boolean; lyrics: boolean; notes: boolean } | null>(null);
   const chordsContentRef = useRef<HTMLDivElement>(null);
   const lyricsContentRef = useRef<HTMLDivElement>(null);
   const notesContentRef = useRef<HTMLDivElement>(null);
   const measureContainerRef = useRef<HTMLDivElement>(null);
   const wasPlayingRef = useRef(false);
 
-  // When playback starts, trigger measurement; when it stops, release
+  // When playback starts, trigger measurement and lock visibility; when it stops, release
   useEffect(() => {
     if (isPlaying && !wasPlayingRef.current) {
       setMeasuring(true);
+      const anyChords = sections.some(s => s.chordLines && s.chordLines.length > 0);
+      const anyLyrics = sections.some(s => s.lyricLines && s.lyricLines.length > 0);
+      const anyNotes = sections.some(s => s.notes && s.notes.trim().length > 0);
+      setLockedVisibility({ chords: anyChords, lyrics: anyLyrics, notes: anyNotes });
     } else if (!isPlaying && wasPlayingRef.current) {
       setLockedHeights(null);
       setMeasuring(false);
+      setLockedVisibility(null);
     }
     wasPlayingRef.current = isPlaying;
-  }, [isPlaying]);
+  }, [isPlaying, sections]);
 
   // After measurement container renders, read max heights and lock
   useEffect(() => {
