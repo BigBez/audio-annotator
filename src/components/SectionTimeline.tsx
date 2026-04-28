@@ -117,7 +117,7 @@ export default function SectionTimeline({
       });
       // Lyrics: calculate mathematically from data — no DOM measurement
       const maxLyricLines = sections.reduce((m, s) => Math.max(m, s.lyricLines?.length ?? 0), 0);
-      const lyricsHeight = maxLyricLines > 0 ? maxLyricLines * 28 + 32 : 0;
+      const lyricsHeight = maxLyricLines > 0 ? maxLyricLines * 34 + 40 : 0;
       setLockedHeights({ chords: maxChords, lyrics: lyricsHeight, notes: maxNotes });
       setMeasuring(false);
     });
