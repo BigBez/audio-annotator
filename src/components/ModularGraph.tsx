@@ -181,6 +181,7 @@ export default function ModularGraph({
           style={{ width: w, height: 24 }}
           onClick={(e) => {
             e.stopPropagation();
+            if (readOnly) return;
             setEditingBarCount(section.id);
             setBarCountValue(getBarCount(section.id));
           }}
