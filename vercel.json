@@ -1,4 +1,16 @@
 {
+  "headers": [
+    {
+      "source": "/Analyses/:file",
+      "headers": [
+        { "key": "Content-Type", "value": "audio/mpeg" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/((?!Analyses).*)", "destination": "/index.html" }
+  ]
+}{
   "rewrites": [{ "source": "/((?!Analyses/).*)", "destination": "/index.html" }],
   "headers": [
     {
