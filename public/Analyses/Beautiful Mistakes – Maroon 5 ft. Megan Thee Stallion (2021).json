@@ -1,0 +1,813 @@
+{
+  "schemaVersion": 1,
+  "audioFilename": "\"Beautiful Mistakes\" – Maroon 5 ft. Megan Thee Stallion.mp3",
+  "sections": [
+    {
+      "id": "83054b02-6aa6-40a8-a054-774b1e89e029",
+      "start": 0,
+      "end": 10.326009,
+      "label": "Intro",
+      "color": "#C94040",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": []
+    },
+    {
+      "id": "37a90b6f-b054-4989-90bd-e5ac52b65458",
+      "start": 10.326009,
+      "end": 29.719318,
+      "label": "Verse",
+      "color": "#3A6EA8",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "6ace7dbe-ac1a-46cd-a52a-d74a30c8e53d",
+          "text": "It's beautiful, it's bittersweet",
+          "startTime": 10.326009,
+          "endTime": 12.339115
+        },
+        {
+          "id": "af84d0b6-d342-4c81-bb08-aa072a6c7fe2",
+          "text": "You're like a broken home to me",
+          "startTime": 12.339115,
+          "endTime": 14.770204
+        },
+        {
+          "id": "5a7a5205-8c4c-4b57-b7c1-9d45b6428296",
+          "text": "I take a shot of memories",
+          "startTime": 14.770204,
+          "endTime": 17.200113
+        },
+        {
+          "id": "174fce9c-dfb6-4f41-986a-ec0f4195b1b4",
+          "text": "And black out like an empty street",
+          "startTime": 17.200113,
+          "endTime": 19.647573
+        },
+        {
+          "id": "dcb86340-310b-444c-b438-cdc8f7247aa7",
+          "text": "I fill my days with the way you walk",
+          "startTime": 19.647573,
+          "endTime": 22.081111
+        },
+        {
+          "id": "e7e3b7f3-7d57-47a9-ac35-13aed635bb51",
+          "text": "And fill my nights with broken dreams",
+          "startTime": 22.081111,
+          "endTime": 24.483287
+        },
+        {
+          "id": "4461931a-6c97-4567-a708-071ea8fa73d0",
+          "text": "I make up lies inside my head",
+          "startTime": 24.483287,
+          "endTime": 26.880929
+        },
+        {
+          "id": "5f4cdb84-8079-458f-93d2-3ca118d633de",
+          "text": "Like one day, you'll come back to me",
+          "startTime": 26.880929,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "b34f9d57-167c-48c2-ba67-2488fd9a63cf",
+      "start": 29.719318,
+      "end": 39.366142,
+      "label": "Prechorus",
+      "color": "#3A8A4A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "22a1d998-46aa-460e-b930-56b2715ebf8d",
+          "text": "Now I'm not holding on, not holding on",
+          "startTime": 29.719318,
+          "endTime": 32.33331
+        },
+        {
+          "id": "e57cbb5e-4538-41cc-938b-2205da5168c1",
+          "text": "I'm just depressed that you're gone",
+          "startTime": 32.33331,
+          "endTime": 34.732086
+        },
+        {
+          "id": "17092194-927e-45f2-93b0-39b6fca04aba",
+          "text": "Not holding on, not holding on",
+          "startTime": 34.732086,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "c35b3c0c-3a40-4a8e-a076-998279b1611e",
+      "start": 39.366142,
+      "end": 58.773722,
+      "label": "Chorus",
+      "color": "#D4A017",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "f7f80820-908f-4562-b544-57be1cd1e1d1",
+          "text": "Beautiful mistakes",
+          "startTime": 39.366142,
+          "endTime": 40.432154
+        },
+        {
+          "id": "844a7722-0994-45f9-817d-48e31f326530",
+          "text": "I make inside my head, she's naked in my bed",
+          "startTime": 40.432154,
+          "endTime": 45.056961
+        },
+        {
+          "id": "46733ca4-cb1f-405b-825d-d7a65fc0d2cc",
+          "text": "And now we lie awake, makin' beautiful mistakes",
+          "startTime": 45.056961,
+          "endTime": 49.911813
+        },
+        {
+          "id": "98af75f5-bb22-4bcf-96fe-3cc93270ef8d",
+          "text": "I wouldn't take 'em back, I'm in love with the past",
+          "startTime": 49.911813,
+          "endTime": 54.762018
+        },
+        {
+          "id": "3efd6aeb-0aec-4d4a-be3c-8c0fc0a751fd",
+          "text": "And now we lie awake, makin' beautiful mistakes",
+          "startTime": 54.762018,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "254b0fab-70b7-46bd-88b3-4240303a19ea",
+      "start": 58.773722,
+      "end": 68.579841,
+      "label": "Postchorus",
+      "color": "#C45C8A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "90058ece-3823-4a56-98c0-0539468296f7",
+          "text": "Nah-nah-nah, in my head",
+          "startTime": 58.773722,
+          "endTime": 61.668756
+        },
+        {
+          "id": "5e0a3d4d-0ea9-4477-8c6d-7aae428dddd2",
+          "text": "Nah-nah-nah, in my bed",
+          "startTime": 61.668756,
+          "endTime": 64.109028
+        },
+        {
+          "id": "103dbede-4b6f-417a-8867-1948a9099864",
+          "text": "Nah-nah-nah, eh (beautiful)",
+          "startTime": 64.109028,
+          "endTime": 66.485762
+        },
+        {
+          "id": "b6e1b614-d465-4853-a7f5-696194ffb018",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 66.485762,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "7fce474c-7443-4007-aef8-eb3ec2b67862",
+      "start": 68.579841,
+      "end": 87.993082,
+      "label": "Verse",
+      "color": "#3A6EA8",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "2d9f624b-3beb-492f-aa3b-441f716285c3",
+          "text": "It's pitiful, I can't believe",
+          "startTime": 68.579841,
+          "endTime": 70.575173
+        },
+        {
+          "id": "ea074b6d-eff7-4568-991e-855e86f7b91a",
+          "text": "How every day gets worse for me",
+          "startTime": 70.575173,
+          "endTime": 73.06778
+        },
+        {
+          "id": "0b9b59db-cda8-4d7c-aa02-ecd17469ac8a",
+          "text": "I take a break, I cut you off",
+          "startTime": 73.06778,
+          "endTime": 75.452905
+        },
+        {
+          "id": "b19b000e-344b-405d-9150-854a8c704e99",
+          "text": "To keep myself from lookin' soft",
+          "startTime": 75.452905,
+          "endTime": 77.881862
+        },
+        {
+          "id": "766b9c90-a41e-4b3b-b517-6eba8a90b7e1",
+          "text": "I fill my nights with the way you was",
+          "startTime": 77.881862,
+          "endTime": 80.272497
+        },
+        {
+          "id": "efdcf90c-a046-4524-989d-d2f60ce8c94f",
+          "text": "And still wake up with broken dreams",
+          "startTime": 80.272497,
+          "endTime": 82.731953
+        },
+        {
+          "id": "d355b03f-cd01-46f5-b647-27457bf079b2",
+          "text": "I make these lies inside my head",
+          "startTime": 82.731953,
+          "endTime": 85.144039
+        },
+        {
+          "id": "8c0226ce-a5ad-4258-b0ec-4cf1c5a90c92",
+          "text": "Feel like they're my reality",
+          "startTime": 85.144039,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "b0031e4b-cc77-4fad-9bed-092087c904da",
+      "start": 87.993082,
+      "end": 97.77271,
+      "label": "Prechorus",
+      "color": "#3A8A4A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "e12bccad-e0c0-4733-825c-46f9bb709ac3",
+          "text": "Now I'm not holdin' on, not holdin' on",
+          "startTime": 87.993082,
+          "endTime": 90.688007
+        },
+        {
+          "id": "cd23806d-0a64-4f0b-8869-dd3882cc779a",
+          "text": "I'm just depressed that you're gone",
+          "startTime": 90.688007,
+          "endTime": 92.948189
+        },
+        {
+          "id": "9b079d33-526b-4bf5-ac40-02446ccaa41b",
+          "text": "Not holdin' on, not holdin' on",
+          "startTime": 92.948189,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "66fead77-cb1d-41c3-950e-824ed2b99e62",
+      "start": 97.77271,
+      "end": 117.090417,
+      "label": "Chorus",
+      "color": "#D4A017",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "801b465b-89ee-446f-9a82-3565a4882ab0",
+          "text": "Beautiful mistakes",
+          "startTime": 97.77271,
+          "endTime": 98.502641
+        },
+        {
+          "id": "87405d4d-e3c2-4358-849f-3fd452ea2917",
+          "text": "I make inside my head",
+          "startTime": 98.502641,
+          "endTime": 100.887721
+        },
+        {
+          "id": "9f6c144f-72c5-4707-8b3d-1103ca69dcd0",
+          "text": "She's naked in my bed",
+          "startTime": 100.887721,
+          "endTime": 103.278084
+        },
+        {
+          "id": "c9dfddd4-d88e-4b4c-9b18-b29954ad1ad0",
+          "text": "And now we lie awake",
+          "startTime": 103.278084,
+          "endTime": 105.374818
+        },
+        {
+          "id": "44821319-7631-44ee-bac7-21c661e16bec",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 105.374818,
+          "endTime": 108.094954
+        },
+        {
+          "id": "f32d2447-5af6-4fa3-a722-bbad88a38ee6",
+          "text": "I wouldn't take 'em back",
+          "startTime": 108.094954,
+          "endTime": 110.617766
+        },
+        {
+          "id": "39ee6364-0cfb-47e6-ac0f-70cfc01df9cc",
+          "text": "I'm in love with the past",
+          "startTime": 110.617766,
+          "endTime": 112.95509
+        },
+        {
+          "id": "d8d108df-6ab2-4323-9140-2932f7d8323b",
+          "text": "And now we lie awake",
+          "startTime": 112.95509,
+          "endTime": 115.08627
+        },
+        {
+          "id": "be43474e-3229-4e75-b7d3-aa984f73a0e8",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 115.08627,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "0c224085-cf01-492c-9e8d-a97ca402d2e1",
+      "start": 117.090417,
+      "end": 126.854383,
+      "label": "Postchorus",
+      "color": "#C45C8A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "089106e7-4f93-40ae-8ad9-1769b0673c65",
+          "text": "Nah-nah-nah, in my head",
+          "startTime": 117.090417,
+          "endTime": 119.937744
+        },
+        {
+          "id": "e5f29ef2-1654-4b5b-8b47-60475e56aab1",
+          "text": "Nah-nah-nah, in my bed",
+          "startTime": 119.937744,
+          "endTime": 122.403095
+        },
+        {
+          "id": "6e39212b-1f51-498e-9ea9-07e8fba5f0fe",
+          "text": "Nah-nah-nah (Yeah, yeah)",
+          "startTime": 122.403095,
+          "endTime": 124.869217
+        },
+        {
+          "id": "0f881231-740a-4485-871f-67fb514c083c",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 124.869217,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "8e3e48c7-3a54-4f27-8e5d-db12b6ec4ac5",
+      "start": 126.854383,
+      "end": 155.919521,
+      "label": "Verse",
+      "color": "#6A9EC4",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "17353ef4-22a0-48d3-9fb3-7aa1613d86ce",
+          "text": "You did me wrong 'cause I let you (Let you)",
+          "startTime": 126.854383,
+          "endTime": 128.600963
+        },
+        {
+          "id": "eb1a8a66-a4db-43e1-8eb1-8f5252ae3add",
+          "text": "Usually, I like my situations beneficial",
+          "startTime": 128.600963,
+          "endTime": 130.945544
+        },
+        {
+          "id": "a8b2b911-ca2f-45b6-896a-77aae2459243",
+          "text": "Doin' somethin' different, got me lookin' stupid (Damn)",
+          "startTime": 130.945544,
+          "endTime": 133.288129
+        },
+        {
+          "id": "b89d3803-aa7d-43f7-8a07-5da3e52ccd32",
+          "text": "The only way I'm comin' back to you is if you dreamin' lucid (Hmm)",
+          "startTime": 133.288129,
+          "endTime": 136.425181
+        },
+        {
+          "id": "c50405d1-ccf7-46f4-a0db-8ef7ff004062",
+          "text": "Prove it, if you made a promise then keep it (Keep it)",
+          "startTime": 136.425181,
+          "endTime": 138.849353
+        },
+        {
+          "id": "bb62c7db-accb-405f-9ac6-1c7e96003eb1",
+          "text": "Why you wanna lie and then get mad I don't believe it (Boy, bye)",
+          "startTime": 138.849353,
+          "endTime": 141.182823
+        },
+        {
+          "id": "f199596a-a930-4c09-be18-88497f136d53",
+          "text": "But really, I was doin' just fine without ya",
+          "startTime": 141.182823,
+          "endTime": 143.434433
+        },
+        {
+          "id": "e0fbdd77-5123-4511-810a-91bd140ce331",
+          "text": "Lookin' fine, sippin' wine, dancin' on club couches (Ah)",
+          "startTime": 143.434433,
+          "endTime": 146.205476
+        },
+        {
+          "id": "949a7c5f-08ac-45b4-97f4-68e19a8ff45e",
+          "text": "Baby, why you wanna lose me like you don't need me? (Don't need me)",
+          "startTime": 146.205476,
+          "endTime": 148.543503
+        },
+        {
+          "id": "de5d0ced-5e61-4ec0-afc6-dd56ebb87c8d",
+          "text": "Like I don't block you and you still try to reach me (Still try to reach me)",
+          "startTime": 148.543503,
+          "endTime": 150.984501
+        },
+        {
+          "id": "abd1e633-3202-465e-aff9-9e47c2e18d3a",
+          "text": "How you figure out how to call me from the TV? (Huh?)",
+          "startTime": 150.984501,
+          "endTime": 153.276519
+        },
+        {
+          "id": "7f48c809-6ada-47ae-9f98-33cee0234b72",
+          "text": "You runnin' outta chances and this time I mean it (Ah)",
+          "startTime": 153.276519,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "64d00f01-4d1b-44ec-8d9f-ab982d5a5b83",
+      "start": 155.919521,
+      "end": 175.372217,
+      "label": "Prechorus",
+      "color": "#7AB87A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "2e7389ac-9c7a-4adb-aac1-189e97facaad",
+          "text": "Yeah, bet you miss my love, all in your bed (Bed)",
+          "startTime": 155.919521,
+          "endTime": 158.812695
+        },
+        {
+          "id": "390cbd52-e0f2-4c15-88e5-10341e9443e9",
+          "text": "Now you're stressin' out, pullin' your hair (Hair)",
+          "startTime": 158.812695,
+          "endTime": 161.242808
+        },
+        {
+          "id": "ddca7990-aae4-4df4-aa71-13344711fece",
+          "text": "Smellin' your pillows and wishin' I was there (I was there)",
+          "startTime": 161.242808,
+          "endTime": 163.61918
+        },
+        {
+          "id": "b1723ecb-eb4f-4361-919a-421423eae887",
+          "text": "Slidin' down the shower wall, lookin' sad (Sad)",
+          "startTime": 163.61918,
+          "endTime": 165.943534
+        },
+        {
+          "id": "87a83860-b2e3-44d1-b8b8-50558d7c040a",
+          "text": "I know it's hard to let go, I'm the best (I'm the best)",
+          "startTime": 165.943534,
+          "endTime": 168.574486
+        },
+        {
+          "id": "997ca469-eb35-42e4-82b6-71a7faea05ac",
+          "text": "Best you ever had and best you gon' get (Gon' get)",
+          "startTime": 168.574486,
+          "endTime": 170.865756
+        },
+        {
+          "id": "1b2693d3-a0f4-4578-a2cf-0a048127e0ed",
+          "text": "And if we break up, I don't wanna be friends (Be friends)",
+          "startTime": 170.865756,
+          "endTime": null
+        },
+        {
+          "id": "a9fc3e7b-14fa-4b46-aff3-4b0db7133ce8",
+          "text": "You're toxic",
+          "startTime": null,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "2384d4d2-96ac-451f-bbff-11a530032c99",
+      "start": 175.372217,
+      "end": 194.766454,
+      "label": "Chorus",
+      "color": "#D4A017",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "5c7c284b-3069-4fff-a570-36c5ef3d5dc0",
+          "text": "Beautiful mistakes",
+          "startTime": 175.372217,
+          "endTime": 176.13809
+        },
+        {
+          "id": "e17263c2-60c0-4759-b96a-af35bcd84d8d",
+          "text": "I make inside my head",
+          "startTime": 176.13809,
+          "endTime": 178.485981
+        },
+        {
+          "id": "1daad421-b71d-47a5-997e-edceaf9922a9",
+          "text": "She's naked in my bed",
+          "startTime": 178.485981,
+          "endTime": 180.951309
+        },
+        {
+          "id": "1a3da72d-ca55-4161-923b-cc1708c6a80f",
+          "text": "And now we lie awake",
+          "startTime": 180.951309,
+          "endTime": 182.998271
+        },
+        {
+          "id": "1d779b04-d67f-46e8-8112-5a7094e6e731",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 182.998271,
+          "endTime": 185.821105
+        },
+        {
+          "id": "c62b0c7d-a715-440f-ba65-0b26c763a3d6",
+          "text": "I wouldn't take 'em back",
+          "startTime": 185.821105,
+          "endTime": 188.174076
+        },
+        {
+          "id": "6e8a8136-6ace-42b2-a2e9-8e4a4ac5d4b7",
+          "text": "I'm in love with the past",
+          "startTime": 188.174076,
+          "endTime": 190.593146
+        },
+        {
+          "id": "cc74b26e-5c5f-4da7-aac9-c73ed8a30ac3",
+          "text": "And now we lie awake",
+          "startTime": 190.593146,
+          "endTime": 192.812874
+        },
+        {
+          "id": "e0481fb8-8b10-49f2-a3d6-201b75459d36",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 192.812874,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "57e8fa12-2f38-49e3-b698-0390af5009d2",
+      "start": 194.766454,
+      "end": 214.177492,
+      "label": "Postchorus",
+      "color": "#C45C8A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "7bbfe8d4-6bde-4a93-9672-9d6c575fc1b2",
+          "text": "Nah-nah-nah, in my head",
+          "startTime": 194.766454,
+          "endTime": 197.723619
+        },
+        {
+          "id": "ae3dca18-dfab-4b85-adaa-dc8bf7f958b8",
+          "text": "Nah-nah-nah, in my bed",
+          "startTime": 197.723619,
+          "endTime": 200.024186
+        },
+        {
+          "id": "b8af3cdf-94c7-453d-b593-6b8785499c82",
+          "text": "Nah-nah-nah, yeah, yeah (Oh)",
+          "startTime": 200.024186,
+          "endTime": 202.569379
+        },
+        {
+          "id": "1f988761-ca70-4b8a-9ed0-54aa84883497",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 202.569379,
+          "endTime": 204.782327
+        },
+        {
+          "id": "217cce35-a5ed-49ef-8710-ec1101d6ef10",
+          "text": "Nah-nah-nah, in my head",
+          "startTime": 204.782327,
+          "endTime": 207.385524
+        },
+        {
+          "id": "fd038233-26aa-4370-ae76-7b5fa97e80f8",
+          "text": "Nah-nah-nah, in my bed (Ay)",
+          "startTime": 207.385524,
+          "endTime": 209.751986
+        },
+        {
+          "id": "f2663ddb-6c87-4878-a9b8-797b92628ddd",
+          "text": "Nah-nah-nah, ay (Beautiful)",
+          "startTime": 209.751986,
+          "endTime": 212.261306
+        },
+        {
+          "id": "2d39013b-9cb7-41e8-ba80-357ae7da39a1",
+          "text": "Makin' beautiful mistakes",
+          "startTime": 212.261306,
+          "endTime": null
+        }
+      ]
+    },
+    {
+      "id": "a7af269c-e113-46e1-9c17-881e50f5c1f0",
+      "start": 214.177492,
+      "end": 228.879092,
+      "label": "Outro",
+      "color": "#E8826A",
+      "content": {
+        "notes": ""
+      },
+      "bars": null,
+      "chordLines": [],
+      "lyricLines": [
+        {
+          "id": "4b821536-50f8-478c-b073-f6c0c7e86c79",
+          "text": "Nah-nah-nah",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "id": "60a9109c-bc39-4e74-8c0d-88b3ad9c2b1b",
+          "text": "Nah-nah-nah (Ooh)",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "id": "d3482940-95e2-43d3-8cec-c4c1ae71833f",
+          "text": "Nah-nah-nah",
+          "startTime": null,
+          "endTime": null
+        },
+        {
+          "id": "5763fc4c-5cc7-41ff-b19c-f29427e55f6d",
+          "text": "Beautiful mistakes",
+          "startTime": null,
+          "endTime": null
+        }
+      ]
+    }
+  ],
+  "vcuSpans": [
+    {
+      "id": "vcu-1777381107091",
+      "label": "VCU1",
+      "sectionIds": [
+        "37a90b6f-b054-4989-90bd-e5ac52b65458",
+        "b34f9d57-167c-48c2-ba67-2488fd9a63cf",
+        "c35b3c0c-3a40-4a8e-a076-998279b1611e",
+        "254b0fab-70b7-46bd-88b3-4240303a19ea"
+      ]
+    },
+    {
+      "id": "vcu-1777381108812",
+      "label": "VCU2",
+      "sectionIds": [
+        "7fce474c-7443-4007-aef8-eb3ec2b67862",
+        "b0031e4b-cc77-4fad-9bed-092087c904da",
+        "66fead77-cb1d-41c3-950e-824ed2b99e62",
+        "0c224085-cf01-492c-9e8d-a97ca402d2e1"
+      ]
+    },
+    {
+      "id": "vcu-1777381110307",
+      "label": "VCU3",
+      "sectionIds": [
+        "8e3e48c7-3a54-4f27-8e5d-db12b6ec4ac5",
+        "64d00f01-4d1b-44ec-8d9f-ab982d5a5b83",
+        "2384d4d2-96ac-451f-bbff-11a530032c99",
+        "57e8fa12-2f38-49e3-b698-0390af5009d2"
+      ]
+    }
+  ],
+  "modularGraph": {
+    "boxWidths": {
+      "83054b02-6aa6-40a8-a054-774b1e89e029": 50,
+      "a7af269c-e113-46e1-9c17-881e50f5c1f0": 50
+    },
+    "joinedGroups": [
+      {
+        "id": "mg-group-1777381117477",
+        "label": "VCU1",
+        "sectionIds": [
+          "37a90b6f-b054-4989-90bd-e5ac52b65458",
+          "b34f9d57-167c-48c2-ba67-2488fd9a63cf",
+          "c35b3c0c-3a40-4a8e-a076-998279b1611e",
+          "254b0fab-70b7-46bd-88b3-4240303a19ea"
+        ]
+      },
+      {
+        "id": "mg-group-1777381120873",
+        "label": "VCU2",
+        "sectionIds": [
+          "7fce474c-7443-4007-aef8-eb3ec2b67862",
+          "b0031e4b-cc77-4fad-9bed-092087c904da",
+          "66fead77-cb1d-41c3-950e-824ed2b99e62",
+          "0c224085-cf01-492c-9e8d-a97ca402d2e1"
+        ]
+      },
+      {
+        "id": "mg-group-1777381123501",
+        "label": "VCU3",
+        "sectionIds": [
+          "8e3e48c7-3a54-4f27-8e5d-db12b6ec4ac5",
+          "64d00f01-4d1b-44ec-8d9f-ab982d5a5b83",
+          "2384d4d2-96ac-451f-bbff-11a530032c99",
+          "57e8fa12-2f38-49e3-b698-0390af5009d2"
+        ]
+      }
+    ],
+    "barCounts": {
+      "83054b02-6aa6-40a8-a054-774b1e89e029": "4",
+      "37a90b6f-b054-4989-90bd-e5ac52b65458": "8",
+      "b34f9d57-167c-48c2-ba67-2488fd9a63cf": "4",
+      "c35b3c0c-3a40-4a8e-a076-998279b1611e": "8",
+      "254b0fab-70b7-46bd-88b3-4240303a19ea": "4",
+      "7fce474c-7443-4007-aef8-eb3ec2b67862": "8",
+      "b0031e4b-cc77-4fad-9bed-092087c904da": "4",
+      "66fead77-cb1d-41c3-950e-824ed2b99e62": "8",
+      "0c224085-cf01-492c-9e8d-a97ca402d2e1": "4",
+      "8e3e48c7-3a54-4f27-8e5d-db12b6ec4ac5": "12",
+      "64d00f01-4d1b-44ec-8d9f-ab982d5a5b83": "8",
+      "2384d4d2-96ac-451f-bbff-11a530032c99": "8",
+      "57e8fa12-2f38-49e3-b698-0390af5009d2": "8",
+      "a7af269c-e113-46e1-9c17-881e50f5c1f0": "4"
+    },
+    "boxColors": {
+      "a7af269c-e113-46e1-9c17-881e50f5c1f0": "#C94040",
+      "83054b02-6aa6-40a8-a054-774b1e89e029": "#C94040",
+      "37a90b6f-b054-4989-90bd-e5ac52b65458": "#3A6EA8",
+      "7fce474c-7443-4007-aef8-eb3ec2b67862": "#3A6EA8",
+      "8e3e48c7-3a54-4f27-8e5d-db12b6ec4ac5": "#6A9EC4",
+      "b34f9d57-167c-48c2-ba67-2488fd9a63cf": "#3A8A4A",
+      "b0031e4b-cc77-4fad-9bed-092087c904da": "#3A8A4A",
+      "64d00f01-4d1b-44ec-8d9f-ab982d5a5b83": "#7AB87A",
+      "c35b3c0c-3a40-4a8e-a076-998279b1611e": "#D4A017",
+      "66fead77-cb1d-41c3-950e-824ed2b99e62": "#D4A017",
+      "2384d4d2-96ac-451f-bbff-11a530032c99": "#D4A017",
+      "254b0fab-70b7-46bd-88b3-4240303a19ea": "#C45C8A",
+      "0c224085-cf01-492c-9e8d-a97ca402d2e1": "#C45C8A",
+      "57e8fa12-2f38-49e3-b698-0390af5009d2": "#C45C8A"
+    }
+  }
+}
