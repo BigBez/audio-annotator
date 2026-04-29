@@ -27,6 +27,11 @@ export default function Index() {
   const [file, setFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioUrlName, setAudioUrlName] = useState<string>('');
+  const [readOnly] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const p = new URLSearchParams(window.location.search);
+    return p.has('audio') || p.has('analysis');
+  });
   const [sections, setSections] = useState<Section[]>([]);
   const [vcuSpans, setVcuSpans] = useState<VcuSpan[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
