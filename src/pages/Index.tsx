@@ -956,7 +956,7 @@ export default function Index() {
             <Music className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-semibold font-display tracking-tight">Formal Analysis</h1>
           </div>
-          {file && (
+          {(file || audioUrl) && (
             <button
               onClick={handleReset}
               className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
@@ -968,12 +968,12 @@ export default function Index() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        {!file ? (
+        {!file && !audioUrl ? (
           <AudioUpload onFileLoaded={setFile} />
         ) : (
           <>
             <div className="flex items-center gap-3 mb-1">
-              <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+              <p className="text-sm font-mono text-muted-foreground truncate">{file ? file.name : audioUrlName}</p>
               <button
                 onClick={(e) => { e.stopPropagation(); handleImport(); }}
                 className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
