@@ -10,7 +10,8 @@ function formatTime(seconds: number | undefined): string {
 }
 
 interface WaveformPlayerProps {
-  file: File;
+  file?: File | null;
+  audioUrl?: string | null;
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
@@ -21,6 +22,7 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
+  audioUrl,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
@@ -33,6 +35,7 @@ export default function WaveformPlayer({
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (!file && !audioUrl) return;
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
@@ -47,7 +50,11 @@ export default function WaveformPlayer({
       normalize: true,
     });
 
-    ws.loadBlob(file);
+    if (file) {
+      ws.loadBlob(file);
+    } else if (audioUrl) {
+      ws.load(audioUrl);
+    }
 
     ws.on('ready', () => {
       const d = ws.getDuration();
@@ -72,7 +79,7 @@ export default function WaveformPlayer({
     wavesurferRef.current = ws;
 
     return () => { ws.destroy(); };
-  }, [file]);
+  }, [file, audioUrl]);
 
   return (
     <div>

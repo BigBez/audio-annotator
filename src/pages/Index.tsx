@@ -25,6 +25,8 @@ interface UndoSnapshot {
 
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrlName, setAudioUrlName] = useState<string>('');
   const [sections, setSections] = useState<Section[]>([]);
   const [vcuSpans, setVcuSpans] = useState<VcuSpan[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -102,9 +104,9 @@ export default function Index() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const audioUrl = params.get('audio');
+    const audioParam = params.get('audio');
     const analysisUrl = params.get('analysis');
-    if (!audioUrl) return;
+    if (!audioParam) return;
 
     (async () => {
       try {
@@ -119,13 +121,10 @@ export default function Index() {
           }
         }
 
-        // 2. Fetch audio, then set the file so WaveSurfer mounts and initializes.
-        const audioRes = await fetch(audioUrl);
-        if (!audioRes.ok) throw new Error('Audio fetch failed');
-        const audioBlob = await audioRes.blob();
-        const filename = audioUrl.split('/').pop()?.split('?')[0] || 'audio';
-        const audioFile = new File([audioBlob], filename, { type: 'audio/mpeg' });
-        setFile(audioFile);
+        // 2. Load audio directly via WaveSurfer's URL loader (no fetch/blob/File needed).
+        const filename = audioParam.split('/').pop()?.split('?')[0] || 'audio';
+        setAudioUrlName(filename);
+        setAudioUrl(audioParam);
         // Pending analysis will be applied by the duration-ready effect below.
       } catch (err) {
         toast({ title: 'Load failed', description: err instanceof Error ? err.message : 'Could not load from URL.' });
@@ -477,10 +476,10 @@ export default function Index() {
 
   // Save analysis as JSON
   const handleSave = useCallback(() => {
-    if (!file || sections.length === 0) return;
+    if ((!file && !audioUrl) || sections.length === 0) return;
     const data = {
       schemaVersion: 1,
-      audioFilename: file.name,
+      audioFilename: file ? file.name : audioUrlName,
       sections: sections.map(s => ({
         id: s.id,
         start: s.start,
@@ -937,6 +936,8 @@ export default function Index() {
     wavesurferRef.current?.destroy();
     wavesurferRef.current = null;
     setFile(null);
+    setAudioUrl(null);
+    setAudioUrlName('');
     setSections([]);
     setVcuSpans([]);
     setCurrentTime(0);
@@ -957,7 +958,7 @@ export default function Index() {
             <Music className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-semibold font-display tracking-tight">Formal Analysis</h1>
           </div>
-          {file && (
+          {(file || audioUrl) && (
             <button
               onClick={handleReset}
               className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
@@ -969,12 +970,12 @@ export default function Index() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        {!file ? (
+        {!file && !audioUrl ? (
           <AudioUpload onFileLoaded={setFile} />
         ) : (
           <>
             <div className="flex items-center gap-3 mb-1">
-              <p className="text-sm font-mono text-muted-foreground truncate">{file.name}</p>
+              <p className="text-sm font-mono text-muted-foreground truncate">{file ? file.name : audioUrlName}</p>
               <button
                 onClick={(e) => { e.stopPropagation(); handleImport(); }}
                 className="flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
@@ -1008,6 +1009,7 @@ export default function Index() {
               </div>
               <WaveformPlayer
                 file={file}
+                audioUrl={audioUrl}
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
