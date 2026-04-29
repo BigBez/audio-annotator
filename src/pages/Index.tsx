@@ -27,6 +27,11 @@ export default function Index() {
   const [file, setFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioUrlName, setAudioUrlName] = useState<string>('');
+  const [readOnly] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const p = new URLSearchParams(window.location.search);
+    return p.has('audio') || p.has('analysis');
+  });
   const [sections, setSections] = useState<Section[]>([]);
   const [vcuSpans, setVcuSpans] = useState<VcuSpan[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -153,6 +158,7 @@ export default function Index() {
   }, []);
 
   const handleBoundary = useCallback(() => {
+    if (readOnly) return;
     const ws = wavesurferRef.current;
     if (!ws) return;
     const time = ws.getCurrentTime();
@@ -296,6 +302,7 @@ export default function Index() {
 
   // Create VCU group from shift or cmd selected sections
   const handleCreateGroup = useCallback(() => {
+    if (readOnly) return;
     const shift = shiftSelectedIdsRef.current;
     const cmd = cmdSelectedIdsRef.current;
     const allSelected = new Set([...shift, ...cmd]);
@@ -333,6 +340,7 @@ export default function Index() {
 
   // Create modular graph joined group from selected sections (J key)
   const handleJoinModular = useCallback(() => {
+    if (readOnly) return;
     const cmd = cmdSelectedIdsRef.current;
     const shift = shiftSelectedIdsRef.current;
     const sel = selectedSectionIdRef.current;
@@ -390,6 +398,7 @@ export default function Index() {
 
   // Split modular graph joined group (S key)
   const handleSplitModular = useCallback(() => {
+    if (readOnly) return;
     const selId = selectedSectionIdRef.current;
     const shiftIds = shiftSelectedIdsRef.current;
     const cmdIds = cmdSelectedIdsRef.current;
@@ -582,6 +591,7 @@ export default function Index() {
   }, [file]);
 
   const handleDeleteSection = useCallback((id: string) => {
+    if (readOnly) return;
     pushUndo();
     let absorbingId: string | null = null;
     setSections(prev => {
@@ -622,6 +632,7 @@ export default function Index() {
   }, [pushUndo]);
 
   const handleColorChange = useCallback((ids: string[], color: string) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => ids.includes(s.id) ? { ...s, color } : s));
     setShiftSelectedIds(new Set());
@@ -644,18 +655,22 @@ export default function Index() {
         wavesurferRef.current?.playPause();
       }
       if (e.code === 'Enter') {
+        if (readOnly) return;
         e.preventDefault();
         handleBoundary();
       }
       if (e.code === 'KeyG' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleCreateGroup();
       }
       if (e.code === 'KeyJ' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleJoinModular();
       }
       if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleSplitModular();
       }
@@ -721,6 +736,7 @@ export default function Index() {
         return;
       }
       if (e.code === 'Backspace' || e.code === 'Delete') {
+        if (readOnly) return;
         e.preventDefault();
         const selSection = selectedSectionIdRef.current;
         if (selSection) {
@@ -732,6 +748,7 @@ export default function Index() {
         }
       }
       if (e.code === 'Comma' || e.code === 'Period') {
+        if (readOnly) return;
         e.preventDefault();
         const selId = selectedSectionIdRef.current;
         if (!selId) return;
@@ -851,25 +868,30 @@ export default function Index() {
   }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleJoinModular, handleSplitModular, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
   }, []);
 
   const handleNotesChange = useCallback((id: string, notes: string) => {
+    if (readOnly) return;
     setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
   }, []);
 
   const handleChordLinesChange = useCallback((id: string, chordLines: import('@/lib/sections').ChordLine[]) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, chordLines } : s));
   }, [pushUndo]);
 
   const handleLyricLinesChange = useCallback((id: string, lyricLines: import('@/lib/sections').LyricLine[]) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, lyricLines } : s));
   }, [pushUndo]);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === sectionId);
@@ -904,17 +926,20 @@ export default function Index() {
   }, []);
 
   const handleVcuLabelChange = useCallback((id: string, label: string) => {
+    if (readOnly) return;
     pushUndo();
     setVcuSpans(prev => prev.map(v => v.id === id ? { ...v, label } : v));
   }, []);
 
   const handleDeleteVcu = useCallback((id: string) => {
+    if (readOnly) return;
     pushUndo();
     setVcuSpans(prev => prev.filter(v => v.id !== id));
     setSelectedVcuId(null);
   }, []);
 
   const handleBarsChange = useCallback((id: string, bars: string | null) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, bars } : s));
   }, []);
@@ -957,6 +982,11 @@ export default function Index() {
           <div className="flex items-center gap-2.5">
             <Music className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-semibold font-display tracking-tight">Formal Analysis</h1>
+            {readOnly && (
+              <span className="ml-1 px-1.5 py-0.5 rounded border border-border bg-secondary text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                Read-only
+              </span>
+            )}
           </div>
           {(file || audioUrl) && (
             <button
