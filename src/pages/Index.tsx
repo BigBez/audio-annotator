@@ -104,9 +104,9 @@ export default function Index() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const audioUrl = params.get('audio');
+    const audioParam = params.get('audio');
     const analysisUrl = params.get('analysis');
-    if (!audioUrl) return;
+    if (!audioParam) return;
 
     (async () => {
       try {
@@ -121,13 +121,10 @@ export default function Index() {
           }
         }
 
-        // 2. Fetch audio, then set the file so WaveSurfer mounts and initializes.
-        const audioRes = await fetch(audioUrl);
-        if (!audioRes.ok) throw new Error('Audio fetch failed');
-        const audioBlob = await audioRes.blob();
-        const filename = audioUrl.split('/').pop()?.split('?')[0] || 'audio';
-        const audioFile = new File([audioBlob], filename, { type: 'audio/mpeg' });
-        setFile(audioFile);
+        // 2. Load audio directly via WaveSurfer's URL loader (no fetch/blob/File needed).
+        const filename = audioParam.split('/').pop()?.split('?')[0] || 'audio';
+        setAudioUrlName(filename);
+        setAudioUrl(audioParam);
         // Pending analysis will be applied by the duration-ready effect below.
       } catch (err) {
         toast({ title: 'Load failed', description: err instanceof Error ? err.message : 'Could not load from URL.' });
