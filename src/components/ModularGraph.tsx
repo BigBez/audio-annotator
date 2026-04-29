@@ -41,6 +41,7 @@ interface ModularGraphProps {
   onLabelChange: (id: string, label: string) => void;
   onModularStateChange: (state: ModularGraphState) => void;
   pushUndo: () => void;
+  readOnly?: boolean;
 }
 
 export default function ModularGraph({
@@ -58,6 +59,7 @@ export default function ModularGraph({
   onLabelChange,
   onModularStateChange,
   pushUndo,
+  readOnly = false,
 }: ModularGraphProps) {
   const { boxWidths, joinedGroups, barCounts, boxColors } = modularState;
 
