@@ -35,6 +35,7 @@ export default function WaveformPlayer({
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (!file && !audioUrl) return;
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
@@ -49,7 +50,11 @@ export default function WaveformPlayer({
       normalize: true,
     });
 
-    ws.loadBlob(file);
+    if (file) {
+      ws.loadBlob(file);
+    } else if (audioUrl) {
+      ws.load(audioUrl);
+    }
 
     ws.on('ready', () => {
       const d = ws.getDuration();
