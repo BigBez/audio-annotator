@@ -25,6 +25,8 @@ interface UndoSnapshot {
 
 export default function Index() {
   const [file, setFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrlName, setAudioUrlName] = useState<string>('');
   const [sections, setSections] = useState<Section[]>([]);
   const [vcuSpans, setVcuSpans] = useState<VcuSpan[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
