@@ -655,18 +655,22 @@ export default function Index() {
         wavesurferRef.current?.playPause();
       }
       if (e.code === 'Enter') {
+        if (readOnly) return;
         e.preventDefault();
         handleBoundary();
       }
       if (e.code === 'KeyG' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleCreateGroup();
       }
       if (e.code === 'KeyJ' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleJoinModular();
       }
       if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) {
+        if (readOnly) return;
         e.preventDefault();
         handleSplitModular();
       }
