@@ -398,6 +398,7 @@ export default function Index() {
 
   // Split modular graph joined group (S key)
   const handleSplitModular = useCallback(() => {
+    if (readOnly) return;
     const selId = selectedSectionIdRef.current;
     const shiftIds = shiftSelectedIdsRef.current;
     const cmdIds = cmdSelectedIdsRef.current;
