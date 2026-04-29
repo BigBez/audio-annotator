@@ -632,6 +632,7 @@ export default function Index() {
   }, [pushUndo]);
 
   const handleColorChange = useCallback((ids: string[], color: string) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => ids.includes(s.id) ? { ...s, color } : s));
     setShiftSelectedIds(new Set());
