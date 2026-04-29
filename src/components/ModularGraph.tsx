@@ -403,6 +403,7 @@ export default function ModularGraph({
                           onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            if (readOnly) return;
                             setEditingGroupLabel(selectedGroup.id);
                             setGroupLabelValue(selectedGroup.label);
                           }}
