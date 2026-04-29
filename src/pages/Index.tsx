@@ -340,6 +340,7 @@ export default function Index() {
 
   // Create modular graph joined group from selected sections (J key)
   const handleJoinModular = useCallback(() => {
+    if (readOnly) return;
     const cmd = cmdSelectedIdsRef.current;
     const shift = shiftSelectedIdsRef.current;
     const sel = selectedSectionIdRef.current;
