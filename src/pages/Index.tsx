@@ -124,7 +124,7 @@ export default function Index() {
         if (!audioRes.ok) throw new Error('Audio fetch failed');
         const audioBlob = await audioRes.blob();
         const filename = audioUrl.split('/').pop()?.split('?')[0] || 'audio';
-        const audioFile = new File([audioBlob], filename, { type: audioBlob.type || 'audio/mpeg' });
+        const audioFile = new File([audioBlob], filename, { type: 'audio/mpeg' });
         setFile(audioFile);
         // Pending analysis will be applied by the duration-ready effect below.
       } catch (err) {
