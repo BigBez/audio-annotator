@@ -982,6 +982,11 @@ export default function Index() {
           <div className="flex items-center gap-2.5">
             <Music className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-semibold font-display tracking-tight">Formal Analysis</h1>
+            {readOnly && (
+              <span className="ml-1 px-1.5 py-0.5 rounded border border-border bg-secondary text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                Read-only
+              </span>
+            )}
           </div>
           {(file || audioUrl) && (
             <button
