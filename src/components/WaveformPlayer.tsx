@@ -79,7 +79,7 @@ export default function WaveformPlayer({
     wavesurferRef.current = ws;
 
     return () => { ws.destroy(); };
-  }, [file]);
+  }, [file, audioUrl]);
 
   return (
     <div>
