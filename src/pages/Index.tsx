@@ -591,6 +591,7 @@ export default function Index() {
   }, [file]);
 
   const handleDeleteSection = useCallback((id: string) => {
+    if (readOnly) return;
     pushUndo();
     let absorbingId: string | null = null;
     setSections(prev => {
