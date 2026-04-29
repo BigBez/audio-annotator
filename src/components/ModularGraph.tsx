@@ -41,6 +41,7 @@ interface ModularGraphProps {
   onLabelChange: (id: string, label: string) => void;
   onModularStateChange: (state: ModularGraphState) => void;
   pushUndo: () => void;
+  readOnly?: boolean;
 }
 
 export default function ModularGraph({
@@ -58,6 +59,7 @@ export default function ModularGraph({
   onLabelChange,
   onModularStateChange,
   pushUndo,
+  readOnly = false,
 }: ModularGraphProps) {
   const { boxWidths, joinedGroups, barCounts, boxColors } = modularState;
 
@@ -179,6 +181,7 @@ export default function ModularGraph({
           style={{ width: w, height: 24 }}
           onClick={(e) => {
             e.stopPropagation();
+            if (readOnly) return;
             setEditingBarCount(section.id);
             setBarCountValue(getBarCount(section.id));
           }}
@@ -277,6 +280,7 @@ export default function ModularGraph({
                       onMouseDown={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        if (readOnly) return;
                         setEditingGroupLabel(group.id);
                         setGroupLabelValue(group.label);
                       }}
@@ -399,6 +403,7 @@ export default function ModularGraph({
                           onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            if (readOnly) return;
                             setEditingGroupLabel(selectedGroup.id);
                             setGroupLabelValue(selectedGroup.label);
                           }}
