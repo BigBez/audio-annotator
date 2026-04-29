@@ -62,32 +62,32 @@ export default function Index() {
       toast({ title: 'Invalid analysis', description: 'No sections found in JSON.' });
       return;
     }
-    const imported: Section[] = data.sections.map((s: any) => ({
-      id: s.id,
-      start: s.start,
-      end: s.end,
-      label: s.label,
-      color: s.color,
-      notes: s.content?.notes ?? s.notes ?? '',
-      bars: s.bars ?? null,
-      chordLines: s.chordLines ?? s.content?.chordLines ?? [],
-      lyricLines: s.lyricLines ?? s.content?.lyricLines ?? [],
+
+    const imported: Section[] = data.sections.map((section: any) => ({
+      id: section.id,
+      start: section.start,
+      end: section.end,
+      label: section.label,
+      color: section.color,
+      notes: section.content?.notes ?? section.notes ?? '',
+      bars: section.bars ?? null,
+      chordLines: section.chordLines ?? section.content?.chordLines ?? [],
+      lyricLines: section.lyricLines ?? section.content?.lyricLines ?? [],
     }));
+
     setSections(imported);
-    if (imported.length > 0) {
-      boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
-    } else {
-      boundariesRef.current = [];
-    }
+    boundariesRef.current = imported.length > 0 ? [imported[0].start, ...imported.map(section => section.end)] : [];
+
     if (data.vcuSpans && Array.isArray(data.vcuSpans)) {
-      setVcuSpans(data.vcuSpans.map((v: any) => ({
-        id: v.id,
-        label: v.label,
-        sectionIds: v.sectionIds,
+      setVcuSpans(data.vcuSpans.map((span: any) => ({
+        id: span.id,
+        label: span.label,
+        sectionIds: span.sectionIds,
       })));
     } else {
       setVcuSpans([]);
     }
+
     if (data.modularGraph) {
       setModularGraph({
         boxWidths: data.modularGraph.boxWidths ?? {},
