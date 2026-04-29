@@ -158,6 +158,7 @@ export default function Index() {
   }, []);
 
   const handleBoundary = useCallback(() => {
+    if (readOnly) return;
     const ws = wavesurferRef.current;
     if (!ws) return;
     const time = ws.getCurrentTime();
