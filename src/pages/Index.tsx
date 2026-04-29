@@ -1097,6 +1097,7 @@ export default function Index() {
                 onLabelChange={handleLabelChange}
                 onModularStateChange={setModularGraph}
                 pushUndo={pushUndo}
+                readOnly={readOnly}
               />
             )}
           </>
