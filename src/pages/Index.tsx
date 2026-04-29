@@ -476,10 +476,10 @@ export default function Index() {
 
   // Save analysis as JSON
   const handleSave = useCallback(() => {
-    if (!file || sections.length === 0) return;
+    if ((!file && !audioUrl) || sections.length === 0) return;
     const data = {
       schemaVersion: 1,
-      audioFilename: file.name,
+      audioFilename: file ? file.name : audioUrlName,
       sections: sections.map(s => ({
         id: s.id,
         start: s.start,
