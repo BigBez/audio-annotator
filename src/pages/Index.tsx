@@ -55,6 +55,51 @@ export default function Index() {
   const modularGraphRef = useRef<ModularGraphState>(DEFAULT_MODULAR_STATE);
   modularGraphRef.current = modularGraph;
 
+  const pendingAnalysisRef = useRef<any | null>(null);
+
+  const applyAnalysisData = useCallback((data: any) => {
+    if (!data.sections || !Array.isArray(data.sections)) {
+      toast({ title: 'Invalid analysis', description: 'No sections found in JSON.' });
+      return;
+    }
+    const imported: Section[] = data.sections.map((s: any) => ({
+      id: s.id,
+      start: s.start,
+      end: s.end,
+      label: s.label,
+      color: s.color,
+      notes: s.content?.notes ?? s.notes ?? '',
+      bars: s.bars ?? null,
+      chordLines: s.chordLines ?? s.content?.chordLines ?? [],
+      lyricLines: s.lyricLines ?? s.content?.lyricLines ?? [],
+    }));
+    setSections(imported);
+    if (imported.length > 0) {
+      boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
+    } else {
+      boundariesRef.current = [];
+    }
+    if (data.vcuSpans && Array.isArray(data.vcuSpans)) {
+      setVcuSpans(data.vcuSpans.map((v: any) => ({
+        id: v.id,
+        label: v.label,
+        sectionIds: v.sectionIds,
+      })));
+    } else {
+      setVcuSpans([]);
+    }
+    if (data.modularGraph) {
+      setModularGraph({
+        boxWidths: data.modularGraph.boxWidths ?? {},
+        joinedGroups: data.modularGraph.joinedGroups ?? [],
+        barCounts: data.modularGraph.barCounts ?? {},
+        boxColors: data.modularGraph.boxColors ?? {},
+      });
+    } else {
+      setModularGraph(DEFAULT_MODULAR_STATE);
+    }
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const audioUrl = params.get('audio');
@@ -63,63 +108,39 @@ export default function Index() {
 
     (async () => {
       try {
+        // 1. Fetch analysis JSON first (if provided), but DON'T apply yet.
+        if (analysisUrl) {
+          try {
+            const analysisRes = await fetch(analysisUrl);
+            if (!analysisRes.ok) throw new Error('Analysis fetch failed');
+            pendingAnalysisRef.current = await analysisRes.json();
+          } catch (err) {
+            toast({ title: 'Analysis load failed', description: err instanceof Error ? err.message : 'Could not load analysis.' });
+          }
+        }
+
+        // 2. Fetch audio, then set the file so WaveSurfer mounts and initializes.
         const audioRes = await fetch(audioUrl);
         if (!audioRes.ok) throw new Error('Audio fetch failed');
         const audioBlob = await audioRes.blob();
         const filename = audioUrl.split('/').pop()?.split('?')[0] || 'audio';
         const audioFile = new File([audioBlob], filename, { type: audioBlob.type || 'audio/mpeg' });
         setFile(audioFile);
-
-        if (analysisUrl) {
-          const analysisRes = await fetch(analysisUrl);
-          if (!analysisRes.ok) throw new Error('Analysis fetch failed');
-          const data = await analysisRes.json();
-          if (!data.sections || !Array.isArray(data.sections)) {
-            toast({ title: 'Invalid analysis', description: 'No sections found in JSON.' });
-            return;
-          }
-          const imported: Section[] = data.sections.map((s: any) => ({
-            id: s.id,
-            start: s.start,
-            end: s.end,
-            label: s.label,
-            color: s.color,
-            notes: s.content?.notes ?? s.notes ?? '',
-            bars: s.bars ?? null,
-            chordLines: s.chordLines ?? s.content?.chordLines ?? [],
-            lyricLines: s.lyricLines ?? s.content?.lyricLines ?? [],
-          }));
-          setSections(imported);
-          if (imported.length > 0) {
-            boundariesRef.current = [imported[0].start, ...imported.map(s => s.end)];
-          } else {
-            boundariesRef.current = [];
-          }
-          if (data.vcuSpans && Array.isArray(data.vcuSpans)) {
-            setVcuSpans(data.vcuSpans.map((v: any) => ({
-              id: v.id,
-              label: v.label,
-              sectionIds: v.sectionIds,
-            })));
-          } else {
-            setVcuSpans([]);
-          }
-          if (data.modularGraph) {
-            setModularGraph({
-              boxWidths: data.modularGraph.boxWidths ?? {},
-              joinedGroups: data.modularGraph.joinedGroups ?? [],
-              barCounts: data.modularGraph.barCounts ?? {},
-              boxColors: data.modularGraph.boxColors ?? {},
-            });
-          } else {
-            setModularGraph(DEFAULT_MODULAR_STATE);
-          }
-        }
+        // Pending analysis will be applied by the duration-ready effect below.
       } catch (err) {
         toast({ title: 'Load failed', description: err instanceof Error ? err.message : 'Could not load from URL.' });
       }
     })();
   }, []);
+
+  // Apply pending analysis only after WaveSurfer reports a valid duration.
+  useEffect(() => {
+    if (duration > 0 && pendingAnalysisRef.current) {
+      const data = pendingAnalysisRef.current;
+      pendingAnalysisRef.current = null;
+      applyAnalysisData(data);
+    }
+  }, [duration, applyAnalysisData]);
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
