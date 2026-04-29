@@ -736,6 +736,7 @@ export default function Index() {
         return;
       }
       if (e.code === 'Backspace' || e.code === 'Delete') {
+        if (readOnly) return;
         e.preventDefault();
         const selSection = selectedSectionIdRef.current;
         if (selSection) {
@@ -747,6 +748,7 @@ export default function Index() {
         }
       }
       if (e.code === 'Comma' || e.code === 'Period') {
+        if (readOnly) return;
         e.preventDefault();
         const selId = selectedSectionIdRef.current;
         if (!selId) return;
