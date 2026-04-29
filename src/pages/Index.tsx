@@ -862,25 +862,30 @@ export default function Index() {
   }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleJoinModular, handleSplitModular, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, label } : s));
   }, []);
 
   const handleNotesChange = useCallback((id: string, notes: string) => {
+    if (readOnly) return;
     setSections(prev => prev.map(s => s.id === id ? { ...s, notes } : s));
   }, []);
 
   const handleChordLinesChange = useCallback((id: string, chordLines: import('@/lib/sections').ChordLine[]) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, chordLines } : s));
   }, [pushUndo]);
 
   const handleLyricLinesChange = useCallback((id: string, lyricLines: import('@/lib/sections').LyricLine[]) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, lyricLines } : s));
   }, [pushUndo]);
 
   const handleBoundaryEdit = useCallback((sectionId: string, field: 'start' | 'end', newValue: number) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => {
       const idx = prev.findIndex(s => s.id === sectionId);
@@ -915,17 +920,20 @@ export default function Index() {
   }, []);
 
   const handleVcuLabelChange = useCallback((id: string, label: string) => {
+    if (readOnly) return;
     pushUndo();
     setVcuSpans(prev => prev.map(v => v.id === id ? { ...v, label } : v));
   }, []);
 
   const handleDeleteVcu = useCallback((id: string) => {
+    if (readOnly) return;
     pushUndo();
     setVcuSpans(prev => prev.filter(v => v.id !== id));
     setSelectedVcuId(null);
   }, []);
 
   const handleBarsChange = useCallback((id: string, bars: string | null) => {
+    if (readOnly) return;
     pushUndo();
     setSections(prev => prev.map(s => s.id === id ? { ...s, bars } : s));
   }, []);
