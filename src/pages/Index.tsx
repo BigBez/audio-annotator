@@ -1007,6 +1007,7 @@ export default function Index() {
               </div>
               <WaveformPlayer
                 file={file}
+                audioUrl={audioUrl}
                 onTimeUpdate={setCurrentTime}
                 onDurationReady={setDuration}
                 onPlayStateChange={setIsPlaying}
