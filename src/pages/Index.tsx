@@ -936,6 +936,8 @@ export default function Index() {
     wavesurferRef.current?.destroy();
     wavesurferRef.current = null;
     setFile(null);
+    setAudioUrl(null);
+    setAudioUrlName('');
     setSections([]);
     setVcuSpans([]);
     setCurrentTime(0);
