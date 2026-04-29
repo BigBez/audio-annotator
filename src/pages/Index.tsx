@@ -302,6 +302,7 @@ export default function Index() {
 
   // Create VCU group from shift or cmd selected sections
   const handleCreateGroup = useCallback(() => {
+    if (readOnly) return;
     const shift = shiftSelectedIdsRef.current;
     const cmd = cmdSelectedIdsRef.current;
     const allSelected = new Set([...shift, ...cmd]);
