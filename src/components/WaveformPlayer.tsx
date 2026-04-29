@@ -10,7 +10,8 @@ function formatTime(seconds: number | undefined): string {
 }
 
 interface WaveformPlayerProps {
-  file: File;
+  file?: File | null;
+  audioUrl?: string | null;
   onTimeUpdate: (time: number) => void;
   onDurationReady: (duration: number) => void;
   onPlayStateChange: (playing: boolean) => void;
@@ -21,6 +22,7 @@ interface WaveformPlayerProps {
 
 export default function WaveformPlayer({
   file,
+  audioUrl,
   onTimeUpdate,
   onDurationReady,
   onPlayStateChange,
