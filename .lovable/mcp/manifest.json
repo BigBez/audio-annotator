@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "audio-annotator-mcp",
+      "version": "0.1.0",
+      "title": "Audio Annotator"
+    },
+    "tools": [
+      {
+        "name": "get_demo",
+        "title": "Get demo analysis links",
+        "description": "Return the built-in demo audio URL, demo analysis JSON URL, and a ready-to-open read-only viewer URL for the bundled 'Beautiful Mistakes' example.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "build_viewer_url",
+        "title": "Build read-only viewer URL",
+        "description": "Build a shareable read-only Audio Annotator URL that opens an audio file with a prebuilt analysis JSON. The generated URL opens the app in read-only mode.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "audioUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Public HTTPS URL to an audio file (mp3, wav, etc.)."
+            },
+            "analysisUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Optional public HTTPS URL to an analysis JSON file."
+            }
+          },
+          "required": [
+            "audioUrl"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "fetch_analysis_summary",
+        "title": "Fetch analysis summary",
+        "description": "Fetch an Audio Annotator analysis JSON from a public URL and return a compact summary: duration, section count, section labels with timings, and detected VCU groups.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "analysisUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Public HTTPS URL to an analysis JSON file."
+            }
+          },
+          "required": [
+            "analysisUrl"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
