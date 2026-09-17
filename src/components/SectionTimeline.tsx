@@ -115,10 +115,8 @@ export default function SectionTimeline({
       if (c) maxChords = Math.max(maxChords, c.scrollHeight);
         if (n) maxNotes = Math.max(maxNotes, n.scrollHeight);
       });
-      // Lyrics: calculate mathematically from data — no DOM measurement
-      const maxLyricLines = sections.reduce((m, s) => Math.max(m, s.lyricLines?.length ?? 0), 0);
-      const lyricsHeight = maxLyricLines > 0 ? maxLyricLines * 30 + 48 : 0;
-      setLockedHeights({ chords: maxChords, lyrics: lyricsHeight, notes: maxNotes });
+      // Lyrics: no locked height — panel resizes to the current section's content
+      setLockedHeights({ chords: maxChords, lyrics: 0, notes: maxNotes });
       setMeasuring(false);
     });
     return () => cancelAnimationFrame(raf);
@@ -438,7 +436,7 @@ export default function SectionTimeline({
                           <span className={lyricsOpen ? 'text-[10px] text-muted-foreground' : ''}>Lyrics</span>
                         </button>
                         {lyricsOpen && (
-                          <div ref={lyricsContentRef} className="px-3 pb-2" style={lockedHeights ? { height: lockedHeights.lyrics } : undefined}>
+                          <div ref={lyricsContentRef} className="px-3 pb-2">
                             <LyricsPanel
                               lyricLines={selectedSection.lyricLines}
                               currentTime={currentTime}
