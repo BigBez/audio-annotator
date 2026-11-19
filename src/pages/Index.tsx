@@ -116,7 +116,11 @@ export default function Index() {
 
     (async () => {
       try {
-        // 1. Fetch analysis JSON first (if provided), but DON'T apply yet.
+        // 1. Load audio directly via WaveSurfer's URL loader (no fetch/blob/File needed).
+        const filename = audioParam.split('/').pop()?.split('?')[0] || 'audio';
+        setAudioUrlName(filename);
+        setAudioUrl(audioParam);
+        // 2. Fetch analysis JSON in parallel; applied once duration is ready.
         if (analysisUrl) {
           try {
             const analysisRes = await fetch(analysisUrl);
@@ -128,10 +132,6 @@ export default function Index() {
           }
         }
 
-        // 2. Load audio directly via WaveSurfer's URL loader (no fetch/blob/File needed).
-        const filename = audioParam.split('/').pop()?.split('?')[0] || 'audio';
-        setAudioUrlName(filename);
-        setAudioUrl(audioParam);
         // Pending analysis will be applied by the duration-ready effect below.
       } catch (err) {
         toast({ title: 'Load failed', description: err instanceof Error ? err.message : 'Could not load from URL.' });
