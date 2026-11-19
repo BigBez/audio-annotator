@@ -63,6 +63,7 @@ export default function Index() {
   modularGraphRef.current = modularGraph;
 
   const pendingAnalysisRef = useRef<any | null>(null);
+  const [analysisReady, setAnalysisReady] = useState<boolean>(() => !new URLSearchParams(window.location.search).get('analysis'));
 
   const applyAnalysisData = useCallback((data: any) => {
     if (!data.sections || !Array.isArray(data.sections)) {
@@ -122,6 +123,7 @@ export default function Index() {
             if (!analysisRes.ok) throw new Error('Analysis fetch failed');
             pendingAnalysisRef.current = await analysisRes.json();
           } catch (err) {
+            setAnalysisReady(true);
             toast({ title: 'Analysis load failed', description: err instanceof Error ? err.message : 'Could not load analysis.' });
           }
         }
@@ -143,8 +145,23 @@ export default function Index() {
       const data = pendingAnalysisRef.current;
       pendingAnalysisRef.current = null;
       applyAnalysisData(data);
+      setAnalysisReady(true);
     }
   }, [duration, applyAnalysisData]);
+  // Retry when analysis arrives after duration is already known
+  useEffect(() => {
+    if (analysisReady || !(duration > 0)) return;
+    const id = setInterval(() => {
+      if (pendingAnalysisRef.current) {
+        const data = pendingAnalysisRef.current;
+        pendingAnalysisRef.current = null;
+        applyAnalysisData(data);
+        setAnalysisReady(true);
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [analysisReady, duration, applyAnalysisData]);
+  const readOnlyLoading = readOnly && (!(duration > 0) || !analysisReady);
 
   const pushUndo = useCallback(() => {
     undoStackRef.current.push({
@@ -652,6 +669,7 @@ export default function Index() {
       }
       if (e.code === 'Space') {
         e.preventDefault();
+        if (readOnlyLoading) return;
         wavesurferRef.current?.playPause();
       }
       if (e.code === 'Enter') {
@@ -865,7 +883,7 @@ export default function Index() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleJoinModular, handleSplitModular, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo]);
+  }, [handleBoundary, handleUndo, handleRedo, handleSave, handleCreateGroup, handleJoinModular, handleSplitModular, handleDeleteSection, handleSectionSelect, selectedVcuId, pushUndo, readOnlyLoading]);
 
   const handleLabelChange = useCallback((id: string, label: string) => {
     if (readOnly) return;
@@ -1023,12 +1041,16 @@ export default function Index() {
                 <Square className="h-3 w-3" />
               </button>
               <button
-                onClick={() => wavesurferRef.current?.playPause()}
-                className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
+                onClick={() => { if (!readOnlyLoading) wavesurferRef.current?.playPause(); }}
+                disabled={readOnlyLoading}
+                className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Play/Pause"
               >
                 {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 ml-0.5" />}
               </button>
+              {readOnlyLoading && (
+                <span className="text-[10px] text-muted-foreground font-mono shrink-0 animate-pulse">Loading analysis…</span>
+              )}
               <span className="text-[10px] text-muted-foreground font-mono shrink-0">Space = Play/Pause · Enter = Mark Section</span>
             </div>
 

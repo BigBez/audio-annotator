@@ -100,6 +100,16 @@ export default function SectionTimeline({
     wasPlayingRef.current = isPlaying;
   }, [isPlaying, sections]);
 
+  // Read-only: if sections change mid-playback (e.g. analysis finished loading after play), re-evaluate
+  useEffect(() => {
+    if (!readOnly || !isPlaying || !wasPlayingRef.current) return;
+    const anyChords = sections.some(s => s.chordLines && s.chordLines.length > 0);
+    const anyLyrics = sections.some(s => s.lyricLines && s.lyricLines.length > 0);
+    const anyNotes = sections.some(s => s.notes && s.notes.trim().length > 0);
+    setLockedVisibility({ chords: anyChords, lyrics: anyLyrics, notes: anyNotes });
+    setMeasuring(true);
+  }, [readOnly, sections]);
+
   // After measurement container renders, read max heights and lock
   useEffect(() => {
     if (!measuring || !measureContainerRef.current) return;
