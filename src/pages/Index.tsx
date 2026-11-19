@@ -1077,6 +1077,7 @@ export default function Index() {
                     onLyricLinesChange={handleLyricLinesChange}
                     onVcuLabelChange={handleVcuLabelChange}
                     onDeleteVcu={handleDeleteVcu}
+                    readOnly={readOnly}
                   />
               )}
             </div>

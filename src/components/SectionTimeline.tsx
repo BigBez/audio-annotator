@@ -31,7 +31,7 @@ interface SectionTimelineProps {
   onLyricLinesChange: (id: string, lyricLines: LyricLine[]) => void;
   onVcuLabelChange: (id: string, label: string) => void;
   onDeleteVcu: (id: string) => void;
-  
+  readOnly?: boolean;
 }
 
 export default function SectionTimeline({
@@ -59,7 +59,7 @@ export default function SectionTimeline({
   onLyricLinesChange,
   onVcuLabelChange,
   onDeleteVcu,
-  
+  readOnly = false,
 }: SectionTimelineProps) {
   const setSelectedId = onSelectedIdChange;
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
@@ -121,6 +121,18 @@ export default function SectionTimeline({
     });
     return () => cancelAnimationFrame(raf);
   }, [measuring]);
+
+  // Read-only mode: auto-expand panels based on the playhead's active section during playback.
+  // Re-applies whenever playback moves to a new section; manual toggles still work between section changes.
+  const playheadSectionId = sections.find(s => currentTime >= s.start && currentTime < s.end)?.id ?? null;
+  useEffect(() => {
+    if (!readOnly || !isPlaying || !playheadSectionId) return;
+    const active = sections.find(s => s.id === playheadSectionId);
+    if (!active) return;
+    setChordsOpen((active.chordLines?.length ?? 0) > 0);
+    setLyricsOpen((active.lyricLines?.length ?? 0) > 0);
+    setNotesOpen(!!active.notes && active.notes.trim().length > 0);
+  }, [readOnly, isPlaying, playheadSectionId, sections]);
 
 
   if (sections.length === 0) {
